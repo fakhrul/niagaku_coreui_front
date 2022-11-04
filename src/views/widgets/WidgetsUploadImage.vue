@@ -31,7 +31,7 @@
       <!--SUCCESS-->
       <div v-if="isSuccess">
 
-        <ul class="list-unstyled">
+        <!-- <ul class="list-unstyled">
           <li v-for="item in uploadedFiles">
             <img
               :src="item.url"
@@ -39,7 +39,7 @@
               :alt="item.originalName"
             />
           </li>
-        </ul>
+        </ul> -->
         <p>
           <a href="javascript:void(0)" @click="reset()"
             >Click to upload again</a

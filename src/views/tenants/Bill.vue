@@ -18,7 +18,6 @@
           <CCard>
             <CCardHeader>
               <strong> Bill </strong> Image
-
               <div class="card-header-actions">
                 <div class="row">
                   <div class="col-2"></div>
@@ -58,7 +57,7 @@
                       <span class="material-icons">paid</span>
                     </a>
                   </div>
-                  <div
+                  <!-- <div
                     class="col-2"
                     @click="toolClick('items')"
                     v-c-tooltip="'Items'"
@@ -66,13 +65,13 @@
                     <a>
                       <span class="material-icons">list</span>
                     </a>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </CCardHeader>
             <CCardBody>
               <CForm>
-                <CRow>
+                <CRow >
                   <CCol sm="12">
                     <v-stage
                       ref="stage"
@@ -88,8 +87,7 @@
                       @click="handleStageMouseClick"
                     >
                       <v-layer>
-
-
+                        <!-- Company Name -->
                         <v-image
                           ref="image"
                           :config="{
@@ -98,25 +96,136 @@
                             image: image,
                           }"
                         />
-                        <v-rect
-                          :config="drawCompany"
+                        <v-line :config="obj.drawCompany" />
+                        <v-circle
+                          v-for="anchor in getAnchors(obj.drawCompany)"
+                          :key="anchor.code"
+                          :config="{
+                            roomId: anchor.roomId,
+                            roomCode: anchor.roomCode,
+                            pointFirstIndex: anchor.pointFirstIndex,
+                            code: anchor.code,
+                            x: anchor.x,
+                            y: anchor.y,
+                            radius: 4,
+                            fill: 'white',
+                            stroke: 'black',
+                            draggable: true,
+                          }"
                         />
-                        <!-- <v-line :config="drawCompany" /> -->
+                        <v-label
+                          :config="{
+                            x: getCenterOfShape(obj.drawCompany)[0], // item.points[0],
+                            y: getCenterOfShape(obj.drawCompany)[1], //item.points[1],
+                          }"
+                        >
+                          <v-text
+                            :config="{
+                              text: getLableInfo(obj.drawCompany),
+                              fill: 'white',
+                            }"
+                          />
+                        </v-label>
+
+                        <!-- Bill Date -->
+                        <v-line :config="obj.drawDate" />
+                        <v-circle
+                          v-for="anchor in getAnchors(obj.drawDate)"
+                          :key="anchor.code"
+                          :config="{
+                            roomId: anchor.roomId,
+                            roomCode: anchor.roomCode,
+                            pointFirstIndex: anchor.pointFirstIndex,
+                            code: anchor.code,
+                            x: anchor.x,
+                            y: anchor.y,
+                            radius: 4,
+                            fill: 'white',
+                            stroke: 'black',
+                            draggable: true,
+                          }"
+                        />
+                        <v-label
+                          :config="{
+                            x: getCenterOfShape(obj.drawDate)[0], // item.points[0],
+                            y: getCenterOfShape(obj.drawDate)[1], //item.points[1],
+                          }"
+                        >
+                          <v-text
+                            :config="{
+                              text: getLableInfo(obj.drawDate),
+                              fill: 'white',
+                            }"
+                          />
+                        </v-label>
+
+                        <!-- Bill No -->
+                        <v-line :config="obj.drawBillNo" />
+                        <v-circle
+                          v-for="anchor in getAnchors(obj.drawBillNo)"
+                          :key="anchor.code"
+                          :config="{
+                            roomId: anchor.roomId,
+                            roomCode: anchor.roomCode,
+                            pointFirstIndex: anchor.pointFirstIndex,
+                            code: anchor.code,
+                            x: anchor.x,
+                            y: anchor.y,
+                            radius: 4,
+                            fill: 'white',
+                            stroke: 'black',
+                            draggable: true,
+                          }"
+                        />
+                        <v-label
+                          :config="{
+                            x: getCenterOfShape(obj.drawBillNo)[0], // item.points[0],
+                            y: getCenterOfShape(obj.drawBillNo)[1], //item.points[1],
+                          }"
+                        >
+                          <v-text
+                            :config="{
+                              text: getLableInfo(obj.drawBillNo),
+                              fill: 'white',
+                            }"
+                          />
+                        </v-label>
+
+                        <!-- Total Amount -->
+                        <v-line :config="obj.drawTotalAmount" />
+                        <v-circle
+                          v-for="anchor in getAnchors(obj.drawTotalAmount)"
+                          :key="anchor.code"
+                          :config="{
+                            roomId: anchor.roomId,
+                            roomCode: anchor.roomCode,
+                            pointFirstIndex: anchor.pointFirstIndex,
+                            code: anchor.code,
+                            x: anchor.x,
+                            y: anchor.y,
+                            radius: 4,
+                            fill: 'white',
+                            stroke: 'black',
+                            draggable: true,
+                          }"
+                        />
+                        <v-label
+                          :config="{
+                            x: getCenterOfShape(obj.drawTotalAmount)[0], // item.points[0],
+                            y: getCenterOfShape(obj.drawTotalAmount)[1], //item.points[1],
+                          }"
+                        >
+                          <v-text
+                            :config="{
+                              text: getLableInfo(obj.drawTotalAmount),
+                              fill: 'white',
+                            }"
+                          />
+                        </v-label>
                       </v-layer>
                     </v-stage>
                   </CCol>
                 </CRow>
-                <!-- <CRow form class="form-group">
-                  <CCol sm="12">
-                    <CImg
-                      :src="billImageUrl"
-                      class="mb-2"
-                      width="100%"
-                      v-if="obj.documentId"
-                    />
-                  </CCol>
-                </CRow> -->
-
                 <CRow form class="form-group">
                   <CCol sm="12">
                     <WidgetsUploadImage
@@ -165,8 +274,9 @@
             </CCardBody>
             <CCardFooter>
               <CButton type="submit" size="sm" color="primary" @click="submit"
-                ><CIcon name="cil-check-circle" /> Submit</CButton
+                >Submit</CButton
               >
+              <CButton size="sm" color="primary" @click="addNew">New</CButton>
             </CCardFooter>
           </CCard>
         </CCol>
@@ -199,22 +309,22 @@ export default {
   },
   data: () => {
     return {
-      drawCompany: null,
       organizationTypeList: [],
       infoList: [],
       uploadedFiles: [],
       image: null,
       stageSize: {
-        width: 3000,
-        height: 3000,
+        width: 20,
+        height: 20,
       },
       obj: {
         drawCompanyId: "",
         drawCompany: {
           code: "",
+          name:"",
         },
         date: new Date(),
-        assemblyConcentrated: "",
+        documentId: "",
         assemblyLessConcentrated: "",
         standingSpace: "",
         kitchen: "",
@@ -247,6 +357,11 @@ export default {
   //   },
   // },
   computed: {
+    isBillImageUrl() {
+      if (this.obj.documentId == null) return false;
+      if (this.obj.documentId == "") return false;
+      return true;
+    },
     billImageUrl() {
       var self = this;
       return (
@@ -265,22 +380,60 @@ export default {
       console.log("drawingMeta value changed", newVal);
     },
 
-    billImageUrl(newVal, oldVal) {
+    // billImageUrl(newVal, oldVal) {
+    //   const image = new window.Image();
+    //   image.src = this.billImageUrl;
+    //   image.crossOrigin = "anonymous";
+    //   image.onload = () => {
+    //     this.image = image;
+    //     this.stageSize.width = image.width;
+    //     this.stageSize.height = image.height;
+    //   };
+    // },
+  },
+
+  methods: {
+    loadImage(){
       const image = new window.Image();
       image.src = this.billImageUrl;
       image.crossOrigin = "anonymous";
       image.onload = () => {
         this.image = image;
-
         this.stageSize.width = image.width;
         this.stageSize.height = image.height;
-
-        this.drawCompany = this.obj.drawCompany;
       };
     },
-  },
+    getLableInfo(item) {
+      if (item) return item.name;
+      return "";
+    },
+    getCenterOfShape(draw) {
+      if (draw == undefined) return [0, 0];
+      if (draw.points == undefined) return [0, 0];
+      if (draw.points.length < 2) return [0, 0];
+      return drawing.getCenterOfShape(draw.points);
+    },
+    getAnchors(item) {
+      var anchors = [];
+      var room = item;
+      if (room == null) return [];
+      if (room.points == null) return [];
+      if (room.points.length == 0) return [];
 
-  methods: {
+      for (let i = 0; i < room.points.length; i += 2) {
+        var anchorCode = room.code + "_points_" + i;
+        anchors.push({
+          roomId: room.id,
+          roomCode: room.code,
+          code: anchorCode,
+          pointFirstIndex: i,
+          x: room.points[i],
+          y: room.points[i + 1],
+        });
+      }
+      return anchors;
+    },
+
     toolClick(item) {
       this.drawTypeSelect(item);
     },
@@ -305,17 +458,31 @@ export default {
       this.drawingState = "end";
       if (this.drawType === "companyName") {
         this.handleDrawCompanyName();
+      } else if (this.drawType === "date") {
+        this.handleDrawDate();
+      } else if (this.drawType === "billNo") {
+        this.handleDrawBillNo();
+      } else if (this.drawType === "totalAmount") {
+        this.handleDrawTotalAmount();
       }
       this.updateCursor("default");
     },
 
     handleStageMouseClick(event) {
       if (event.evt.button == 2) {
+        this.handleDone();
+        this.drawType = "";
       } else {
         console.log("handleStageMouseClick", this.drawType);
 
         if (this.drawType === "companyName") {
           this.handleDrawCompanyName();
+        } else if (this.drawType === "date") {
+          this.handleDrawDate();
+        } else if (this.drawType === "billNo") {
+          this.handleDrawBillNo();
+        } else if (this.drawType === "totalAmount") {
+          this.handleDrawTotalAmount();
         }
       }
     },
@@ -324,35 +491,104 @@ export default {
       const x = mousePos.x;
       const y = mousePos.y;
       if (this.drawingState === "") {
-        this.drawCompany = {
+        this.obj.drawCompany = {
           code: "companyName" + 1,
           name: "Company Name" + 1,
-          x : x,
-          y: y, 
-          width: 1,
-          height: 1,
-          stroke: "red",
+          points: [x, y],
+          stroke: "#FF0000",
           strokeWidth: 1,
           closed: true,
+          fill: helper.hexToRgbA("#FF0000", 50),
         };
-        this.drawingState = "end";
+        this.drawingState = "progress";
+      } else if (this.drawingState === "progress") {
+        this.obj.drawCompany.points.push(x, y);
       } else if (this.drawingState == "end") {
-        
-        var startX = this.drawCompany.x;
-        var startY = this.drawCompany.y;
-        this.drawCompany.width = x - startX;
-        this.drawCompany.height = y - startY;
-
-        // this.drawCompany.points.push(startX, y);
-        // this.drawCompany.points.push(x, y);
-        // this.drawCompany.points.push(x, startY);
         this.drawingState = "";
       }
-
-      console.log("this.drawCompany",this.drawCompany);
+      const stage = this.$refs.stage.getStage();
+      stage.draw();
     },
+
+    handleDrawDate() {
+      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      if (this.drawingState === "") {
+        this.obj.drawDate = {
+          code: "date" + 1,
+          name: "Bill Date" + 1,
+          points: [x, y],
+          stroke: "#FFFF00",
+          strokeWidth: 1,
+          closed: true,
+          fill: helper.hexToRgbA("#FFFF00", 50),
+        };
+        this.drawingState = "progress";
+      } else if (this.drawingState === "progress") {
+        this.obj.drawDate.points.push(x, y);
+      } else if (this.drawingState == "end") {
+        this.drawingState = "";
+      }
+      const stage = this.$refs.stage.getStage();
+      stage.draw();
+    },
+    handleDrawBillNo() {
+      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      if (this.drawingState === "") {
+        this.obj.drawBillNo = {
+          code: "bill" + 1,
+          name: "Bill No" + 1,
+          points: [x, y],
+          stroke: "#FF00FF",
+          strokeWidth: 1,
+          closed: true,
+          fill: helper.hexToRgbA("#FF00FF", 50),
+        };
+        this.drawingState = "progress";
+      } else if (this.drawingState === "progress") {
+        this.obj.drawBillNo.points.push(x, y);
+      } else if (this.drawingState == "end") {
+        this.drawingState = "";
+      }
+      const stage = this.$refs.stage.getStage();
+      stage.draw();
+    },
+
+    handleDrawTotalAmount() {
+      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      if (this.drawingState === "") {
+        this.obj.drawTotalAmount = {
+          code: "total_amount" + 1,
+          name: "Total Amount" + 1,
+          points: [x, y],
+          stroke: "#0000FF",
+          strokeWidth: 1,
+          closed: true,
+          fill: helper.hexToRgbA("#0000FF", 50),
+        };
+        this.drawingState = "progress";
+      } else if (this.drawingState === "progress") {
+        this.obj.drawTotalAmount.points.push(x, y);
+      } else if (this.drawingState == "end") {
+        this.drawingState = "";
+      }
+      const stage = this.$refs.stage.getStage();
+      stage.draw();
+    },
+
     uploaded(data) {
-      this.uploadedFiles = data.uploadedFiles;
+      var self = this;
+      self.uploadedFiles = data.uploadedFiles;
+      if (self.uploadedFiles.length > 0)
+      {
+        self.obj.documentId = self.uploadedFiles[0].id;
+        this.loadImage();
+      }
       // console.log(data);
     },
     updateCursor(cursor) {
@@ -367,6 +603,7 @@ export default {
           .then((response) => {
             self.obj = response.result;
             self.billDateTime = self.obj.date;
+            self.loadImage();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -384,19 +621,17 @@ export default {
 
       //self.obj.date = moment(self.billDateTime).format();
 
-      if (self.uploadedFiles.length > 0)
-        self.obj.documentId = self.uploadedFiles[0].id;
-      // if (self.obj.drawCompany){
-      //   self.obj.drawCompanyId = self.obj.drawCompany.id;
-      // }
+      // if (self.uploadedFiles.length > 0)
+      //   self.obj.documentId = self.uploadedFiles[0].id;
 
-      self.obj.drawCompany = this.drawCompany;
+      //self.obj.drawCompany = this.drawCompany;
 
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenant/billList" });
+            self.obj = response.result;
+            self.$router.push({ path: `/tenant/Bill/${self.obj.id}` });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -405,7 +640,9 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenant/billList" });
+            self.toast("Save", "Save Success", "success");
+            // self.$router.push({ path: `/tenant/Bill/${self.obj.id}` });
+            // self.$router.push({ path: "/tenant/billList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -445,11 +682,16 @@ export default {
     getEmptyObj() {
       return {
         date: new Date(),
-        code: "",
-        name: "",
+        documentId: "",
+        drawCompany: {
+
+        }
       };
     },
     analyze() {},
+    addNew() {
+      this.$router.push({ path: "/tenant/Bill" });
+    },
     submit() {
       // if (this.isValid) {
       this.onSubmit();
