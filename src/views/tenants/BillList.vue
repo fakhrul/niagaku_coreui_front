@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Building Code </strong> List </CCardHeader>
+            <CCardHeader> <strong> Bill </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="items"
+                :items="computedItems"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -31,6 +31,17 @@
                 pagination
                 :loading="loading"
               >
+              <template #show_image="{ item }">
+                  <td class="py-2">
+                    <CImg
+                      thumbnail
+                      :src="getImage(item)"
+                      height="70"
+                      width="70"
+                    />
+                  </td>
+                </template>
+
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -96,13 +107,20 @@
 
 <script>
 import BillApi from "@/lib/billApi";
+import moment from "moment";
 
 const items = [];
 const fields = [
+{ key: "createdOn" },
   { key: "date" },
   { key: "companyName" },
   { key: "billNo" },
   { key: "totalAmount" },
+  {
+    key: "show_image",
+    label: "Image",
+  },
+
   {
     key: "show_details",
     label: "",
@@ -116,7 +134,7 @@ export default {
   name: "BillList",
   data() {
     return {
-      loading: true,
+      loading: false,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
@@ -133,7 +151,27 @@ export default {
     var self = this;
     self.refreshTable();
   },
+  computed: {
+    computedItems() {
+      return this.items.map((item) => {
+        return {
+          ...item,
+          createdOn: this.getDisplayDateTime(item.createdOn),
+          date: this.getDisplayDateTime(item.date),
+        };
+      });
+    },
+  },
   methods: {
+    getImage(item) {
+      var url =
+        process.env.VUE_APP_API_URL + "documents/file/" + item.documentId;
+      return url;
+    },
+
+    getDisplayDateTime(dt) {
+      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
+    },
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -142,8 +180,8 @@ export default {
         color: color,
       });
     },
-    toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+    toggleDetails(item) {
+      this.$set(item, "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -151,7 +189,7 @@ export default {
     },
     refreshTable() {
       var self = this;
-      self.loading = false;
+      self.loading = true;
       // self.items = floorPlanData;
       self.api
         .getList()
@@ -161,6 +199,7 @@ export default {
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
+          self.loading = false;
         });
     },
     // onAddLocation(item) {

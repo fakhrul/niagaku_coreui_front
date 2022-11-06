@@ -1,5 +1,10 @@
 <template>
   <CHeader>
+    <CToggler
+      in-header
+      class="ml-3 d-lg-none"
+      @click="$store.commit('toggleSidebarMobile')"
+    />
 
     <CToggler
       in-header

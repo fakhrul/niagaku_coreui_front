@@ -19,7 +19,24 @@ class BillApi {
                 return data
             });
     }
- 
+    getNext(id) {
+        var url = apiUrl + 'bills/nextTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+    
+    getPrev(id) {
+        var url = apiUrl + 'bills/prevTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
     create(data) {
         var url = apiUrl + 'bills';
         return api.call('post', url, data)

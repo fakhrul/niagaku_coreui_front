@@ -24,7 +24,7 @@
               <CCardBody>
                 <CForm class="mb-2 text-center">
                   <CImg :src="logoUrl" width="100" class="mb-2"></CImg>
-                  <h5>Fire Safety Analysis System</h5>
+                  <h5>Billing Record & Analysis System</h5>
                   <CInput
                     placeholder="Username"
                     autocomplete="username email"
@@ -110,7 +110,7 @@ export default {
           //      console.log(response.result);
           console.log(response);
           auth.recordLogin(response.accessToken, response, false);
-          self.$router.push({ path: "/dashboard" });
+          self.$router.push({ path: "/" });
           // self.$router.push({ path: "/" });
         })
         .catch(({ data }) => {

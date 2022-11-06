@@ -158,15 +158,15 @@ function configRoutes() {
   return [
     {
       path: '/',
-      redirect: '/dashboard',
+      redirect: '/tenant/billList',
       name: 'Home',
       component: TheContainer,
       children: [
-        {
-          path: 'dashboard',
-          name: 'Dashboard',
-          component: Dashboard
-        },
+        // {
+        //   path: 'dashboard',
+        //   name: 'Dashboard',
+        //   component: Dashboard
+        // },
         {
           path: 'theme',
           redirect: '/theme/colors',
