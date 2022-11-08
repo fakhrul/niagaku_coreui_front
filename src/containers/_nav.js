@@ -12,6 +12,16 @@ export default [
         to: '/tenant/billList',
         icon: 'cilBookmark'
       }, 
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Experiment'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'OpenCV',
+        to: '/openCV/openCV',
+        icon: 'cilBookmark'
+      }, 
     ]
   }
 ]

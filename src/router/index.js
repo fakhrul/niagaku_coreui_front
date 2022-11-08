@@ -95,7 +95,7 @@ const FloorPlanRoom = () => import('@/views/tenants/FloorPlanRoom')
 const FloorPlanCompliance = () => import('@/views/tenants/FloorPlanCompliance')
 
 const BuildingCodeList = () => import('@/views/tenants/BuildingCodeList')
-const BuildingCode = () => import('@/views/tenants/BuildingCode')
+const OpenCV = () => import('@/views/tenants/OpenCV')
 
 const BuildingCodeCategoryList = () => import('@/views/tenants/BuildingCodeCategoryList')
 const BuildingCodeCategory = () => import('@/views/tenants/BuildingCodeCategory')
@@ -162,11 +162,6 @@ function configRoutes() {
       name: 'Home',
       component: TheContainer,
       children: [
-        // {
-        //   path: 'dashboard',
-        //   name: 'Dashboard',
-        //   component: Dashboard
-        // },
         {
           path: 'theme',
           redirect: '/theme/colors',
@@ -212,208 +207,18 @@ function configRoutes() {
             }
           ]
         },
-        // {
-        //   path: 'widgets',
-        //   name: 'Widgets',
-        //   component: Widgets
-        // },
-        // {
-        //   path: 'users',
-        //   meta: { label: 'Users' },
-        //   component: {
-        //     render(c) { return c('router-view') }
-        //   },
-        //   children: [
-        //     {
-        //       path: '',
-        //       name: 'Users',
-        //       component: Users
-        //     },
-        //     {
-        //       path: ':id',
-        //       meta: {
-        //         label: 'User Details'
-        //       },
-        //       name: 'User',
-        //       component: User
-        //     }
-        //   ]
-        // },
-
-        
-
-
         {
-          path: 'tenant',
-          redirect: '/tenant/floorPlanList',
-          name: 'FloorPlan',
+          path: 'openCV',
+          redirect: '/openCV/openCV',
+          name: 'OpenCV',
           component: {
             render(c) { return c('router-view') }
           },
           children: [
             {
-              path: 'floorPlan/:id',
-              name: 'floorPlanById',
-              component: FloorPlan
-            },
-            {
-              path: 'floorPlan',
-              name: 'floorPlan',
-              component: FloorPlan
-            },
-            {
-              path: 'floorPlanList',
-              name: 'floorPlanList',
-              component: FloorPlanList
-            },
-            {
-              path: 'floorPlanTravelDistance',
-              name: 'floorPlanTravelDistance',
-              component: FloorPlanTravelDistance
-            },
-            {
-              path: 'floorPlanCompliance',
-              name: 'floorPlanCompliance',
-              component: FloorPlanCompliance
-            },
-            {
-              path: 'floorPlanRoom',
-              name: 'floorPlanRoom',
-              component: FloorPlanRoom
-            },
-
-            // {
-            //   path: 'workSpace/:id',
-            //   name: 'WorkSpace',
-            //   component: WorkSpace2
-            // },
-            // {
-            //   path: 'workSpace',
-            //   name: 'WorkSpace',
-            //   component: WorkSpace2
-            // },
-
-
-
-          ]
-        },
-        {
-          path: 'tenant',
-          redirect: '/tenant/buildingCodeList',
-          name: 'BuildingCode',
-          component: {
-            render(c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: 'buildingCodeCategory/:id',
-              name: 'buildingCodeCategoryById',
-              component: BuildingCodeCategory
-            },
-            {
-              path: 'buildingCodeCategory',
-              name: 'buildingCodeCategory',
-              component: BuildingCodeCategory
-            },
-            {
-              path: 'buildingCodeCategoryList',
-              name: 'buildingCodeCategoryList',
-              component: BuildingCodeCategoryList
-            },
-            {
-              path: 'buildingCode/:id',
-              name: 'buildingCodeById',
-              component: BuildingCode
-            },
-            {
-              path: 'buildingCode',
-              name: 'buildingCode',
-              component: BuildingCode
-            },
-            {
-              path: 'buildingCodeList',
-              name: 'buildingCodeList',
-              component: BuildingCodeList
-            },
-            {
-              path: 'bill/:id',
-              name: 'billById',
-              component: Bill
-            },
-            {
-              path: 'bill',
-              name: 'bill',
-              component: Bill
-            },
-            {
-              path: 'billList',
-              name: 'billList',
-              component: BillList
-            },
-            {
-              path: 'occupantLoadFactor/:id',
-              name: 'occupantLoadFactorById',
-              component: OccupantLoadFactor
-            },
-            {
-              path: 'occupantLoadFactor',
-              name: 'occupantLoadFactor',
-              component: OccupantLoadFactor
-            },
-            {
-              path: 'occupantLoadFactorList',
-              name: 'occupantLoadFactorList',
-              component: OccupantLoadFactorList
-            },
-            {
-              path: 'minimumNumberOfExit/:id',
-              name: 'minimumNumberOfExitById',
-              component: MinimumNumberOfExit
-            },
-            {
-              path: 'minimumNumberOfExit',
-              name: 'minimumNumberOfExit',
-              component: MinimumNumberOfExit
-            },
-            {
-              path: 'minimumNumberOfExitList',
-              name: 'minimumNumberOfExitList',
-              component: MinimumNumberOfExitList
-            },
-            {
-              path: 'egressParameter/:id',
-              name: 'egressParameterById',
-              component: EgressParameter
-            },
-            {
-              path: 'egressParameter',
-              name: 'egressParameter',
-              component: EgressParameter
-            },
-            {
-              path: 'egressParameterList',
-              name: 'egressParameterList',
-              component: EgressParameterList
-            },
-            {
-              path: 'room/:id',
-              name: 'roomById',
-              component: Room
-            },
-            {
-              path: 'room',
-              name: 'room',
-              component: Room
-            },
-            {
-              path: 'drawing',
-              name: 'drawing',
-              component: Drawing
-            },
-            {
-              path: 'loadImage',
-              name: 'loadImage',
-              component: LoadImage
+              path: 'openCV',
+              name: 'openCV',
+              component: OpenCV
             },
           ]
         },

@@ -15,6 +15,7 @@ import BusinessHelper from './lib/businessHelper'
 import DrawingHelper from './lib/drawingHelper'
 import "./index.css";
 import 'material-icons/iconfont/material-icons.css';
+//import opencv from './opencv.js';
 
 Vue.use(CoreuiVuePro)
 Vue.prototype.$log = console.log.bind(console)
