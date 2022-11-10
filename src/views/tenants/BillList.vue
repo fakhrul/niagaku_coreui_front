@@ -31,7 +31,7 @@
                 pagination
                 :loading="loading"
               >
-              <template #show_image="{ item }">
+                <template #show_image="{ item }">
                   <td class="py-2">
                     <CImg
                       thumbnail
@@ -111,7 +111,7 @@ import moment from "moment";
 
 const items = [];
 const fields = [
-{ key: "createdOn" },
+  { key: "createdOn" },
   { key: "date" },
   { key: "companyName" },
   { key: "billNo" },
@@ -211,7 +211,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenant/Bill/${item.id}`,
+        path: `/tenants/Bill/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -235,7 +235,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenant/Bill" });
+      this.$router.push({ path: "/tenants/Bill" });
     },
     toast(header, message, color) {
       var self = this;

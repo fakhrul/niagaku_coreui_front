@@ -9,7 +9,7 @@ export default [
       {
         _name: 'CSidebarNavItem',
         name: 'Bill',
-        to: '/tenant/billList',
+        to: '/tenants/billList',
         icon: 'cilBookmark'
       }, 
       {

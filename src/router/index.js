@@ -87,41 +87,11 @@ const Compose = () => import('@/views/apps/email/Compose')
 const Inbox = () => import('@/views/apps/email/Inbox')
 const Message = () => import('@/views/apps/email/Message')
 
-
-const FloorPlanList = () => import('@/views/tenants/FloorPlanList')
-const FloorPlan = () => import('@/views/tenants/FloorPlan')
-const FloorPlanTravelDistance = () => import('@/views/tenants/FloorPlanTravelDistance')
-const FloorPlanRoom = () => import('@/views/tenants/FloorPlanRoom')
-const FloorPlanCompliance = () => import('@/views/tenants/FloorPlanCompliance')
-
-const BuildingCodeList = () => import('@/views/tenants/BuildingCodeList')
 const OpenCV = () => import('@/views/tenants/OpenCV')
-
-const BuildingCodeCategoryList = () => import('@/views/tenants/BuildingCodeCategoryList')
-const BuildingCodeCategory = () => import('@/views/tenants/BuildingCodeCategory')
-
 const BillList = () => import('@/views/tenants/BillList')
 const Bill = () => import('@/views/tenants/Bill')
-
-const OccupantLoadFactorList = () => import('@/views/tenants/OccupantLoadFactorList')
-const OccupantLoadFactor = () => import('@/views/tenants/OccupantLoadFactor')
-
-const MinimumNumberOfExitList = () => import('@/views/tenants/MinimumNumberOfExitList')
-const MinimumNumberOfExit = () => import('@/views/tenants/MinimumNumberOfExit')
-const EgressParameterList = () => import('@/views/tenants/EgressParameterList')
-const EgressParameter = () => import('@/views/tenants/EgressParameter')
-
-
-const Room = () => import('@/views/tenants/Room')
-
-const Drawing = () => import('@/views/tenants/Drawing')
-const LoadImage = () => import('@/views/tenants/LoadImage')
 const WorkArea = () => import('@/views/pages/WorkArea')
 const Workspace = () => import('@/views/Workspace')
-// const WorkSpace = () => import('@/views/drawings/WorkSpace')
-
-const WorkSpace2 = () => import('@/views/tenants/WorkSpace')
-
 const UserList = () => import('@/views/admins/UserList')
 const User = () => import('@/views/admins/User')
 
@@ -158,28 +128,34 @@ function configRoutes() {
   return [
     {
       path: '/',
-      redirect: '/tenant/billList',
+      redirect: '/tenants/billList',
       name: 'Home',
       component: TheContainer,
       children: [
         {
-          path: 'theme',
-          redirect: '/theme/colors',
-          name: 'Theme',
+          path: 'tenants',
+          redirect: '/tenants/billList',
+          name: 'Tenants',
           component: {
             render(c) { return c('router-view') }
           },
           children: [
             {
-              path: 'colors',
-              name: 'Colors',
-              component: Colors
+              path: '/tenants/billList',
+              name: 'BillList',
+              component: BillList
             },
             {
-              path: 'typography',
-              name: 'Typography',
-              component: Typography
-            }
+              path: 'bill/:id',
+              name: 'BillById',
+              component: Bill
+            },
+            {
+              path: 'bill',
+              name: 'Bill',
+              component: Bill
+            },
+            
           ]
         },
         // {

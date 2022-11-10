@@ -61,6 +61,15 @@
                       <span class="material-icons">paid</span>
                     </a>
                   </div>
+                  <div
+                    class="col-2"
+                    @click="toolClick('billItem')"
+                    v-c-tooltip="'Bill item'"
+                  >
+                    <a>
+                      <span class="material-icons">list</span>
+                    </a>
+                  </div>
                   <!-- <div
                     class="col-2"
                     @click="toolClick('items')"
@@ -216,6 +225,39 @@
                               }"
                             />
                           </v-label>
+
+                          <!-- Itemized -->
+                          <v-line :config="obj.drawBillItem" />
+                          <v-circle
+                            v-for="anchor in getAnchors(obj.drawBillItem)"
+                            :key="anchor.code"
+                            :config="{
+                              roomId: anchor.roomId,
+                              roomCode: anchor.roomCode,
+                              pointFirstIndex: anchor.pointFirstIndex,
+                              code: anchor.code,
+                              x: anchor.x,
+                              y: anchor.y,
+                              radius: 4,
+                              fill: 'white',
+                              stroke: 'black',
+                              draggable: true,
+                            }"
+                          />
+                          <v-label
+                            :config="{
+                              x: getCenterOfShape(obj.drawBillItem)[0], // item.points[0],
+                              y: getCenterOfShape(obj.drawBillItem)[1], //item.points[1],
+                            }"
+                          >
+                            <v-text
+                              :config="{
+                                text: getLableInfo(obj.drawBillItem),
+                                fill: 'white',
+                              }"
+                            />
+                          </v-label>
+
                         </v-layer>
                       </v-stage>
                     </div>
@@ -512,7 +554,11 @@ export default {
         this.handleDrawBillNo();
       } else if (this.drawType === "totalAmount") {
         this.handleDrawTotalAmount();
+      } else if (this.drawType === "billItem") {
+        this.handleDrawBillItem();
       }
+
+
       this.updateCursor("default");
     },
 
@@ -531,6 +577,8 @@ export default {
           this.handleDrawBillNo();
         } else if (this.drawType === "totalAmount") {
           this.handleDrawTotalAmount();
+        } else if (this.drawType === "billItem") {
+          this.handleDrawBillItem();
         }
       }
     },
@@ -629,6 +677,30 @@ export default {
       stage.draw();
     },
 
+    handleDrawBillItem() {
+      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      if (this.drawingState === "") {
+        this.obj.drawBillItem = {
+          code: "bill_item",
+          name: "Bill Item",
+          points: [x, y],
+          stroke: "#0FFFFF",
+          strokeWidth: 1,
+          closed: true,
+          fill: helper.hexToRgbA("#0FFFFF", 50),
+        };
+        this.drawingState = "progress";
+      } else if (this.drawingState === "progress") {
+        this.obj.drawBillItem.points.push(x, y);
+      } else if (this.drawingState == "end") {
+        this.drawingState = "";
+      }
+      const stage = this.$refs.stage.getStage();
+      stage.draw();
+    },
+
     uploaded(data) {
       var self = this;
       self.uploadedFiles = data.uploadedFiles;
@@ -678,7 +750,7 @@ export default {
           .create(self.obj)
           .then((response) => {
             self.obj = response.result;
-            self.$router.push({ path: `/tenant/Bill/${self.obj.id}` });
+            self.$router.push({ path: `/tenants/Bill/${self.obj.id}` });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -688,8 +760,6 @@ export default {
           .update(self.obj)
           .then((response) => {
             self.toast("Save", "Save Success", "success");
-            // self.$router.push({ path: `/tenant/Bill/${self.obj.id}` });
-            // self.$router.push({ path: "/tenant/billList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -735,7 +805,7 @@ export default {
     },
     analyze() {},
     addNew() {
-      this.$router.push({ path: "/tenant/Bill" });
+      this.$router.push({ path: "/tenants/Bill" });
     },
     previous() {
       var self = this;
@@ -744,7 +814,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenant/Bill/${nextObj.id}`,
+            path: `/tenants/Bill/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
@@ -758,7 +828,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenant/Bill/${nextObj.id}`,
+            path: `/tenants/Bill/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
