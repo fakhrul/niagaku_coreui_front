@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Building Main Classification </strong> List </CCardHeader>
+            <CCardHeader> <strong> Chart of Account </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="items"
@@ -31,19 +31,6 @@
                 pagination
                 :loading="loading"
               >
-                <!-- <template #tenant_name="{ item }">
-                  <td>
-                    {{ item.tenant.fullName }}
-                  </td>
-                </template> -->
-                <!-- <template #status="{item}">
-              <td>
-                <CBadge :color="getBadge(item.status)">
-                  {{ item.status }}
-                </CBadge>
-              </td>
-            </template>
-            -->
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -63,42 +50,6 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
-                      <p class="text-muted">Code: {{ item.code }}</p>
-                      <p class="text-muted">Name: {{ item.name }}</p>
-                      <!-- <p class="text-muted">Latitude: {{ item.latitude }}</p>
-                      <p class="text-muted">Longitude: {{ item.longitude }}</p> -->
-                      <!-- <p class="text-muted">Email: {{ item.email }}</p>
-                        <p class="text-muted">Phone: {{ item.phone }}</p>
-                        <p class="text-muted">Address:</p>
-                        <p class="text-muted">{{ item.address1 }}</p>
-                        <p class="text-muted">{{ item.address2 }}</p>
-                        <p class="text-muted">{{ item.address3 }}</p>
-                        <p class="text-muted">City: {{ item.city }}</p>
-                        <p class="text-muted">Postcode: {{ item.postcode }}</p>
-                        <p class="text-muted">State: {{ item.state }}</p>
-                        <p class="text-muted">Country: {{ item.country }}</p>
-                        <p class="text-muted">Role: {{ item.role }}</p> -->
-                      <!-- <p class="text-muted">System Id : {{ item.id }}</p>
-                    <p class="text-muted">System User Id: {{ item.user_id }}</p> -->
-                      <!-- <p class="text-muted">
-                      Org. Name: {{ item.organization.name }}
-                    </p>
-                    <p class="text-muted">
-                      Roles:
-                    </p>
-                    <ul id="example-1">
-                      <li v-for="item in item.roleList" :key="item.id">
-                        {{ item.name }}
-                      </li>
-                    </ul> -->
-                      <!-- <CButton
-                          size="sm"
-                          color="info"
-                          class="ml-1"
-                          @click="onAddLocation(item)"
-                        >
-                          Add Location
-                        </CButton> -->
                       <CButton
                         size="sm"
                         color="info"
@@ -141,15 +92,13 @@
 </template>
 
 <script>
-import OlfMainCategoryApi from "../../lib/olfMainCategoryApi";
-//import buildingCodeData from "../../data/BuildingCodeData";
+import ChartOfAccountApi from "@/lib/chartOfAccountApi";
 
 const items = [];
-// const items = buildingCodeData;
 const fields = [
-  { key: "code", _style: "min-width:200px;" },
-  { key: "name", _style: "min-width:200px;" },
-  { key: "description", _style: "min-width:200px;" },
+  { key: "category"},
+  { key: "accountNo"},
+  { key: "name" },
   {
     key: "show_details",
     label: "",
@@ -162,7 +111,7 @@ const fields = [
 
 
 export default {
-  name: "BuildingCodeCategoryList",
+  name: "ChartOfAccountList",
   data() {
     return {
       loading: true,
@@ -173,7 +122,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new OlfMainCategoryApi(),
+      api: new ChartOfAccountApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -211,16 +160,10 @@ export default {
           self.toast("Error", helper.getErrorMessage(data), "danger");
         });
     },
-    // onAddLocation(item) {
-    //   var self = this;
-    //   self.$router.push({
-    //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
-    //   });
-    // },
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenant/BuildingCodeCategory/${item.id}`,
+        path: `/tenants/ChartOfAccount/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -233,7 +176,6 @@ export default {
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       }
       self.itemToDelete = {};
@@ -244,7 +186,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenant/BuildingCodeCategory" });
+      this.$router.push({ path: "/tenants/ChartOfAccount" });
     },
     toast(header, message, color) {
       var self = this;

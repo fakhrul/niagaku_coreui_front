@@ -15,23 +15,18 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Building Main Classification </strong> Information </CCardHeader>
+          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Code" horizontal v-model="obj.code" />
+              <CInput label="Category" horizontal v-model="obj.category" />
+              <CInput label="Account No" horizontal v-model="obj.accountNo" />
               <CInput label="Name" horizontal v-model="obj.name" />
-              <CInput
-                label="Description"
-                horizontal
-                v-model="obj.description"
-              />
             </CForm>
           </CCardBody>
           <CCardFooter>
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
-
           </CCardFooter>
         </CCard>
       </CCol>
@@ -40,62 +35,26 @@
 </template>
 
 <script>
-import OlfMainCategoryApi from "../../lib/olfMainCategoryApi";
-import { validationMixin } from "vuelidate";
-import {
-  required,
-  minLength,
-  email,
-  sameAs,
-  helpers,
-  numeric,
-  maxLength,
-} from "vuelidate/lib/validators";
+import ChartOfAccountApi from "@/lib/chartOfAccountApi";
 
 export default {
-  name: "BuildingCodeCategory",
+  name: "ChartOfAccount",
   data: () => {
     return {
       organizationTypeList: [],
       infoList: [],
       obj: {
-        name: "",
-        code: "",
-        decsription: "",
       },
       submitted: false,
-      api: new OlfMainCategoryApi(),
+      api: new ChartOfAccountApi(),
     };
   },
   mounted() {
     var self = this;
-    // self.refreshOrganizationType();
     self.resetObj();
   },
-  // validations: {
-  //   obj: {
-  //     code: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //     name: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //   },
-  // },
   computed: {
-    // formString() {
-    //   return JSON.stringify(this.obj, null, 4);
-    // },
-    // isValid() {
-    //   return !this.$v.obj.$invalid;
-    // },
-    // isDirty() {
-    //   return this.$v.obj.$anyDirty;
-    // },
+    
   },
   methods: {
     resetObj() {
@@ -108,39 +67,34 @@ export default {
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       } else {
         self.obj = self.getEmptyObj();
       }
     },
     onSubmit() {
-      //evt.preventDefault();
       var self = this;
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenant/buildingCodeCategoryList" });
+            self.$router.push({ path: "/tenants/chartOfAccountList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       } else {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenant/buildingCodeCategoryList" });
+            self.$router.push({ path: "/tenants/chartOfAccountList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       }
     },
     onReset() {
-      //evt.preventDefault();
       this.obj = {};
     },
     toast(header, message, color) {
@@ -163,27 +117,22 @@ export default {
       this.$v.$touch();
     },
     reset() {
-      // this.obj = this.getEmptyObj();
       this.resetObj();
       this.submitted = false;
       this.$v.$reset();
     },
     getEmptyObj() {
       return {
-        code: "",
-        name: "",
-        decsription: "",
+        // code: "",
+        // name: "",
+        // decsription: "",
       };
     },
     submit() {
-      // if (this.isValid) {
         this.onSubmit();
         this.submitted = true;
-      // }
     },
-    cancel() {
-      this.$router.push({ path: "/tenant/maplist" });
-    },
+    
   },
 };
 </script>

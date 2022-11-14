@@ -90,6 +90,10 @@ const Message = () => import('@/views/apps/email/Message')
 const OpenCV = () => import('@/views/tenants/OpenCV')
 const BillList = () => import('@/views/tenants/BillList')
 const Bill = () => import('@/views/tenants/Bill')
+
+const ChartOfAccountList = () => import('@/views/tenants/ChartOfAccountList')
+const ChartOfAccount = () => import('@/views/tenants/ChartOfAccount')
+
 const WorkArea = () => import('@/views/pages/WorkArea')
 const Workspace = () => import('@/views/Workspace')
 const UserList = () => import('@/views/admins/UserList')
@@ -155,7 +159,22 @@ function configRoutes() {
               name: 'Bill',
               component: Bill
             },
-            
+
+            {
+              path: '/tenants/chartOfAccountList',
+              name: 'chartOfAccountList',
+              component: ChartOfAccountList
+            },
+            {
+              path: 'chartOfAccount/:id',
+              name: 'chartOfAccountById',
+              component: ChartOfAccount
+            },
+            {
+              path: 'chartOfAccount',
+              name: 'ChartOfAccount',
+              component: ChartOfAccount
+            },
           ]
         },
         // {

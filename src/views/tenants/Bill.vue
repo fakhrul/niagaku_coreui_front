@@ -257,7 +257,6 @@
                               }"
                             />
                           </v-label>
-
                         </v-layer>
                       </v-stage>
                     </div>
@@ -274,7 +273,13 @@
               </CForm>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit" class="ml-1" color="primary" @click="analyze" >AI Analyize</CButton>
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="analyze"
+                >AI Analyize</CButton
+              >
               <!-- <CButton  size="sm" color="primary" @click="downloadImage" >Download</CButton> -->
               <CButton
                 type="submit"
@@ -286,7 +291,6 @@
               >
                 Download
               </CButton>
-
             </CCardFooter>
           </CCard>
         </CCol>
@@ -301,6 +305,13 @@
                   :value="getDisplayDateTime(obj.createdOn)"
                   readonly
                 />
+                <CSelect
+                  label="Document Type"
+                  horizontal
+                  :options="['Receipt', 'Invoice', 'Cheque', 'Purchase Order']"
+                  :value.sync="obj.documentType"
+                />
+
                 <CInput
                   label="Company Name"
                   horizontal
@@ -323,25 +334,79 @@
                   horizontal
                   v-model="obj.totalAmount"
                 />
+
+                <CInput
+                  label="Chart of Account"
+                  horizontal
+                  readonly
+                  v-model="selectedChartOfAccount.name"
+                >
+                  <template #append>
+                    <CButton    color="primary" @click="onSearchChartOfAccount()">
+                      Search
+                    </CButton>
+                  </template>
+                </CInput>
               </CForm>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit"  class="ml-1" color="primary" @click="submit"
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="submit"
                 >Save</CButton
               >
-              <CButton class="ml-1" color="primary" @click="addNew">New</CButton>
-              <CButton class="ml-1" color="primary" @click="previous">Prev</CButton>
+              <CButton class="ml-1" color="primary" @click="addNew"
+                >New</CButton
+              >
+              <CButton class="ml-1" color="primary" @click="previous"
+                >Prev</CButton
+              >
               <CButton class="ml-1" color="primary" @click="next">Next</CButton>
             </CCardFooter>
           </CCard>
         </CCol>
       </CRow>
     </div>
+
+    <div>
+      <CModal :show.sync="chartOfAccountSearchPopup" size="xl">
+        <CRow>
+          <CCol sm="12">
+            <CDataTable
+              :items="chartOfAccountList"
+              :fields="chartOfAccountFieldList"
+              column-filter
+              items-per-page-select
+              :items-per-page="10"
+              hover
+              sorter
+              pagination
+            >
+              <template #show_details="{ item, index }">
+                <td class="py-2">
+                  <CButton
+                    color="primary"
+                    variant="outline"
+                    square
+                    @click="onChartOfAccountSelected(item, index)"
+                  >
+                    Select
+                  </CButton>
+                </td>
+              </template>
+            </CDataTable>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
   </div>
 </template>
 
 <script>
 import BillApi from "../../lib/billApi";
+import ChartOfAccountApi from "../../lib/chartOfAccountApi";
 import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
 import moment from "moment";
 
@@ -357,6 +422,20 @@ import {
 } from "vuelidate/lib/validators";
 import { resolvePlugin } from "@babel/core";
 
+const chartOfAccountList = [];
+const chartOfAccountFieldList = [
+  { key: "category" },
+  { key: "accountNo" },
+  { key: "name" },
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+];
+
 export default {
   name: "Bill",
   components: {
@@ -364,7 +443,15 @@ export default {
   },
   data: () => {
     return {
-      // imageRotationValue: 0,
+      chartOfAccountSearchPopup: false,
+      chartOfAccountList: chartOfAccountList.map((item, id) => {
+        return { ...item, id };
+      }),
+      chartOfAccountFieldList,
+      selectedChartOfAccount: {
+        id: null,
+        name: "",
+      },
       imageConfig: {
         x: 0,
         y: 0,
@@ -400,6 +487,7 @@ export default {
       drawType: "",
       drawingState: "",
       api: new BillApi(),
+      chartOfAccountApi: new ChartOfAccountApi(),
       loading: false,
     };
   },
@@ -449,9 +537,26 @@ export default {
   },
 
   methods: {
-    downloadImage(){
-
+    onSearchChartOfAccount() {
+      var self = this;
+      self.refreshTableChartOfAccount();
+      self.chartOfAccountSearchPopup = true;
     },
+
+    refreshTableChartOfAccount() {
+      var self = this;
+      self.loading = true;
+      self.chartOfAccountList = [];
+      self.chartOfAccountApi
+        .getList()
+        .then((response) => {
+          self.chartOfAccountList = response.result;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+    downloadImage() {},
     getDisplayDateTime(dt) {
       return moment(dt).format("DD/MM/YYYY HH:mm:ss");
     },
@@ -557,7 +662,6 @@ export default {
       } else if (this.drawType === "billItem") {
         this.handleDrawBillItem();
       }
-
 
       this.updateCursor("default");
     },
@@ -722,6 +826,7 @@ export default {
           .then((response) => {
             self.obj = response.result;
             self.billDateTime = self.obj.date;
+            self.selectedChartOfAccount = self.obj.chartAccount;
             self.loadImage();
           })
           .catch(({ data }) => {
@@ -738,7 +843,7 @@ export default {
     onSubmit() {
       var self = this;
 
-      //self.obj.date = moment(self.billDateTime).format();
+      self.obj.date = moment(self.billDateTime).format();
 
       // if (self.uploadedFiles.length > 0)
       //   self.obj.documentId = self.uploadedFiles[0].id;
@@ -843,6 +948,13 @@ export default {
     },
     cancel() {
       this.$router.push({ path: "/tenant/maplist" });
+    },
+
+    onChartOfAccountSelected(item, index) {
+      var self = this;
+      self.selectedChartOfAccount = item;
+      self.obj.chartAccountId = item.id.toString();
+      self.chartOfAccountSearchPopup = false;
     },
   },
 };

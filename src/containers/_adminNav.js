@@ -11,7 +11,15 @@ export default [
         name: 'Bill',
         to: '/tenants/billList',
         icon: 'cilBookmark'
-      },      {
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Chart of Account',
+        to: '/tenants/chartOfAccountList',
+        icon: 'cilBookmark'
+      },
+
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Administrator'],
       },
@@ -20,6 +28,16 @@ export default [
         name: 'Users',
         to: '/admins/userList',
         icon: 'cilUser'
+      },
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Experiment'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'OpenCV',
+        to: '/openCV/openCV',
+        icon: 'cilBookmark'
       },
     ]
   }

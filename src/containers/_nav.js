@@ -13,6 +13,12 @@ export default [
         icon: 'cilBookmark'
       }, 
       {
+        _name: 'CSidebarNavItem',
+        name: 'Chart of Account',
+        to: '/tenants/chartOfAccountList',
+        icon: 'cilBookmark'
+      }, 
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Experiment'],
       },
