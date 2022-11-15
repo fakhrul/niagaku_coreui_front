@@ -342,7 +342,7 @@
                   v-model="selectedChartOfAccount.name"
                 >
                   <template #append>
-                    <CButton    color="primary" @click="onSearchChartOfAccount()">
+                    <CButton color="primary" @click="onSearchChartOfAccount()">
                       Search
                     </CButton>
                   </template>
@@ -827,6 +827,10 @@ export default {
             self.obj = response.result;
             self.billDateTime = self.obj.date;
             self.selectedChartOfAccount = self.obj.chartAccount;
+            if (self.selectedChartOfAccount == null)
+              self.selectedChartOfAccount = {
+                name: "",
+              };
             self.loadImage();
           })
           .catch(({ data }) => {
@@ -904,6 +908,7 @@ export default {
     getEmptyObj() {
       return {
         date: new Date(),
+        name: "",
         documentId: "",
         drawCompany: {},
       };
