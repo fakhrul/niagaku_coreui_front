@@ -102,10 +102,11 @@
                           <v-line :config="obj.drawCompany" />
                           <v-circle
                             v-for="anchor in getAnchors(obj.drawCompany)"
+                            @dragmove="updatePolyCompany"
                             :key="anchor.code"
                             :config="{
-                              roomId: anchor.roomId,
-                              roomCode: anchor.roomCode,
+                              // roomId: anchor.roomId,
+                              // roomCode: anchor.roomCode,
                               pointFirstIndex: anchor.pointFirstIndex,
                               code: anchor.code,
                               x: anchor.x,
@@ -134,10 +135,11 @@
                           <v-line :config="obj.drawDate" />
                           <v-circle
                             v-for="anchor in getAnchors(obj.drawDate)"
+                            @dragmove="updatePolyDate"
                             :key="anchor.code"
                             :config="{
-                              roomId: anchor.roomId,
-                              roomCode: anchor.roomCode,
+                              // roomId: anchor.roomId,
+                              // roomCode: anchor.roomCode,
                               pointFirstIndex: anchor.pointFirstIndex,
                               code: anchor.code,
                               x: anchor.x,
@@ -166,10 +168,11 @@
                           <v-line :config="obj.drawBillNo" />
                           <v-circle
                             v-for="anchor in getAnchors(obj.drawBillNo)"
+                            @dragmove="updatePolyBillNo"
                             :key="anchor.code"
                             :config="{
-                              roomId: anchor.roomId,
-                              roomCode: anchor.roomCode,
+                              // roomId: anchor.roomId,
+                              // roomCode: anchor.roomCode,
                               pointFirstIndex: anchor.pointFirstIndex,
                               code: anchor.code,
                               x: anchor.x,
@@ -198,10 +201,11 @@
                           <v-line :config="obj.drawTotalAmount" />
                           <v-circle
                             v-for="anchor in getAnchors(obj.drawTotalAmount)"
+                            @dragmove="updatePolyTotalAmount"
                             :key="anchor.code"
                             :config="{
-                              roomId: anchor.roomId,
-                              roomCode: anchor.roomCode,
+                              // roomId: anchor.roomId,
+                              // roomCode: anchor.roomCode,
                               pointFirstIndex: anchor.pointFirstIndex,
                               code: anchor.code,
                               x: anchor.x,
@@ -230,10 +234,11 @@
                           <v-line :config="obj.drawBillItem" />
                           <v-circle
                             v-for="anchor in getAnchors(obj.drawBillItem)"
+                            @dragmove="updatePolyBillItem"
                             :key="anchor.code"
                             :config="{
-                              roomId: anchor.roomId,
-                              roomCode: anchor.roomCode,
+                              // roomId: anchor.roomId,
+                              // roomCode: anchor.roomCode,
                               pointFirstIndex: anchor.pointFirstIndex,
                               code: anchor.code,
                               x: anchor.x,
@@ -305,13 +310,32 @@
                   :value="getDisplayDateTime(obj.createdOn)"
                   readonly
                 />
+                <CInput
+                  label="Document Id"
+                  horizontal
+                  :value="obj.documentId"
+                  readonly
+                />
+
                 <CSelect
                   label="Document Type"
                   horizontal
-                  :options="['Receipt', 'Invoice', 'Cheque', 'Purchase Order']"
+                  :options="[
+                    'Receipt',
+                    'Invoice',
+                    'Cheque',
+                    'Purchase Order',
+                    'Credit Card',
+                  ]"
                   :value.sync="obj.documentType"
                 />
-
+                <CInput
+                  label="Profile"
+                  horizontal
+                  :value="getProfileEmail(obj)"
+                  readonly
+                />
+                <!--  -->
                 <CInput
                   label="Company Name"
                   horizontal
@@ -347,6 +371,23 @@
                     </CButton>
                   </template>
                 </CInput>
+
+                <CRow form class="form-group">
+                    <CCol tag="label" sm="3" class="col-form-label">
+                      Is For ML?
+                    </CCol>
+                    <CCol sm="9">
+                      <CSwitch
+                        class="mr-1"
+                        color="primary"
+                        :checked.sync="obj.isUseForMLTraining"
+                         label-on="YES"
+                         label-off="NO"
+                      >
+                      </CSwitch>
+                    </CCol>
+                  </CRow>
+
               </CForm>
             </CCardBody>
             <CCardFooter>
@@ -537,6 +578,51 @@ export default {
   },
 
   methods: {
+    getProfileEmail(item) {
+      if (item.profile == null) return "N/A";
+      return item.profile.email;
+    },
+    updatePolyCompany(event) {
+      const mousePos = this.$refs.stage.getNode().getPointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      const pointFirstIndex = event.target.attrs.pointFirstIndex;
+      this.obj.drawCompany.points[pointFirstIndex] = x;
+      this.obj.drawCompany.points[pointFirstIndex + 1] = y;
+    },
+    updatePolyDate(event) {
+      const mousePos = this.$refs.stage.getNode().getPointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      const pointFirstIndex = event.target.attrs.pointFirstIndex;
+      this.obj.drawDate.points[pointFirstIndex] = x;
+      this.obj.drawDate.points[pointFirstIndex + 1] = y;
+    },
+    updatePolyBillNo(event) {
+      const mousePos = this.$refs.stage.getNode().getPointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      const pointFirstIndex = event.target.attrs.pointFirstIndex;
+      this.obj.drawBillNo.points[pointFirstIndex] = x;
+      this.obj.drawBillNo.points[pointFirstIndex + 1] = y;
+    },
+    updatePolyTotalAmount(event) {
+      const mousePos = this.$refs.stage.getNode().getPointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      const pointFirstIndex = event.target.attrs.pointFirstIndex;
+      this.obj.drawTotalAmount.points[pointFirstIndex] = x;
+      this.obj.drawTotalAmount.points[pointFirstIndex + 1] = y;
+    },
+    updatePolyBillItem(event) {
+      const mousePos = this.$refs.stage.getNode().getPointerPosition();
+      const x = mousePos.x;
+      const y = mousePos.y;
+      const pointFirstIndex = event.target.attrs.pointFirstIndex;
+      this.obj.drawBillItem.points[pointFirstIndex] = x;
+      this.obj.drawBillItem.points[pointFirstIndex + 1] = y;
+    },
+
     onSearchChartOfAccount() {
       var self = this;
       self.refreshTableChartOfAccount();
@@ -597,20 +683,20 @@ export default {
     },
     getAnchors(item) {
       var anchors = [];
-      var room = item;
-      if (room == null) return [];
-      if (room.points == null) return [];
-      if (room.points.length == 0) return [];
+      // var room = item;
+      if (item == null) return [];
+      if (item.points == null) return [];
+      if (item.points.length == 0) return [];
 
-      for (let i = 0; i < room.points.length; i += 2) {
-        var anchorCode = room.code + "_points_" + i;
+      for (let i = 0; i < item.points.length; i += 2) {
+        var anchorCode = item.code + "_points_" + i;
         anchors.push({
-          roomId: room.id,
-          roomCode: room.code,
+          // roomId: room.id,
+          // roomCode: room.code,
           code: anchorCode,
           pointFirstIndex: i,
-          x: room.points[i],
-          y: room.points[i + 1],
+          x: item.points[i],
+          y: item.points[i + 1],
         });
       }
       return anchors;
