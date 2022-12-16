@@ -3,6 +3,16 @@ let apiUrl = process.env.VUE_APP_API_URL;
 
 class BillApi {
 
+
+    
+    getBillDataSet() {
+        var url = apiUrl + 'bills/xmlList';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     getList() {
         var url = apiUrl + 'bills';
         return api.call('get', url)

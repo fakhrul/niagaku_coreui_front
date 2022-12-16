@@ -30,6 +30,12 @@ export default [
         icon: 'cilUser'
       },
       {
+        _name: 'CSidebarNavItem',
+        name: 'Machine Learning',
+        to: '/admins/mlDownload',
+        icon: 'cilUser'
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Experiment'],
       },

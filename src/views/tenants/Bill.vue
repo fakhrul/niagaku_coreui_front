@@ -326,6 +326,10 @@
                     'Cheque',
                     'Purchase Order',
                     'Credit Card',
+                    'Payment voucher',
+                    'Insurance policy',
+                    'Others (with amount)',
+                    'Others (no amount)'
                   ]"
                   :value.sync="obj.documentType"
                 />

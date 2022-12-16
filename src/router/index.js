@@ -98,6 +98,7 @@ const WorkArea = () => import('@/views/pages/WorkArea')
 const Workspace = () => import('@/views/Workspace')
 const UserList = () => import('@/views/admins/UserList')
 const User = () => import('@/views/admins/User')
+const MlDownload = () => import('@/views/admins/MlDownload')
 
 
 Vue.use(Router)
@@ -241,7 +242,11 @@ function configRoutes() {
               name: 'UserList',
               component: UserList
             },
-            
+            {
+              path: 'mlDownload',
+              name: 'MlDownload',
+              component: MlDownload
+            },            
           ]
         },
 

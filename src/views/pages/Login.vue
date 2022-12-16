@@ -23,7 +23,7 @@
             <CCard class="p-4">
               <CCardBody>
                 <CForm class="mb-2 text-center">
-                  <CImg :src="logoUrl" width="100" class="mb-2"></CImg>
+                  <CImg :src="logoUrl" width="300" class="mb-2"></CImg>
                   <h5>Billing Record & Analysis System</h5>
                   <CInput
                     placeholder="Username"

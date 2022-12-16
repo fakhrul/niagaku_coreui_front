@@ -19,12 +19,19 @@
             <CCardHeader> <strong> User </strong> Information </CCardHeader>
             <CCardBody>
               <CForm>
-                <CInput
-                  label="Name"
+                <CInput label="Name" horizontal v-model="obj.fullName" />
+                <!-- <CInput
+                  label="Role"
                   horizontal
-                  v-model="obj.fullName"
+                  v-model="obj.appUser.role"
+                  readonly
+                /> -->
+                <CSelect
+                  label="Role"
+                  horizontal
+                  :options="['admin', 'normal']"
+                  :value.sync="obj.appUser.role"
                 />
-                <CInput label="Role" horizontal v-model="obj.role" readonly />
                 <CInput
                   label="Email"
                   horizontal
@@ -67,15 +74,10 @@
               </CForm>
             </CCardBody>
             <CCardFooter>
-              <CButton
-                type="submit"
-                size="sm"
-                color="primary"
-                @click="submit"
+              <CButton type="submit" size="sm" color="primary" @click="submit"
                 ><CIcon name="cil-check-circle" /> Submit</CButton
               >
 
-            
               <CButton class="ml-1" color="secondary" @click="cancel">
                 Cancel
               </CButton>
@@ -102,7 +104,9 @@ export default {
       api: new ProfileApi(),
       obj: {
         fullName: "",
-        role: "normal",
+        appUser: {
+          role: "normal",
+        },
         email: "",
       },
       loading: false,
@@ -113,12 +117,11 @@ export default {
     var self = this;
     self.resetObj();
   },
- 
+
   computed: {
     formString() {
       return JSON.stringify(this.obj, null, 4);
     },
-  
   },
   methods: {
     onSubmit() {
@@ -127,10 +130,11 @@ export default {
         profile: self.obj,
         isResetPassword: self.isResetPassword,
         plainPassword: self.plainPassword,
+        role: self.obj.appUser.role,
       };
 
       if (!self.obj.id) {
-        self.obj.role = "normal";
+        if (self.obj.appUser.role == null) self.obj.appUser.role = "normal";
         this.api
           .createProfileAppUser(profileDto)
           .then((response) => {
@@ -192,12 +196,14 @@ export default {
       return {
         fullName: "",
         email: "",
-        role: "normal",
+        appUser: {
+          role: "normal",
+        },
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
     cancel() {
       this.$router.push({ path: "/admins/UserList" });

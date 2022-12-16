@@ -5,14 +5,16 @@
     @update:show="(value) => $store.commit('set', ['sidebarShow', value])"
   >
     <CSidebarBrand class="d-md-down-none" to="/">
-      <!-- <CIcon
+      <CImg :src="logoUrl" height="48"></CImg>
+<!-- 
+       <CIcon
         class="c-sidebar-brand-full"
         name="logo"
         size="custom-size"
         :height="35"
         viewBox="0 0 642 134"
-      />
-      <CIcon
+      /> -->
+    <!--  <CIcon
         class="c-sidebar-brand-minimized"
         name="logo"
         size="custom-size"
@@ -36,6 +38,11 @@ export default {
   name: 'TheSidebar',
   nav,
   adminNav,
+  data: () => {
+    return {
+      logoUrl: "img/logo.png",
+    };
+  },
   computed: {
     show () {
       return this.$store.state.sidebarShow
