@@ -283,7 +283,14 @@
                 class="ml-1"
                 color="primary"
                 @click="analyze"
-                >AI Analyize</CButton
+                >Analyze Image</CButton
+              >
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="extract"
+                >Extract Text</CButton
               >
               <!-- <CButton  size="sm" color="primary" @click="downloadImage" >Download</CButton> -->
               <CButton
@@ -329,7 +336,7 @@
                     'Payment voucher',
                     'Insurance policy',
                     'Others (with amount)',
-                    'Others (no amount)'
+                    'Others (no amount)',
                   ]"
                   :value.sync="obj.documentType"
                 />
@@ -377,21 +384,20 @@
                 </CInput>
 
                 <CRow form class="form-group">
-                    <CCol tag="label" sm="3" class="col-form-label">
-                      Is For ML?
-                    </CCol>
-                    <CCol sm="9">
-                      <CSwitch
-                        class="mr-1"
-                        color="primary"
-                        :checked.sync="obj.isUseForMLTraining"
-                         label-on="YES"
-                         label-off="NO"
-                      >
-                      </CSwitch>
-                    </CCol>
-                  </CRow>
-
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Is For ML?
+                  </CCol>
+                  <CCol sm="9">
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="obj.isUseForMLTraining"
+                      label-on="YES"
+                      label-off="NO"
+                    >
+                    </CSwitch>
+                  </CCol>
+                </CRow>
               </CForm>
             </CCardBody>
             <CCardFooter>
@@ -453,6 +459,7 @@
 import BillApi from "../../lib/billApi";
 import ChartOfAccountApi from "../../lib/chartOfAccountApi";
 import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
+import OcrApi from "../../lib/ocrApi";
 import moment from "moment";
 
 import { validationMixin } from "vuelidate";
@@ -532,6 +539,7 @@ export default {
       drawType: "",
       drawingState: "",
       api: new BillApi(),
+      ocrApi: new OcrApi(),
       chartOfAccountApi: new ChartOfAccountApi(),
       loading: false,
     };
@@ -582,6 +590,77 @@ export default {
   },
 
   methods: {
+    extract() {
+      console.log(this.obj);
+
+      var companyPoints = "";
+      var datePoints = "";
+      var numberPoints = "";
+      var amountPoints = "";
+      var itemPoints = "";
+
+      if (this.obj.drawCompany != null)
+        if (this.obj.drawCompany.points != null)
+          companyPoints = this.obj.drawCompany.points.join(",");
+      if (this.obj.drawDate != null) {
+        if (this.obj.drawDate.points != null) {
+          datePoints = this.obj.drawDate.points.join(",");
+        }
+      }
+      if (this.obj.drawBillNo != null)
+        if (this.obj.drawBillNo.points != null)
+          numberPoints = this.obj.drawBillNo.points.join(",");
+      if (this.obj.drawTotalAmount != null)
+        if (this.obj.drawTotalAmount.points != null)
+          amountPoints = this.obj.drawTotalAmount.points.join(",");
+      if (this.obj.drawBillItem != null)
+        if (this.obj.drawBillItem.points != null)
+          itemPoints = this.obj.drawBillItem.points.join(",");
+
+      var data = {
+        uri: this.billImageUrl,
+        company_box: companyPoints,
+        date_box: datePoints,
+        number_box: numberPoints,
+        amount_box: amountPoints,
+        item_box: itemPoints,
+      };
+
+      // var data = this.ocrApi.imageToText(data);
+
+      this.ocrApi
+        .imageToText(data)
+        .then((response) => {
+          console.log(response);
+
+          var tempObj = response;
+          if(tempObj.company != "")
+          {
+            this.obj.companyName = tempObj.company;
+          }
+
+          if(tempObj.date != "")
+          {
+            //2022-04-09 00:00:00
+            var dateObj = moment(tempObj.date, 'YYYY-MM-DD HH:mm:ss');
+            this.obj.date = dateObj.format();
+            this.billDateTime = this.obj.date;
+          }
+
+          if(tempObj.number != "")
+          {
+            this.obj.billNo = tempObj.number;
+          }
+          if(tempObj.amount != "")
+          {
+            this.obj.totalAmount = tempObj.amount;
+          }
+          // self.$router.push({ path: "/tenants/chartOfAccountList" });
+        })
+        .catch(({ data }) => {
+          this.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
     getProfileEmail(item) {
       if (item.profile == null) return "N/A";
       return item.profile.email;
