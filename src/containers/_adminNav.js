@@ -4,7 +4,53 @@ export default [
     _children: [
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Purchase'],
+        _children: ['Expenses'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Expense',
+        to: '/tenants/expenseList',
+        icon: 'cilBookmark'
+      },
+      
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Invoicing'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Quotation',
+        to: '/tenants/quotationList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Invoice',
+        to: '/tenants/billList',
+        icon: 'cilBookmark'
+      },
+
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Bookkeeping'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Bill',
+        to: '/tenants/billList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Chart of Account',
+        to: '/tenants/chartOfAccountList',
+        icon: 'cilBookmark'
+      },
+
+
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Bookkeeping'],
       },
       {
         _name: 'CSidebarNavItem',

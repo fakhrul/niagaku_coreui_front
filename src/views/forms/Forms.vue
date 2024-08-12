@@ -4,7 +4,7 @@
       <CCol sm="6">
         <CCard>
           <CCardHeader>
-            <strong>Credit Card </strong> <small>Form</small>
+            <strong>Credit Card  asdsad</strong> <small>Form</small>
             <div class="card-header-actions">
               <a 
                 href="https://coreui.io/vue/docs/components/form-components" 

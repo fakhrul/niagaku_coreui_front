@@ -90,6 +90,7 @@ const Message = () => import('@/views/apps/email/Message')
 const OpenCV = () => import('@/views/tenants/OpenCV')
 const BillList = () => import('@/views/tenants/BillList')
 const Bill = () => import('@/views/tenants/Bill')
+const ExpenseList = () => import('@/views/tenants/ExpenseList')
 
 const ChartOfAccountList = () => import('@/views/tenants/ChartOfAccountList')
 const ChartOfAccount = () => import('@/views/tenants/ChartOfAccount')
@@ -145,6 +146,13 @@ function configRoutes() {
             render(c) { return c('router-view') }
           },
           children: [
+            {
+              path: '/tenants/expenseList',
+              name: 'ExpenseList',
+              component: ExpenseList
+            },
+
+
             {
               path: '/tenants/billList',
               name: 'BillList',

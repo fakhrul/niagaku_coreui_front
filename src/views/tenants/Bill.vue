@@ -1082,7 +1082,10 @@ export default {
         drawCompany: {},
       };
     },
-    analyze() {},
+    analyze() {
+
+      
+    },
     addNew() {
       this.$router.push({ path: "/tenants/Bill" });
     },
