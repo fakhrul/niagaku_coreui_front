@@ -6,7 +6,7 @@
   >
     <CSidebarBrand class="d-md-down-none" to="/">
       <CImg :src="logoUrl" height="48"></CImg>
-<!-- 
+      <!-- 
        <CIcon
         class="c-sidebar-brand-full"
         name="logo"
@@ -14,7 +14,7 @@
         :height="35"
         viewBox="0 0 642 134"
       /> -->
-    <!--  <CIcon
+      <!--  <CIcon
         class="c-sidebar-brand-minimized"
         name="logo"
         size="custom-size"
@@ -22,7 +22,7 @@
         viewBox="0 0 110 134"
       /> -->
     </CSidebarBrand>
-    <CRenderFunction flat :contentToRender="navigation"/>
+    <CRenderFunction flat :contentToRender="navigation" />
     <CSidebarMinimizer
       class="c-d-md-down-none"
       @click.native="$store.commit('toggle', 'sidebarMinimize')"
@@ -32,10 +32,12 @@
 
 <script>
 import adminNav from "./_adminNav";
+import tenantAdminNav from "./_tenantAdminNav";
+
 import nav from "./_nav";
 
 export default {
-  name: 'TheSidebar',
+  name: "TheSidebar",
   nav,
   adminNav,
   data: () => {
@@ -44,28 +46,29 @@ export default {
     };
   },
   computed: {
-    show () {
-      return this.$store.state.sidebarShow
+    show() {
+      return this.$store.state.sidebarShow;
     },
-    minimize () {
-      return this.$store.state.sidebarMinimize
+    minimize() {
+      return this.$store.state.sidebarMinimize;
     },
     navigation() {
-       try {
+      try {
         var role = auth.getRole();
-        console.log('role',role);
-        if (role == "admin") {
+        console.log("role", role);
+        if (role == "SystemAdmin") {
           return adminNav;
-        }
-        if (role == "normal") {
+        } else if (role == "TenantAdmin") {
+          return tenantAdminNav;
+        } else {
           return nav;
         }
       } catch (error) {}
       return nav;
 
-      return ;
+      return;
     },
-  }
-}
+  },
+};
 </script>
 

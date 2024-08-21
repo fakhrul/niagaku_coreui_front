@@ -33,6 +33,7 @@
       </CHeaderNavItem> -->
     </CHeaderNav>
     <CHeaderNav>
+      {{ userName }} ( {{businessName}})
       <!-- <CHeaderNavItem class="px-3 c-d-legacy-none">
         <button
           @click="() => $store.commit('toggle', 'darkMode')"
@@ -80,6 +81,22 @@ export default {
     return {
       logoUrl: "img/logo.png",
     };
+  },
+  computed: {
+    userName() {
+      try {
+        return auth.getUserName();
+      } catch (error) {}
+      return "Unknown";
+    },
+    businessName() {
+      try {
+        return auth.getDefaultBusinessName();
+      } catch (error) {}
+      return "Unknown";
+    },
+
+    
   },
 }
 </script>

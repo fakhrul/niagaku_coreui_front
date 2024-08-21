@@ -101,6 +101,21 @@ const UserList = () => import('@/views/admins/UserList')
 const User = () => import('@/views/admins/User')
 const MlDownload = () => import('@/views/admins/MlDownload')
 
+const TenantList = () => import('@/views/admins/TenantList')
+const Tenant = () => import('@/views/admins/Tenant')
+
+
+const BusinessList = () => import('@/views/tenants/BusinessList')
+const Business = () => import('@/views/tenants/Business')
+const QuotationList = () => import('@/views/tenants/QuotationList')
+const Quotation = () => import('@/views/tenants/Quotation')
+
+const CustomerList = () => import('@/views/tenants/CustomerList')
+const Customer = () => import('@/views/tenants/Customer')
+
+const ProductList = () => import('@/views/tenants/ProductList')
+const Product = () => import('@/views/tenants/Product')
+
 
 Vue.use(Router)
 
@@ -134,39 +149,139 @@ function configRoutes() {
   return [
     {
       path: '/',
-      redirect: '/tenants/billList',
+      redirect: '/dashboard',
       name: 'Home',
       component: TheContainer,
       children: [
         {
-          path: 'tenants',
-          redirect: '/tenants/billList',
-          name: 'Tenants',
+          path: 'dashboard',
+          name: 'Dashboard',
+          component: Dashboard,
+       
+        },
+        {
+          path: 'admins',
+          redirect: '/admins/tenantList',
+          name: 'TenantList',
           component: {
             render(c) { return c('router-view') }
           },
           children: [
             {
-              path: '/tenants/expenseList',
-              name: 'ExpenseList',
-              component: ExpenseList
+              path: '/admins/tenantList',
+              name: 'TenantList',
+              component: TenantList
             },
+            {
+              path: '/admins/tenant/:id',
+              name: 'TenantById',
+              component: Tenant
+            },
+            {
+              path: '/admins/tenant',
+              name: 'Tenant',
+              component: Tenant
+            },
+
+            {
+              path: 'user/:id',
+              name: 'UserById',
+              component: User
+            },
+            {
+              path: 'user',
+              name: 'User',
+              component: User
+            },
+            {
+              path: 'userList',
+              name: 'UserList',
+              component: UserList
+            },
+            // {
+            //   path: 'mlDownload',
+            //   name: 'MlDownload',
+            //   component: MlDownload
+            // },            
+          ]
+        },
+        {
+          path: 'tenants',
+          redirect: '/tenants/subsription',
+          name: 'Tenants',
+          component: {
+            render(c) { return c('router-view') }
+          },
+          children: [
+            // {
+            //   path: '/tenants/businessList',
+            //   name: 'ExpenseList',
+            //   component: BusinessList
+            // },
 
 
             {
-              path: '/tenants/billList',
-              name: 'BillList',
-              component: BillList
+              path: '/tenants/businessList',
+              name: 'BusinessList',
+              component: BusinessList
             },
             {
-              path: 'bill/:id',
-              name: 'BillById',
-              component: Bill
+              path: '/tenants/business/:id',
+              name: 'BusinessById',
+              component: Business
             },
             {
-              path: 'bill',
-              name: 'Bill',
-              component: Bill
+              path: '/tenants/business',
+              name: 'Business',
+              component: Business
+            },
+            
+            {
+              path: '/tenants/quotation',
+              name: 'Quotation',
+              component: Quotation
+            },
+            {
+              path: '/tenants/quotation/:id',
+              name: 'QuotationById',
+              component: Quotation
+            },
+            {
+              path: '/tenants/quotationList',
+              name: 'QuotationList',
+              component: QuotationList
+            },
+
+            {
+              path: '/tenants/Customer',
+              name: 'Customer',
+              component: Customer
+            },
+            {
+              path: '/tenants/Customer/:id',
+              name: 'CustomerById',
+              component: Customer
+            },
+            {
+              path: '/tenants/CustomerList',
+              name: 'CustomerList',
+              component: CustomerList
+            },
+
+            {
+              path: '/tenants/Product',
+              name: 'Product',
+              component: Product
+            },
+            {
+              path: '/tenants/Product/:id',
+              name: 'ProductById',
+              component: Product
+            },
+            {
+              path: '/tenants/ProductList',
+              name: 'ProductList',
+              component: ProductList
             },
 
             {
@@ -227,36 +342,7 @@ function configRoutes() {
           ]
         },
 
-        {
-          path: 'admins',
-          redirect: '/admins/userList',
-          name: 'UserList',
-          component: {
-            render(c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: 'user/:id',
-              name: 'UserById',
-              component: User
-            },
-            {
-              path: 'user',
-              name: 'User',
-              component: User
-            },
-            {
-              path: 'userList',
-              name: 'UserList',
-              component: UserList
-            },
-            {
-              path: 'mlDownload',
-              name: 'MlDownload',
-              component: MlDownload
-            },            
-          ]
-        },
+        
 
         {
           path: 'base',

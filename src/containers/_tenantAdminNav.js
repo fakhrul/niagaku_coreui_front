@@ -4,12 +4,52 @@ export default [
     _children: [
       {
         _name: 'CSidebarNavTitle',
-        _children: ['System Admin'],
+        _children: ['Tenant Admin'],
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Tenant List',
-        to: '/admins/tenantList',
+        name: 'Subscription',
+        to: '/tenants/subscription',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Business',
+        to: '/tenants/businessList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Income'],
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Quotation',
+        to: '/tenants/quotationList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Sales Order',
+        to: '/tenants/quotationList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Invoice',
+        to: '/tenants/quotationList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Customer',
+        to: '/tenants/customerList',
+        icon: 'cilBookmark'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Product',
+        to: '/tenants/productList',
         icon: 'cilBookmark'
       },
       {

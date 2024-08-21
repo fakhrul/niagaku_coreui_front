@@ -64,6 +64,48 @@
                   </CRow>
                 </CForm>
               </CCardBody>
+              <CCardFooter>
+                <CRow>
+                  <CCol class="text-center">
+                    <p>{{ version }}</p>
+                  </CCol>
+                </CRow>
+                <CRow>
+                  <CCol>
+                    <h3>System Admin</h3>
+                    <ul>
+                      <li>admin@niagaku.com</li>
+                    </ul>
+                  </CCol>
+                </CRow>
+                <CRow>
+                  <CCol>
+                    <h3>Tenant 1</h3>
+                    <ul>
+                      <li>tenant1@niagaku.com</li>
+                      <li>accountant1_1@tenant1.com</li>
+                      <li>accountant1_2@tenant1.com</li>
+                      <li>staff1_1@tenant1.com</li>
+                      <li>staff1_2@tenant1.com</li>
+                      <li>staff1_3@tenant1.com</li>
+                    </ul>
+                  </CCol>
+                </CRow>
+                <CRow>
+                  <CCol>
+                    <h3>Tenant 2</h3>
+                    <ul>
+                      <li>tenant2@niagaku.com</li>
+                      <li>accountant1_1@tenant2.com</li>
+                      <li>accountant1_2@tenant2.com</li>
+                      <li>staff1_1@tenant2.com</li>
+                      <li>staff1_2@tenant2.com</li>
+                      <li>staff1_3@tenant2.com</li>
+                    </ul>
+                  </CCol>
+                </CRow>
+              </CCardFooter>
+
             </CCard>
           </CCardGroup>
           <CRow>
@@ -86,11 +128,16 @@ export default {
       infoList: [],
       logoUrl: "img/logo.png",
       loginObj: {
-        email: "",
-        password: "",
+        email: "admin@niagaku.com",
+        password: "qwe123",
         // authenticated: true,
       },
     };
+  },
+  computed: {
+    version() {
+      return process.env.VUE_APP_VERSION;
+    },
   },
   methods: {
     gotToAdmin() {

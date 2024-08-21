@@ -20,6 +20,24 @@ class AuthService {
                 this.user = data;
             });
     }
+    getDefaultBusinessName(){
+        try {
+            return this.user.userData.profile.defaultBusiness.name;
+        } catch (error) {
+            return "Unknown";
+        }
+    }
+    getUserName(){
+        console.log(this.user);
+        return this.user.userData.userName;
+    }
+
+    // setDefaultBusinessName(data){
+    //     console.log('setDefaultBusinessName');
+    //     console.log(data);
+    //     this.user.userData.profile.defaultBusiness = data;
+    //     this.user.userData.profile.defaultBusinessId = data.Id;
+    // }
 
     doLogin(data) {
         var url = apiUrl + 'Account/login';
