@@ -33,6 +33,7 @@
 <script>
 import adminNav from "./_adminNav";
 import tenantAdminNav from "./_tenantAdminNav";
+import accountantNav from "./_accountantNav";
 
 import nav from "./_nav";
 
@@ -60,6 +61,8 @@ export default {
           return adminNav;
         } else if (role == "TenantAdmin") {
           return tenantAdminNav;
+        } else if (role == "Accountant") {
+          return accountantNav;
         } else {
           return nav;
         }

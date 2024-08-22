@@ -79,7 +79,7 @@ const Calendar = () => import('@/views/plugins/Calendar')
 const Spinners = () => import('@/views/plugins/Spinners')
 
 // Apps -> Invoice
-const Invoice = () => import('@/views/apps/invoicing/Invoice')
+// const Invoice = () => import('@/views/apps/invoicing/Invoice')
 
 // Apps -> Email
 const EmailApp = () => import('@/views/apps/email/EmailApp')
@@ -115,7 +115,19 @@ const Customer = () => import('@/views/tenants/Customer')
 
 const ProductList = () => import('@/views/tenants/ProductList')
 const Product = () => import('@/views/tenants/Product')
+const SalesOrderList = () => import('@/views/tenants/SalesOrderList')
+const SalesOrder = () => import('@/views/tenants/SalesOrder')
 
+const InvoiceList = () => import('@/views/tenants/InvoiceList')
+const Invoice = () => import('@/views/tenants/Invoice')
+
+const OtherExpenseList = () => import('@/views/tenants/OtherExpenseList')
+const OtherExpense = () => import('@/views/tenants/OtherExpense')
+
+const ClaimList = () => import('@/views/employee/ClaimList')
+const Claim = () => import('@/views/employee/Claim')
+const PaySlipList = () => import('@/views/employee/PaySlipList')
+const PaySlip = () => import('@/views/employee/PaySlip')
 
 Vue.use(Router)
 
@@ -159,6 +171,51 @@ function configRoutes() {
           component: Dashboard,
        
         },
+        //
+        {
+          path: 'employee',
+          redirect: '/employee/dashboard',
+          name: 'EmployeeDashboard',
+          component: {
+            render(c) { return c('router-view') }
+          },
+          children: [
+            {
+              path: '/employee/paySlipList',
+              name: 'PaySlipList',
+              component: PaySlipList
+            },
+            {
+              path: '/employee/paySlip/:id',
+              name: 'PaySlipById',
+              component: PaySlip
+            },
+            {
+              path: '/employee/paySlip',
+              name: 'PaySlip',
+              component: PaySlip
+            },
+            {
+              path: '/employee/claimList',
+              name: 'ClaimList',
+              component: ClaimList
+            },
+            {
+              path: '/employee/claim/:id',
+              name: 'ClaimById',
+              component: Claim
+            },
+            {
+              path: '/employee/claim',
+              name: 'Claim',
+              component: Claim
+            },
+                
+          ]
+        },
+
+
+        //
         {
           path: 'admins',
           redirect: '/admins/tenantList',
@@ -284,6 +341,56 @@ function configRoutes() {
               component: ProductList
             },
 
+            //
+            {
+              path: '/tenants/SalesOrder',
+              name: 'SalesOrder',
+              component: SalesOrder
+            },
+            {
+              path: '/tenants/SalesOrder/:id',
+              name: 'SalesOrderById',
+              component: SalesOrder
+            },
+            {
+              path: '/tenants/SalesOrderList',
+              name: 'SalesOrderList',
+              component: SalesOrderList
+            },
+            //
+            {
+              path: '/tenants/Invoice',
+              name: 'Invoice',
+              component: Invoice
+            },
+            {
+              path: '/tenants/Invoice/:id',
+              name: 'InvoiceById',
+              component: Invoice
+            },
+            {
+              path: '/tenants/InvoiceList',
+              name: 'InvoiceList',
+              component: InvoiceList
+            },
+
+            //
+            {
+              path: '/tenants/OtherExpense',
+              name: 'OtherExpense',
+              component: OtherExpense
+            },
+            {
+              path: '/tenants/OtherExpense/:id',
+              name: 'OtherExpenseById',
+              component: OtherExpense
+            },
+            {
+              path: '/tenants/OtherExpenseList',
+              name: 'OtherExpenseList',
+              component: OtherExpenseList
+            },
+//
             {
               path: '/tenants/chartOfAccountList',
               name: 'chartOfAccountList',

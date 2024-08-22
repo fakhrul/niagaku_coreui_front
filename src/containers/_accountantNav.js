@@ -2,23 +2,23 @@ export default [
   {
     _name: 'CSidebarNav',
     _children: [
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Tenant Admin'],
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Subscription',
+      //   to: '/tenants/subscription',
+      //   icon: 'cilBookmark'
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Business',
+      //   to: '/tenants/businessList',
+      //   icon: 'cilBookmark'
+      // },
       {
-        _name: 'CSidebarNavTitle',
-        _children: ['Tenant Admin'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Subscription',
-        to: '/tenants/subscription',
-        icon: 'cilBookmark'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Business',
-        to: '/tenants/businessList',
-        icon: 'cilBookmark'
-      },
-   {
         _name: 'CSidebarNavTitle',
         _children: ['Company'],
       },
@@ -60,45 +60,6 @@ export default [
           },
         ]
       },
-
-
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Incomes'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Quotation',
-      //   to: '/tenants/quotationList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Sales Order',
-      //   to: '/tenants/salesOrderList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Invoice',
-      //   to: '/tenants/invoiceList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Customer',
-      //   to: '/tenants/customerList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Product/Service',
-      //   to: '/tenants/productList',
-      //   icon: 'cilBookmark'
-      // },
-
-
-      //
       {
         _name: 'CSidebarNavDropdown',
         name: 'Expenses',
@@ -275,18 +236,18 @@ export default [
 
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Bookkeeping'],
+        _children: ['My Records'],
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Bill',
-        to: '/tenants/billList',
+        name: 'PaySlip',
+        to: '/employee/paySlipList',
         icon: 'cilBookmark'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Chart of Account',
-        to: '/tenants/chartOfAccountList',
+        name: 'Claims',
+        to: '/employee/claimList',
         icon: 'cilBookmark'
       },
 
