@@ -102,6 +102,9 @@ const fields = [
   { key: "businessName" },
   { key: "date" },
   { key: "claimNo" },
+  { key: "totalAmount" },
+  { key: "claimStateDescription" },
+  
   {
     key: "show_details",
     label: "",
@@ -135,6 +138,7 @@ export default {
           ...item,
           profileName: item.profile.fullName,
           businessName: item.business.name,
+          totalAmount: this.getTotalAmount(item)
         };
       });
     },
@@ -145,6 +149,15 @@ export default {
     self.refreshTable();
   },
   methods: {
+    getTotalAmount(item){
+      try {
+        const totalAmount = item.items.reduce((sum, claim) => sum + claim.amount, 0);
+      return totalAmount.toFixed(2);
+        
+      } catch (error) {
+        return 0;
+      } 
+    },
     setDefault(item) {
       var self = this;
       self.api

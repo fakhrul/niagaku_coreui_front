@@ -151,7 +151,7 @@ export default {
       var self = this;
       self.loading = false;
       self.api
-        .getList()
+        .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
           self.loading = false;

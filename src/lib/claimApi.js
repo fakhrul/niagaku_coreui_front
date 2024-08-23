@@ -19,8 +19,14 @@ class ClaimApi {
                 return data
             });
     }
-
-
+    
+    getClaimState() {
+        var url = apiUrl + 'claims/states';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
     get(id) {
         var url = apiUrl + 'claims/';
         return api.call('get', url + id)

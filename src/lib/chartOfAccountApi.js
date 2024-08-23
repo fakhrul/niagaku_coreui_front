@@ -3,6 +3,16 @@ let apiUrl = process.env.VUE_APP_API_URL;
 
 class ChartOfAccountApi {
 
+    getListByCurrentBusiness()
+    {
+        var url = apiUrl + 'chartAccounts/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
     getList() {
         var url = apiUrl + 'chartAccounts';
         return api.call('get', url)

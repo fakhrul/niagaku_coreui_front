@@ -172,7 +172,7 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Chart Of Account',
-            to: '/tenants/expenseList',
+            to: '/tenants/chartOfAccountList',
             icon: 'cilBookmark'
           },
         ]
