@@ -162,77 +162,9 @@ export default [
             to: '/tenants/expenseList',
             icon: 'cilBookmark'
           },
-          // {
-          //   _name: 'CSidebarNavItem',
-          //   name: 'Reconcilation',
-          //   to: '/tenants/expenseList',
-          //   icon: 'cilBookmark'
-          // },
-          // {
-          //   _name: 'CSidebarNavItem',
-          //   name: 'Chart Of Account',
-          //   to: '/tenants/expenseList',
-          //   icon: 'cilBookmark'
-          // },
+    
         ]
       },
-      //
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Expenses'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Purchase Quotation',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Purchase Order',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Bill',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Receipt',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Vendor/Supplier',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Other Expenses',
-      //   to: '/tenants/otherExpenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Invoicing'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Quotation',
-      //   to: '/tenants/quotationList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Invoice',
-      //   to: '/tenants/billList',
-      //   icon: 'cilBookmark'
-      // },
 
       {
         _name: 'CSidebarNavTitle',
@@ -250,7 +182,12 @@ export default [
         to: '/employee/claimList',
         icon: 'cilBookmark'
       },
-
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Receipts',
+        to: '/employee/receiptList',
+        icon: 'cilBookmark'
+      },
 
       {
         _name: 'CSidebarNavTitle',

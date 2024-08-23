@@ -90,13 +90,12 @@ const Message = () => import('@/views/apps/email/Message')
 const OpenCV = () => import('@/views/tenants/OpenCV')
 const BillList = () => import('@/views/tenants/BillList')
 const Bill = () => import('@/views/tenants/Bill')
+
 const ExpenseList = () => import('@/views/tenants/ExpenseList')
 
 const ChartOfAccountList = () => import('@/views/tenants/ChartOfAccountList')
 const ChartOfAccount = () => import('@/views/tenants/ChartOfAccount')
 
-const WorkArea = () => import('@/views/pages/WorkArea')
-const Workspace = () => import('@/views/Workspace')
 const UserList = () => import('@/views/admins/UserList')
 const User = () => import('@/views/admins/User')
 const MlDownload = () => import('@/views/admins/MlDownload')
@@ -128,7 +127,8 @@ const ClaimList = () => import('@/views/employee/ClaimList')
 const Claim = () => import('@/views/employee/Claim')
 const PaySlipList = () => import('@/views/employee/PaySlipList')
 const PaySlip = () => import('@/views/employee/PaySlip')
-
+const ReceiptList = () => import('@/views/employee/ReceiptList')
+const Receipt = () => import('@/views/employee/Receipt')
 Vue.use(Router)
 
 const router = new Router({
@@ -180,6 +180,23 @@ function configRoutes() {
             render(c) { return c('router-view') }
           },
           children: [
+            {
+              path: '/employee/receiptList',
+              name: 'ReceiptList',
+              component: ReceiptList
+            },
+            {
+              path: '/employee/receipt/:id',
+              name: 'ReceiptById',
+              component: Receipt
+            },
+            {
+              path: '/employee/receiptSlip',
+              name: 'Receipt',
+              component: Receipt
+            },
+
+
             {
               path: '/employee/paySlipList',
               name: 'PaySlipList',
@@ -275,6 +292,24 @@ function configRoutes() {
             //   name: 'ExpenseList',
             //   component: BusinessList
             // },
+
+            {
+              path: '/tenants/BillList',
+              name: 'BillList',
+              component: BillList
+            },
+            {
+              path: '/tenants/bill/:id',
+              name: 'BillById',
+              component: Bill
+            },
+            {
+              path: '/tenants/bill',
+              name: 'Bill',
+              component: Bill
+            },
+
+            //
 
 
             {
@@ -729,11 +764,7 @@ function configRoutes() {
         }
       ]
     },
-    {
-      path: '/workspace/:id',
-      name: 'Workspace',
-      component: Workspace,
-    },
+  
     {
       path: '/apps/email',
       redirect: '/apps/email/inbox',
@@ -785,16 +816,16 @@ function configRoutes() {
           component: Register
         },
 
-        {
-          path: 'workArea/:id',
-          name: 'WorkArea',
-          component: WorkArea
-        },
-        {
-          path: 'workArea',
-          name: 'WorkArea',
-          component: WorkArea
-        },
+        // {
+        //   path: 'workArea/:id',
+        //   name: 'WorkArea',
+        //   component: WorkArea
+        // },
+        // {
+        //   path: 'workArea',
+        //   name: 'WorkArea',
+        //   component: WorkArea
+        // },
 
       ]
     },
