@@ -2,6 +2,14 @@ let apiUrl = process.env.VUE_APP_API_URL;
 
 
 class QuotationApi {
+    
+    getQuotationStatus() {
+        var url = apiUrl + 'quotations/states';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
 
     getListByCurrentBusiness()
     {
@@ -45,6 +53,15 @@ class QuotationApi {
             });
 
     }
+
+    updateState(data) {
+        var url = apiUrl + 'quotations/state/';
+        return api.call('put', url + data.id, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     update(data) {
         var url = apiUrl + 'quotations/';
         return api.call('put', url + data.id, data)

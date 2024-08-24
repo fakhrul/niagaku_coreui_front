@@ -15,13 +15,62 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
+          <CCardHeader> <strong> Business</strong> Information </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Category" horizontal v-model="obj.category" />
-              <CInput label="Account No" horizontal v-model="obj.accountNo" />
               <CInput label="Name" horizontal v-model="obj.name" />
+              <CInput label="RegNo" horizontal v-model="obj.regNo" />
+              <CInput label="Tagline" horizontal v-model="obj.tagLine" />
             </CForm>
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
+              <CCol sm="9">
+                <CTextarea
+                  placeholder="Address..."
+                  rows="5"
+                  v-model="obj.address"
+                />
+              </CCol>
+            </CRow>
+
+            <CInput label="City" horizontal v-model="obj.city" />
+            <CInput label="Country" horizontal v-model="obj.country" />
+            <CInput label="State" horizontal v-model="obj.state" />
+            <CInput label="Postcode" horizontal v-model="obj.postcode" />
+            <!-- <CInput label="Phone" horizontal v-model="obj.tagLine" /> -->
+            <CInput label="Phone" horizontal v-model="obj.phone" />
+            <CInput label="Website" horizontal v-model="obj.website" />
+            <CInput label="TaxIdentificationNumber" horizontal v-model="obj.taxIdentificationNumber" />
+            <CInput label="Currency" horizontal v-model="obj.currency" />
+
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label">
+                Company Logo
+              </CCol>
+              <CCol sm="9">
+                <CImg :src="getImageUrl()" class="mb-2" thumbnail></CImg>
+              </CCol>
+            </CRow>
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label"> </CCol>
+              <CCol sm="9">
+                <WidgetsUploadImage :logoUrl="logoUrl" @uploaded="uploaded" />
+              </CCol>
+            </CRow>
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label">
+                Company Chop
+              </CCol>
+              <CCol sm="9">
+                <CImg :src="getChopImageUrl()" class="mb-2" thumbnail></CImg>
+              </CCol>
+            </CRow>
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label"> </CCol>
+              <CCol sm="9">
+                <WidgetsUploadImage :logoUrl="chopUrl" @uploaded="chop_uploaded" />
+              </CCol>
+            </CRow>
           </CCardBody>
           <CCardFooter>
             <CButton type="submit" size="sm" color="primary" @click="submit"
@@ -35,28 +84,63 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import BusinessApi from "@/lib/businessApi";
+import WidgetsUploadImage from "../widgets/WidgetsUploadImage";
 
 export default {
-  name: "ChartOfAccount",
+  name: "Business",
+  components: {
+    WidgetsUploadImage,
+  },
   data: () => {
     return {
+      logoUrl: "",
+      chopUrl: "",
+      // uploadedFiles: [],
+
       organizationTypeList: [],
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
-      api: new ChartOfAccountApi(),
+      api: new BusinessApi(),
     };
   },
   mounted() {
     var self = this;
     self.resetObj();
   },
-  computed: {
-    
-  },
+  computed: {},
   methods: {
+    uploaded(data) {
+      // this.uploadedFiles = data.uploadedFiles;
+
+      console.log('uploaded', data);
+      var url = "/Documents/File/" + data.uploadedFiles[0].id;
+      this.obj.logoUrl = url;
+    },
+    chop_uploaded(data) {
+      // this.uploadedFiles = data.uploadedFiles;
+      var url = "/Documents/File/" + data.uploadedFiles[0].id;
+
+      this.obj.companyChopUrl = url;
+    },
+    removeTrailingSlash(str) {
+      if (str.endsWith("/")) {
+        return str.slice(0, -1);
+      }
+      return str;
+    },
+    getChopImageUrl() {
+      var url = this.removeTrailingSlash(apiUrl) + this.obj.companyChopUrl;
+      console.log(url);
+      return url;
+    },
+    getImageUrl() {
+      var url = this.removeTrailingSlash(apiUrl) + this.obj.logoUrl;
+      console.log(url);
+      return url;
+    },
+
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -78,7 +162,7 @@ export default {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            // self.$router.push({ path: "/tenants/businessList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -87,7 +171,10 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            self.toast("Success", "Database had been update", "success");
+            self.resetObj();
+
+            // self.$router.push({ path: "/tenants/businessList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -129,10 +216,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

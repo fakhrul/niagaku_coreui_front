@@ -19,7 +19,17 @@
           <CCardBody>
             <CForm>
               <CInput label="Name" horizontal v-model="obj.name" />
-              <CInput label="Address" horizontal v-model="obj.address" />
+              <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
+              <CCol sm="9">
+                <CTextarea
+                  placeholder="Address..."
+                  rows="5"
+                  v-model="obj.address"
+                />
+              </CCol>
+            </CRow>
+
               <CInput label="City" horizontal v-model="obj.city" />
               <CInput label="Country" horizontal v-model="obj.country" />
               <CInput label="State" horizontal v-model="obj.state" />

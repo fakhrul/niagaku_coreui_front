@@ -25,8 +25,10 @@ Vue.use(VueKonva);
 window.api = new Api();
 window.auth = new AuthService();
 window.helper = new Helper();
-window.business = new BusinessHelper();
-window.drawing = new DrawingHelper();
+window.apiUrl = process.env.VUE_APP_API_URL || window.config.API_URL;
+
+// window.business = new BusinessHelper();
+// window.drawing = new DrawingHelper();
 
 
 new Vue({
