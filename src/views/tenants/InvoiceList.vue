@@ -31,6 +31,17 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_status="{ item }">
+                  <td>
+                    <CBadge
+                      :color="
+                        getInvoiceStatusBadgeColor(item.statusDescription)
+                      "
+                      >{{ item.statusDescription }}</CBadge
+                    >
+                  </td>
+                </template>
+
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -96,10 +107,12 @@ import InvoiceApi from "@/lib/invoiceApi";
 
 const items = [];
 const fields = [
-  { key: "invoiceNumber"},
-  { key: "customerName"},
-  { key: "accountNo"},
-  { key: "status" },
+  { key: "invoiceNumber" },
+  { key: "customerName" },
+  { key: "grandTotal" },
+
+  { key: "show_status", label: "Status" },
+  // { key: "statusDescription" },
   {
     key: "show_details",
     label: "",
@@ -108,8 +121,6 @@ const fields = [
     filter: false,
   },
 ];
-
-
 
 export default {
   name: "InvoiceList",
@@ -138,13 +149,37 @@ export default {
         return {
           ...item,
           customerName: item.customer.name,
+          grandTotal: this.getGrandTotal(item),
         };
       });
     },
-   
   },
 
   methods: {
+    getGrandTotal(invoice) {
+      console.log('grandTotal', invoice);
+      var total = 0;
+      for (var i = 0; i < invoice.items.length; i++) {
+        var item = invoice.items[i];
+        total += item.price * item.quantity;
+      }
+      return total.toFixed(2);
+    },
+    getInvoiceStatusBadgeColor(status) {
+      return status === "Draft"
+        ? "secondary"
+        : status === "Accepted"
+        ? "primary"
+        : status === "Sent"
+        ? "success"
+        : status === "Rejected"
+        ? "warning"
+        : status === "ShowRoom"
+        ? "info"
+        : status === "Cancelled"
+        ? "danger"
+        : "secondary";
+    },
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -167,7 +202,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
-          console.log(self.items);  
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {

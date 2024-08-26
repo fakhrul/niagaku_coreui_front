@@ -92,13 +92,12 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import SalesOrderApi from "@/lib/salesOrderApi";
 
 const items = [];
 const fields = [
-  { key: "category"},
-  { key: "accountNo"},
-  { key: "name" },
+  { key: "date"},
+  { key: "orderNo"},
   {
     key: "show_details",
     label: "",
@@ -111,7 +110,7 @@ const fields = [
 
 
 export default {
-  name: "ChartOfAccountList",
+  name: "SalesOrderList",
   data() {
     return {
       loading: true,
@@ -122,7 +121,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ChartOfAccountApi(),
+      api: new SalesOrderApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -151,7 +150,7 @@ export default {
       var self = this;
       self.loading = false;
       self.api
-        .getList()
+        .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
           self.loading = false;
@@ -163,7 +162,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/ChartOfAccount/${item.id}`,
+        path: `/tenants/SalesOrder/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -186,7 +185,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/ChartOfAccount" });
+      this.$router.push({ path: "/tenants/SalesOrder" });
     },
     toast(header, message, color) {
       var self = this;

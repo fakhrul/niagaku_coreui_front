@@ -15,12 +15,36 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
+          <CCardHeader>
+            <strong> Sales Order </strong> Information
+          </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Category" horizontal v-model="obj.category" />
-              <CInput label="Account No" horizontal v-model="obj.accountNo" />
-              <CInput label="Name" horizontal v-model="obj.name" />
+              <CInput label="Order No" horizontal v-model="obj.orderNo" />
+              <CInput
+                horizontal
+                label="Date"
+                type="date"
+                :value="computeDate"
+                @change="setDate"
+              />
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label">
+                  BOL Documents
+                </CCol>
+                <CCol sm="9">
+                  <CLink target="_blank" :href="getDocumentUrl()">{{
+                    getDocumentName()
+                  }}</CLink>
+                </CCol>
+              </CRow>
+
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label"> </CCol>
+                <CCol sm="9">
+                  <WidgetsUploadDocument @uploaded="uploaded" />
+                </CCol>
+              </CRow>
             </CForm>
           </CCardBody>
           <CCardFooter>
@@ -35,18 +59,27 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import SalesOrderApi from "@/lib/salesOrderApi";
+import moment from "moment";
+import WidgetsUploadDocument from "../widgets/WidgetsUploadDocument.vue";
 
 export default {
-  name: "ChartOfAccount",
+  name: "SalesOrder",
+  components: {
+    WidgetsUploadDocument,
+  },
   data: () => {
     return {
+      uploadedFiles: [],
+      orderDate: Date(),
       organizationTypeList: [],
       infoList: [],
       obj: {
+        date: Date(),
+        orderNo: "",
       },
       submitted: false,
-      api: new ChartOfAccountApi(),
+      api: new SalesOrderApi(),
     };
   },
   mounted() {
@@ -54,9 +87,42 @@ export default {
     self.resetObj();
   },
   computed: {
-    
+    computeDate() {
+      return moment(this.orderDate).format("YYYY-MM-DD");
+    },
   },
   methods: {
+    getDocumentUrl()
+    {
+      var self = this;
+      return apiUrl + "documents/file/" + this.obj.documentId;
+
+    },
+    getDocumentName()
+    {
+      if (this.obj.document == null) return "Unknown";
+      if (this.obj.document.fileName == null) return "Unknown";
+
+      return this.obj.document.fileName;
+
+    },
+    uploaded(data) {
+      var self = this;
+      self.uploadedFiles = data.uploadedFiles;
+      console.log(self.uploadedFiles);
+      self.obj.documentId = self.uploadedFiles[0].id;
+      // self.api
+      //   .createReceiptImage(self.uploadedFiles)
+      //   .then((response) => {
+      //     self.resetObj();
+      //   })
+      //   .catch(({ data }) => {
+      //     self.toast("Error", helper.getErrorMessage(data), "danger");
+      //   });
+    },
+    setDate(e) {
+      this.orderDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -64,6 +130,9 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            this.orderDate = self.obj.date;
+
+            console.log(self.obj);
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -74,11 +143,13 @@ export default {
     },
     onSubmit() {
       var self = this;
+      self.obj.date = self.orderDate;
+
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            self.$router.push({ path: "/tenants/salesOrderList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -87,7 +158,7 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            self.$router.push({ path: "/tenants/salesOrderList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -129,10 +200,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

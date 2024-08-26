@@ -10,8 +10,6 @@ class TenantApi {
                 return data
             });
     }
-
-
     get(id) {
         var url = apiUrl + 'tenants/';
         return api.call('get', url + id)

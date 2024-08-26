@@ -38,19 +38,9 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
-                  <!-- 
-                <CDropdownItem>Action</CDropdownItem>
-                <CDropdownItem>Another action</CDropdownItem>
-                <CDropdownItem>Something else here</CDropdownItem> -->
+            
                 </CDropdown>
-                <!-- <a
-                href="https://vue-select.org/"
-                rel="noreferrer noopener"
-                target="_blank"
-                class="card-header-action"
-              >
-                <small class="text-muted">docs</small>
-              </a> -->
+         
               </div>
             </CCardHeader>
             <CCardBody>

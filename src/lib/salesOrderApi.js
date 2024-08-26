@@ -1,36 +1,20 @@
 let apiUrl = process.env.VUE_APP_API_URL;
 
 
-class InvoiceApi {
-
-    getInvoiceStatus() {
-        var url = apiUrl + 'invoices/states';
-        return api.call('get', url)
-            .then(({ data }) => {
-                return data
-            });
-    }
+class SalesOrderApi {
 
     getListByCurrentBusiness()
     {
-        var url = apiUrl + 'invoices/currentBusiness/';
+        var url = apiUrl + 'salesOrders/currentBusiness/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
 
-    }
-
-    getListByCurrentTenant(){
-        var url = apiUrl + 'invoices/currentUser/';
-        return api.call('get', url)
-            .then(({ data }) => {
-                return data
-            });
     }
 
     getList() {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'salesOrders';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -39,14 +23,32 @@ class InvoiceApi {
 
 
     get(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'salesOrders/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
+    getNext(id) {
+        var url = apiUrl + 'salesOrders/nextTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+    
+    getPrev(id) {
+        var url = apiUrl + 'salesOrders/prevTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
     create(data) {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'salesOrders';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -54,14 +56,14 @@ class InvoiceApi {
 
     }
     update(data) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'salesOrders/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
     delete(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'salesOrders/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -70,4 +72,4 @@ class InvoiceApi {
 
 }
 
-export default InvoiceApi;
+export default SalesOrderApi;

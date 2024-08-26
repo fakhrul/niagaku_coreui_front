@@ -98,12 +98,73 @@
           </CModal>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol sm="12">
+          <CCard>
+            <CCardHeader> <strong> User </strong> List </CCardHeader>
+            <CCardBody>
+              <CDataTable
+                :items="computedProfileItems"
+                :fields="profilefields"
+                column-filter
+                items-per-page-select
+                :items-per-page="10"
+                hover
+                sorter
+                pagination
+                :loading="profileLoading"
+              >
+                <template #show_details="{ item }">
+                  <td>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      square
+                      size="sm"
+                      @click="onEditProfile(item)"
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      square
+                      size="sm"
+                      @click="showDeleteProfileConfirmation(item)"
+                    >
+                      Delete
+                    </CButton>
+                  </td>
+                </template>
+              </CDataTable>
+            </CCardBody>
+            <CCardFooter>
+              <CButton
+                type="submit"
+                size="sm"
+                color="primary"
+                @click="addNewProfile"
+                ><CIcon name="cil-check-circle" /> Add New</CButton
+              >
+            </CCardFooter>
+          </CCard>
+          <CModal
+            title="Confirm Delete"
+            color="warning"
+            :show.sync="warningProfileModal"
+            @update:show="onDeleteProfileConfirmation"
+          >
+            Are you sure you want to delete this {{ itemToDelete.code }} ?
+          </CModal>
+        </CCol>
+      </CRow>
     </div>
   </div>
 </template>
 
 <script>
 import BusinessApi from "@/lib/businessApi";
+import ProfileApi from "@/lib/profileApi";
 
 const items = [];
 const fields = [
@@ -119,19 +180,40 @@ const fields = [
   },
 ];
 
+// const profileItems = [];
+const profilefields = [
+  { key: "fullName" },
+  { key: "email" },
+  { key: "business" },
+  { key: "role" },
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:150px",
+    sorter: false,
+    filter: false,
+  },
+];
+
 export default {
   name: "BusinessList",
   data() {
     return {
+      warningProfileModal: false,
+      profileLoading: true,
+      profileItems: [],
+      profilefields,
       loading: true,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
+
       infoList: [],
       fields,
       details: [],
       collapseDuration: 0,
       api: new BusinessApi(),
+      profileApi: new ProfileApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -139,8 +221,65 @@ export default {
   mounted() {
     var self = this;
     self.refreshTable();
+    self.refreshProfileTable();
   },
+  computed: {
+    computedProfileItems() {
+      return this.profileItems.map((item) => {
+        return {
+          ...item,
+          business:item.defaultBusiness.name,
+          role: item.appUser.role,
+        };
+      });
+    },
+  },
+
   methods: {
+    /// For Profile List
+    onEditProfile(item) {
+      var self = this;
+      self.$router.push({
+        path: `/admins/tenant/${item.id}`,
+      });
+    },
+    onDeleteProfileConfirmation(status, evt, accept) {
+      var self = this;
+      if (accept) {
+        this.api
+          .delete(self.itemToDelete.id)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      self.itemToDelete = {};
+    },
+    showDeleteProfileConfirmation(item) {
+      var self = this;
+      self.itemToDelete = item;
+      self.warningProfileModal = true;
+    },
+    addNewProfile() {
+      this.$router.push({ path: "/admins/Tenant" });
+    },
+    refreshProfileTable() {
+      var self = this;
+      self.profileLoading = false;
+      self.profileApi
+        .getListByCurrentTenant()
+        .then((response) => {
+          self.profileItems = response.result;
+          console.log(self.profileItems);
+          self.profileLoading = false;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
     setDefault(item) {
       var self = this;
       self.api
@@ -169,6 +308,8 @@ export default {
         this.collapseDuration = 0;
       });
     },
+   
+
     refreshTable() {
       var self = this;
       self.loading = false;
@@ -176,6 +317,7 @@ export default {
         .getListByCurrentTenant()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {

@@ -18,15 +18,15 @@
             />
           </CCol>
           <CCol>
-            <h1>{{ quotation.business.name }}</h1>
-            <p>{{ "(" + quotation.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(quotation.business.address)"></p>
-            <p>Tel: {{ quotation.business.phone }}</p>
+            <h1>{{ invoice.business.name }}</h1>
+            <p>{{ "(" + invoice.business.regNo + ")" }}</p>
+            <p v-html="formatAddress(invoice.business.address)"></p>
+            <p>Tel: {{ invoice.business.phone }}</p>
           </CCol>
         </CRow>
         <hr class="thick-hr" />
         <div class="invoice-details">
-          <h3 class="text-center">QUOTATION</h3>
+          <h3 class="text-center">INVOICE</h3>
           <CRow>
             <CCol md="6">
               <p>
@@ -36,15 +36,15 @@
             </CCol>
             <CCol md="6" class="text-right">
               <p>
-                <strong>Quotation No:</strong> {{ quotation.quotationNumber }}
+                <strong>Invoice No:</strong> {{ invoice.invoiceNumber }}
               </p>
-              <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
-              <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>
+              <p><strong>Issue Date:</strong> {{ getInvoiceIssuedDate() }}</p>
+              <p><strong>Due Date:</strong> {{ getInvoiceExpiryDate() }}</p>
             </CCol>
           </CRow>
           <CRow>
             <CCol>
-              <p><strong>Title: </strong> {{ quotation.title }}</p>
+              <p><strong>Title: </strong> {{ invoice.title }}</p>
             </CCol>
           </CRow>
         </div>
@@ -55,12 +55,12 @@
               <th>#</th>
               <th>Item & Description</th>
               <th class="text-center">Quantity</th>
-              <th class="text-center">Price ({{ quotation.business.currency }})</th>
-              <th class="text-center">Total ({{ quotation.business.currency }})</th>
+              <th class="text-center">Price ({{ invoice.business.currency }})</th>
+              <th class="text-center">Total ({{ invoice.business.currency }})</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in computedQuotationItems" :key="item.name">
+            <tr v-for="item in computedInvoiceItems" :key="item.name">
               <td>{{ item.position }}</td>
               <td>
                 <p>
@@ -103,9 +103,9 @@
           </tbody>
         </table>
         <!-- Terms and Conditions Section -->
-        <div v-if="quotation.note" class="terms-and-conditions mt-4">
+        <div v-if="invoice.note" class="terms-and-conditions mt-4">
           <h4>Terms and Conditions</h4>
-          <p v-html="formatNote(quotation.note)"></p>
+          <p v-html="formatNote(invoice.note)"></p>
         </div>
 
      
@@ -117,7 +117,7 @@
           <p><strong>Model:</strong> {{ getBrandModelNo() }}</p>
         </div>-->
         <!-- <div class="signature text-right">
-          <p>{{ quotation.business.name }}</p>
+          <p>{{ invoice.business.name }}</p>
         </div>
         <br />
         <br />
@@ -136,14 +136,14 @@ import moment from "moment";
 export default {
   name: "WidgetsReportInvoice",
   props: {
-    quotation: {
+    invoice: {
       type: Object,
       required: true,
     },
   },
   computed: {
-    computedQuotationItems() {
-      return this.quotation.items.map((item) => {
+    computedInvoiceItems() {
+      return this.invoice.items.map((item) => {
         return {
           ...item,
           productName: item.product.name,
@@ -153,7 +153,7 @@ export default {
     },
     grandTotal() {
       // Calculate the grand total by summing up the total amount per item
-      return this.computedQuotationItems
+      return this.computedInvoiceItems
         .reduce((acc, item) => {
           return acc + item.totalAmountPerItem;
         }, 0)
@@ -172,11 +172,11 @@ export default {
       }
     },
 
-    getQuotationIssuedDate() {
-      return moment(this.quotation.issuedDate).format("DD/MM/YYYY");
+    getInvoiceIssuedDate() {
+      return moment(this.invoice.issuedDate).format("DD/MM/YYYY");
     },
-    getQuotationExpiryDate() {
-      return moment(this.quotation.expiryDate).format("DD/MM/YYYY");
+    getInvoiceExpiryDate() {
+      return moment(this.invoice.expiryDate).format("DD/MM/YYYY");
     },
     getNetAmountDue() {
       var totalAmount = this.getTotalAmountDue() - this.getTotalLess();
@@ -244,14 +244,14 @@ export default {
     },
     getCustomerAddress() {
       try {
-        return this.quotation.customer.address;
+        return this.invoice.customer.address;
       } catch (error) {
         return "N/A";
       }
     },
     getCustomerName() {
       try {
-        return this.quotation.customer.name;
+        return this.invoice.customer.name;
       } catch (error) {
         return "N/A";
       }
@@ -271,12 +271,12 @@ export default {
     },
     getImageChopUrl() {
       var url =
-        this.removeTrailingSlash(apiUrl) + this.quotation.business.companyChopUrl;
+        this.removeTrailingSlash(apiUrl) + this.invoice.business.companyChopUrl;
       return url;
     },
     getImageUrl() {
       var url =
-        this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
+        this.removeTrailingSlash(apiUrl) + this.invoice.business.logoUrl;
       return url;
     },
     formatAddress(address) {

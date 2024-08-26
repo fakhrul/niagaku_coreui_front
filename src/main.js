@@ -10,7 +10,7 @@ import i18n from './i18n.js'
 import VueKonva from 'vue-konva';
 import AuthService from './lib/authservice'
 import Api from './lib/api'
-import Helper from './lib/helper'
+import Helper from './utils/helper.js'
 import BusinessHelper from './lib/businessHelper'
 import DrawingHelper from './lib/drawingHelper'
 import "./index.css";

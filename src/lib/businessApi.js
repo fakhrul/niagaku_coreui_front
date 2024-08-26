@@ -3,6 +3,7 @@ let apiUrl = process.env.VUE_APP_API_URL;
 
 class BusinessApi {
 
+
     getListByCurrentTenant() {
         var url = apiUrl + 'businesses/currentUser/';
         return api.call('get', url)

@@ -43,6 +43,15 @@ class ProfileApi {
             });
     }
 
+    getListByCurrentTenant() {
+        var url = apiUrl + 'profiles/currentTennant/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+
     getCurrentProfile() {
         var url = apiUrl + 'profiles/byCurrentProfile';
         return api.call('get', url)

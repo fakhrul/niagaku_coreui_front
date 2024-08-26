@@ -5,14 +5,14 @@ class Helper {
     }
 
     removeObjFromArray(array, obj) {
-      let loc = this.getArrayIndexByValue(array, obj);
-      array.splice(loc, 1);
+        let loc = this.getArrayIndexByValue(array, obj);
+        array.splice(loc, 1);
     }
 
     getArrayIndexByValue(arr, value) {
-      for (var i = 0, iLen = arr.length; i < iLen; i++) {
-        if (arr[i].id == value) return i;
-      }
+        for (var i = 0, iLen = arr.length; i < iLen; i++) {
+            if (arr[i].id == value) return i;
+        }
     }
 
 
@@ -47,15 +47,15 @@ class Helper {
             return false;
     }
 
-    hexToRgbA(hex, opacity){
+    hexToRgbA(hex, opacity) {
         var c;
-        if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-            c= hex.substring(1).split('');
-            if(c.length== 3){
-                c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+            c = hex.substring(1).split('');
+            if (c.length == 3) {
+                c = [c[0], c[0], c[1], c[1], c[2], c[2]];
             }
-            c= '0x'+c.join('');
-            return 'rgb('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+ Math.round((opacity/100) * 10) / 10 + ')';
+            c = '0x' + c.join('');
+            return 'rgb(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + Math.round((opacity / 100) * 10) / 10 + ')';
         }
         throw new Error('Bad Hex');
     }
@@ -74,7 +74,7 @@ class Helper {
         }
         return errorMessage;
     }
-    
+
     // getCenterOfShape(pointList) {
 
     //     //     var x = 0,
