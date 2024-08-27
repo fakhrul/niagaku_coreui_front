@@ -17,8 +17,8 @@
         <CCol sm="12">
           <CCard>
             <CCardHeader>
-              <strong>Quotation</strong>
-              <small>{{ obj.quotationNumber }}</small>
+              <strong>Purchase Order</strong>
+              <small>{{ obj.orderNumber }}</small>
               <a href="" target="_blank" :class="getBadgeClass()">
                 {{ obj.statusDescription }}
               </a>
@@ -33,7 +33,7 @@
                   class="m-2 d-inline-block"
                   size="sm"
                 >
-                  <template v-for="status in quotationStatuses">
+                  <template v-for="status in purchaseorderStatuses">
                     <CDropdownItem @click="changeState(status)">{{
                       status.name
                     }}</CDropdownItem>
@@ -47,23 +47,23 @@
               <CRow>
                 <CCol
                   ><CFormGroup wrapperClasses="input-group pt-2">
-                    <template #label>Customer </template>
+                    <template #label>Vendor/Supplier </template>
                     <template #input>
                       <v-select
                         style="width: 100%"
-                        v-model="selectedCustomer"
+                        v-model="selectedVendor"
                         :label="'name'"
-                        :options="customerItems"
-                        placeholder="Select customer"
+                        :options="vendorItems"
+                        placeholder="Select vendor"
                       />
                     </template>
                   </CFormGroup>
                 </CCol>
                 <CCol
                   ><CInput
-                    label="Quotation No"
+                    label="PO No"
                     placeholder=""
-                    v-model="obj.quotationNumber"
+                    v-model="obj.orderNumber"
                 /></CCol>
                 <CCol>
                   <CInput
@@ -95,7 +95,7 @@
               <CRow>
                 <CCol>
                   <CTextarea
-                    label="Quotation Title"
+                    label="Title"
                     v-model="obj.title"
                     placeholder=""
                     rows="2"
@@ -108,8 +108,8 @@
                   <!-- Wrap CDataTable with draggable -->
 
                   <CDataTable
-                    :items="computedQuotationItems"
-                    :fields="quotationFields"
+                    :items="computedPurchaseOrderItems"
+                    :fields="purchaseOrderFields"
                   >
                     <template #show_drag="{ item, index }">
                       <td>
@@ -128,7 +128,7 @@
                           <template #input>
                             <v-select
                               style="width: 100%"
-                              v-model="item.product"
+                              v-model="item.purchaseProduct"
                               :label="'name'"
                               :options="productItems"
                               placeholder="Select product"
@@ -179,7 +179,7 @@
                           color="primary"
                           size="sm"
                           @click="moveItem(index, 'down')"
-                          :disabled="index === quotationItems.length - 1"
+                          :disabled="index === purchaseOrderItems.length - 1"
                         >
                           ↓
                         </CButton>
@@ -238,19 +238,19 @@
       </CRow>
       <!-- <CRow>
         <CCol>
-          <WidgetsReportQuotation :quotation="obj"></WidgetsReportQuotation>
+          <WidgetsReportPurchaseOrder :purchaseorder="obj"></WidgetsReportPurchaseOrder>
         </CCol>
       </CRow> -->
     </div>
     <div>
       <CModal
-        title="Quotation Preview"
-        :show.sync="quotationPreviewPopup"
+        title="PurchaseOrder Preview"
+        :show.sync="purchaseorderPreviewPopup"
         size="xl"
       >
         <CRow>
           <CCol>
-            <WidgetsReportQuotation :quotation="previewObj"></WidgetsReportQuotation>
+            <!-- <WidgetsReportPurchaseOrder :purchaseorder="previewObj"></WidgetsReportPurchaseOrder> -->
           </CCol>
         </CRow>
       </CModal>
@@ -259,16 +259,16 @@
 </template>
 
 <script>
-import QuotationApi from "@/lib/quotationApi";
-import CustomerApi from "@/lib/customerApi";
-import ProductApi from "@/lib/productApi";
+import PurchaseOrderApi from "@/lib/purchaseOrderApi";
+import VendorApi from "@/lib/vendorApi";
+import PurchaseProductApi from "@/lib/purchaseProductApi";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import moment from "moment";
-import WidgetsReportQuotation from "../widgets/WidgetsReportQuotation";
+import WidgetsReportPurchaseOrder from "../widgets/WidgetsReportPurchaseOrder";
 
-const quotationItems = [];
-const quotationFields = [
+const purchaseOrderItems = [];
+const purchaseOrderFields = [
   {
     key: "show_index",
     label: "#",
@@ -311,43 +311,44 @@ const quotationFields = [
 ];
 
 export default {
-  name: "Quotation",
+  name: "PurchaseOrder",
   components: {
     vSelect,
-    WidgetsReportQuotation,
+    WidgetsReportPurchaseOrder,
   },
   data: () => {
     return {
       previewObj: null,
-      quotationPreviewPopup: false,
-      quotationStatuses: [],
+      purchaseorderPreviewPopup: false,
+      purchaseorderStatuses: [],
       issuedDate: Date(),
       expiryDate: Date(),
-      // Quotation Itm
-      quotationItems: quotationItems.map((item, id) => {
+      // PurchaseOrder Itm
+      purchaseOrderItems: purchaseOrderItems.map((item, id) => {
         return { ...item, id };
       }),
 
-      quotationFields,
+      purchaseOrderFields,
 
       selectedItem: null,
 
-      selectedCustomer: null,
+      selectedVendor: null,
       organizationTypeList: [],
       infoList: [],
       obj: {},
       submitted: false,
-      api: new QuotationApi(),
-      customerApi: new CustomerApi(),
-      productApi: new ProductApi(),
-      customerItems: [],
+      api: new PurchaseOrderApi(),
+      vendorApi: new VendorApi(),
+      productApi: new PurchaseProductApi(),
+      vendorItems: [],
       productItems: [],
     };
   },
   mounted() {
     var self = this;
-    this.fetchQuotationStatuses();
-    self.refreshCustomer();
+    self.initializeDefaultDate();
+    this.fetchPurchaseOrderStatuses();
+    self.refreshVendor();
     self.refreshProduct();
     self.resetObj();
   },
@@ -359,25 +360,37 @@ export default {
       return moment(this.issuedDate).format("YYYY-MM-DD");
     },
 
-    computedQuotationItems() {
-      return this.quotationItems.map((item) => {
+    computedPurchaseOrderItems() {
+      return this.purchaseOrderItems.map((item) => {
         return {
           ...item,
-          productName: item.product.name,
+          productName: item.purchaseProduct.name,
           totalAmountPerItem: this.getTotalItemPrice(item),
         };
       });
     },
     grandTotal() {
       var total = 0;
-      for (var i = 0; i < this.quotationItems.length; i++) {
-        var item = this.quotationItems[i];
+      for (var i = 0; i < this.purchaseOrderItems.length; i++) {
+        var item = this.purchaseOrderItems[i];
         total += item.price * item.quantity;
       }
       return total;
     },
   },
   methods: {
+    initializeDefaultDate() {
+      const today = new Date();
+      this.issuedDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0
+      );
+      this.expiryDate = this.issuedDate;
+    },
     changeState(item) {
       var self = this;
       self.obj.status = item.id;
@@ -392,13 +405,13 @@ export default {
           });
       }
     },
-    fetchQuotationStatuses() {
+    fetchPurchaseOrderStatuses() {
       var self = this;
       self.api
-        .getQuotationStatus()
+        .getPurchaseOrderStatus()
         .then((response) => {
-          this.quotationStatuses = response.result;
-          console.log(this.quotationStatuses);
+          this.purchaseorderStatuses = response.result;
+          // console.log(this.purchaseorderStatuses);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -406,10 +419,9 @@ export default {
     },
 
     preview() {
-
       this.previewObj = this.obj;
-      this.previewObj.items = this.computedQuotationItems;
-      this.quotationPreviewPopup = true;
+      this.previewObj.items = this.computedPurchaseOrderItems;
+      this.purchaseorderPreviewPopup = true;
     },
     getBadgeClass() {
       if (this.obj.statusDescription == "Draft") {
@@ -433,34 +445,34 @@ export default {
       this.issuedDate = new Date(e + "T00:00:00"); // ISO format assumes local time
     },
     updatePositions() {
-      this.computedQuotationItems.forEach((item, index) => {
+      this.computedPurchaseOrderItems.forEach((item, index) => {
         item.position = index + 1;
       });
     },
 
     moveItem(index, direction) {
       const newIndex = direction === "up" ? index - 1 : index + 1;
-      if (newIndex >= 0 && newIndex < this.computedQuotationItems.length) {
-        const temp = this.computedQuotationItems[index];
+      if (newIndex >= 0 && newIndex < this.computedPurchaseOrderItems.length) {
+        const temp = this.computedPurchaseOrderItems[index];
         this.$set(
-          this.computedQuotationItems,
+          this.computedPurchaseOrderItems,
           index,
-          this.computedQuotationItems[newIndex]
+          this.computedPurchaseOrderItems[newIndex]
         );
-        this.$set(this.computedQuotationItems, newIndex, temp);
+        this.$set(this.computedPurchaseOrderItems, newIndex, temp);
 
         // Update positions after swapping
-        this.computedQuotationItems[index].position = index + 1;
-        this.computedQuotationItems[newIndex].position = newIndex + 1;
+        this.computedPurchaseOrderItems[index].position = index + 1;
+        this.computedPurchaseOrderItems[newIndex].position = newIndex + 1;
       }
     },
 
     onRemoveClaimItem(item) {
       var self = this;
-      if (self.computedQuotationItems != null) {
-        for (var i = 0; i < self.computedQuotationItems.length; i++) {
-          if (self.computedQuotationItems[i].id === item.id) {
-            self.computedQuotationItems.splice(i, 1);
+      if (self.computedPurchaseOrderItems != null) {
+        for (var i = 0; i < self.computedPurchaseOrderItems.length; i++) {
+          if (self.computedPurchaseOrderItems[i].id === item.id) {
+            self.computedPurchaseOrderItems.splice(i, 1);
           }
         }
       }
@@ -479,10 +491,12 @@ export default {
       );
     },
     addNewItem() {
-      const newPosition = this.computedQuotationItems.length + 1;
-      this.computedQuotationItems.push({
+      // console.log(this.computedPurchaseOrderItems);
+
+      const newPosition = this.computedPurchaseOrderItems.length + 1;
+      this.computedPurchaseOrderItems.push({
         id: this.generateGUID(),
-        product: this.productItems[0],
+        purchaseProduct: this.productItems[0],
         price: 0,
         quantity: 0,
         description: "",
@@ -506,14 +520,20 @@ export default {
         .catch(({ data }) => {});
     },
 
-    refreshCustomer() {
+    refreshVendor() {
       var self = this;
       self.loading = false;
-      self.customerApi
+      self.vendorApi
         .getListByCurrentBusiness()
         .then((response) => {
-          self.customerItems = response.result;
+          self.vendorItems = response.result;
 
+          // for (let i = 0; i < response.result.length; i++) {
+          //   self.vendorItems.push({
+          //     value: response.result[i].id,
+          //     label: response.result[i].name,
+          //   });
+          // }
         })
         .catch(({ data }) => {});
     },
@@ -528,7 +548,7 @@ export default {
             console.log(self.obj);
             this.issuedDate = self.obj.issuedDate;
             this.expiryDate = self.obj.dueDate;
-            self.selectedCustomer = self.obj.customer;
+            self.selectedVendor = self.obj.vendor;
 
             if (self.obj.items.length > 0) {
               if (self.obj.items[0].position == 0) {
@@ -538,7 +558,7 @@ export default {
               }
             }
 
-            self.quotationItems = self.obj.items;
+            self.purchaseOrderItems = self.obj.items;
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -549,13 +569,15 @@ export default {
     },
     onSubmit() {
       var self = this;
-      self.obj.items = self.computedQuotationItems;
+      self.obj.items = self.computedPurchaseOrderItems;
       self.obj.issuedDate = self.issuedDate;
       self.obj.dueDate = self.expiryDate;
 
       self.obj.items.forEach((item) => {
-        item.productId = item.product.id;
+        item.purchaseProductId = item.purchaseProduct.id;
       });
+
+      self.obj.vendorId = self.selectedVendor.id;
       console.log(self.obj.items);
 
       if (!self.obj.id) {
@@ -564,7 +586,7 @@ export default {
           .then((response) => {
             self.toast("Success", "Updated", "success");
             self.resetObj();
-            // self.$router.push({ path: "/tenants/quotationList" });
+            // self.$router.push({ path: "/tenants/purchaseorderList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -575,7 +597,7 @@ export default {
           .then((response) => {
             self.toast("Success", "Updated", "success");
             self.resetObj();
-            //  self.$router.push({ path: "/tenants/quotationList" });
+            //  self.$router.push({ path: "/tenants/purchaseorderList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");

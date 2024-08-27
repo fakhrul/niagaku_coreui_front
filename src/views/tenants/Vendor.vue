@@ -15,38 +15,31 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Product </strong> Information </CCardHeader>
+          <CCardHeader> <strong> Vendor </strong> Information </CCardHeader>
           <CCardBody>
             <CForm>
               <CInput label="Name" horizontal v-model="obj.name" />
-              <!-- <CInput label="Description" horizontal v-model="obj.description" /> -->
               <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Description
-                </CCol>
-                <CCol sm="9">
-                  <CTextarea
-                    placeholder=""
-                    rows="5"
-                    v-model="obj.description"
-                  />
-                </CCol>
-              </CRow>
+              <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
+              <CCol sm="9">
+                <CTextarea
+                  placeholder="Address..."
+                  rows="5"
+                  v-model="obj.address"
+                />
+              </CCol>
+            </CRow>
 
-              <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Chart of Account
-                </CCol>
-                <CCol sm="9">
-                  <v-select
-                    style="width: 100%"
-                    v-model="selectedChartOfAccount"
-                    :label="'name'"
-                    :options="chartOfAccountItems"
-                    placeholder="Select COA"
-                  />
-                </CCol>
-              </CRow>
+              <CInput label="City" horizontal v-model="obj.city" />
+              <CInput label="Country" horizontal v-model="obj.country" />
+              <CInput label="State" horizontal v-model="obj.state" />
+              <CInput label="Postcode" horizontal v-model="obj.postcode" />
+              <CInput label="Phone" horizontal v-model="obj.phone" />
+              <CInput label="Website" horizontal v-model="obj.website" />
+
+              <CInput label="Contact Name" horizontal v-model="obj.contactName" />
+              <CInput label="Contact Phone" horizontal v-model="obj.contactPhone" />
+              <CInput label="Contact Email" horizontal v-model="obj.contactEmail" />
             </CForm>
           </CCardBody>
           <CCardFooter>
@@ -61,46 +54,28 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import VendorApi from "@/lib/vendorApi";
 
 export default {
-  name: "Product",
-  components: {
-    vSelect,
-  },
+  name: "Vendor",
   data: () => {
     return {
-      coaApi: new ChartOfAccountApi(),
-      selectedChartOfAccount: null,
-      chartOfAccountItems: [],
-
       organizationTypeList: [],
       infoList: [],
-      obj: {},
+      obj: {
+      },
       submitted: false,
-      api: new ProductApi(),
+      api: new VendorApi(),
     };
   },
   mounted() {
     var self = this;
-    self.refreshChartOfAccount();
     self.resetObj();
   },
-  computed: {},
+  computed: {
+    
+  },
   methods: {
-    refreshChartOfAccount() {
-      var self = this;
-      self.coaApi
-        .getListByCurrentBusiness()
-        .then((response) => {
-          self.chartOfAccountItems = response.result;
-        })
-        .catch(({ data }) => {});
-    },
-
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -108,9 +83,6 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            console.log(self.obj);
-            self.selectedChartOfAccount = self.obj.chartAccount;
-            console.log(self.selectedChartOfAccount);
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -121,14 +93,11 @@ export default {
     },
     onSubmit() {
       var self = this;
-      self.obj.chartAccount = self.selectedChartOfAccount;
-      self.obj.chartAccountId = self.selectedChartOfAccount.id;
-
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/vendorList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -137,7 +106,7 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/vendorList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -179,9 +148,10 @@ export default {
       };
     },
     submit() {
-      this.onSubmit();
-      this.submitted = true;
+        this.onSubmit();
+        this.submitted = true;
     },
+    
   },
 };
 </script>

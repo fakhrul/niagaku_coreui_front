@@ -112,10 +112,22 @@ const Quotation = () => import('@/views/tenants/Quotation')
 const CustomerList = () => import('@/views/tenants/CustomerList')
 const Customer = () => import('@/views/tenants/Customer')
 
+const VendorList = () => import('@/views/tenants/VendorList')
+const Vendor = () => import('@/views/tenants/Vendor')
+
+const PurchaseProductList = () => import('@/views/tenants/PurchaseProductList')
+const PurchaseProduct = () => import('@/views/tenants/PurchaseProduct')
+
 const ProductList = () => import('@/views/tenants/ProductList')
 const Product = () => import('@/views/tenants/Product')
 const SalesOrderList = () => import('@/views/tenants/SalesOrderList')
 const SalesOrder = () => import('@/views/tenants/SalesOrder')
+
+const PurchaseQuotationList = () => import('@/views/tenants/PurchaseQuotationList')
+const PurchaseQuotation = () => import('@/views/tenants/PurchaseQuotation')
+
+const PurchaseOrderList = () => import('@/views/tenants/PurchaseOrderList')
+const PurchaseOrder = () => import('@/views/tenants/PurchaseOrder')
 
 const InvoiceList = () => import('@/views/tenants/InvoiceList')
 const Invoice = () => import('@/views/tenants/Invoice')
@@ -129,6 +141,18 @@ const PaySlipList = () => import('@/views/employee/PaySlipList')
 const PaySlip = () => import('@/views/employee/PaySlip')
 const ReceiptList = () => import('@/views/employee/ReceiptList')
 const Receipt = () => import('@/views/employee/Receipt')
+
+const TenantReceiptList = () => import('@/views/tenants/ReceiptList')
+const TenantReceipt = () => import('@/views/tenants/Receipt')
+const TenantPaySlipList = () => import('@/views/tenants/PaySlipList')
+const TenantPaySlip = () => import('@/views/tenants/PaySlip')
+const TenantClaimList = () => import('@/views/tenants/ClaimList')
+const TenantClaim = () => import('@/views/tenants/Claim')
+
+const EmployeeList = () => import('@/views/tenants/EmployeeList')
+const Employee = () => import('@/views/tenants/Employee')
+
+
 Vue.use(Router)
 
 const router = new Router({
@@ -169,7 +193,7 @@ function configRoutes() {
           path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
-       
+
         },
         //
         {
@@ -227,7 +251,7 @@ function configRoutes() {
               name: 'Claim',
               component: Claim
             },
-                
+
           ]
         },
 
@@ -327,7 +351,7 @@ function configRoutes() {
               name: 'Business',
               component: Business
             },
-            
+
             {
               path: '/tenants/quotation',
               name: 'Quotation',
@@ -394,6 +418,70 @@ function configRoutes() {
             },
             //
             {
+              path: '/tenants/PurchaseQuotation',
+              name: 'PurchaseQuotation',
+              component: PurchaseQuotation
+            },
+            {
+              path: '/tenants/PurchaseQuotation/:id',
+              name: 'PurchaseQuotationById',
+              component: PurchaseQuotation
+            },
+            {
+              path: '/tenants/PurchaseQuotationList',
+              name: 'PurchaseQuotationList',
+              component: PurchaseQuotationList
+            },
+            //
+            {
+              path: '/tenants/PurchaseOrder',
+              name: 'PurchaseOrder',
+              component: PurchaseOrder
+            },
+            {
+              path: '/tenants/PurchaseOrder/:id',
+              name: 'PurchaseOrderById',
+              component: PurchaseOrder
+            },
+            {
+              path: '/tenants/PurchaseOrderList',
+              name: 'PurchaseOrderList',
+              component: PurchaseOrderList
+            },
+            //
+            {
+              path: '/tenants/Vendor',
+              name: 'Vendor',
+              component: Vendor
+            },
+            {
+              path: '/tenants/Vendor/:id',
+              name: 'VendorById',
+              component: Vendor
+            },
+            {
+              path: '/tenants/VendorList',
+              name: 'VendorList',
+              component: VendorList
+            },
+            //
+            {
+              path: '/tenants/PurchaseProduct',
+              name: 'PurchaseProduct',
+              component: PurchaseProduct
+            },
+            {
+              path: '/tenants/PurchaseProduct/:id',
+              name: 'PurchaseProductById',
+              component: PurchaseProduct
+            },
+            {
+              path: '/tenants/PurchaseProductList',
+              name: 'PurchaseProductList',
+              component: PurchaseProductList
+            },
+            //
+            {
               path: '/tenants/Invoice',
               name: 'Invoice',
               component: Invoice
@@ -425,7 +513,7 @@ function configRoutes() {
               name: 'OtherExpenseList',
               component: OtherExpenseList
             },
-//
+            //
             {
               path: '/tenants/chartOfAccountList',
               name: 'chartOfAccountList',
@@ -441,6 +529,73 @@ function configRoutes() {
               name: 'ChartOfAccount',
               component: ChartOfAccount
             },
+
+            //
+            {
+              path: '/tenants/receiptList',
+              name: 'TenantReceiptList',
+              component: TenantReceiptList
+            },
+            {
+              path: '/tenants/receipt/:id',
+              name: 'TenantReceiptById',
+              component: TenantReceipt
+            },
+            {
+              path: '/tenants/receipt',
+              name: 'TenantReceipt',
+              component: TenantReceipt
+            },
+
+            //
+            {
+              path: '/tenants/paySlipList',
+              name: 'TenantReceiptList',
+              component: TenantPaySlipList
+            },
+            {
+              path: '/tenants/paySlip/:id',
+              name: 'TenantPaySlipById',
+              component: TenantPaySlip
+            },
+            {
+              path: '/tenants/paySlip',
+              name: 'TenantPaySlip',
+              component: TenantPaySlip
+            },
+            //
+            {
+              path: '/tenants/claimList',
+              name: 'TenantClaimList',
+              component: TenantClaimList
+            },
+            {
+              path: '/tenants/claim/:id',
+              name: 'TenantClaimById',
+              component: TenantClaim
+            },
+            {
+              path: '/tenants/claim',
+              name: 'TenantClaim',
+              component: TenantClaim
+            },
+            //
+            {
+              path: '/tenants/employeeList',
+              name: 'EmployeeList',
+              component: EmployeeList
+            },
+            {
+              path: '/tenants/employee/:id',
+              name: 'EmployeeById',
+              component: Employee
+            },
+            {
+              path: '/tenants/employee',
+              name: 'Employee',
+              component: Employee
+            },
+
           ]
         },
         // {
@@ -484,7 +639,7 @@ function configRoutes() {
           ]
         },
 
-        
+
 
         {
           path: 'base',
@@ -764,7 +919,7 @@ function configRoutes() {
         }
       ]
     },
-  
+
     {
       path: '/apps/email',
       redirect: '/apps/email/inbox',

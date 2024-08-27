@@ -18,19 +18,26 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Employee </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="computedProfileItems"
                 :fields="fields"
                 column-filter
                 items-per-page-select
-                :items-per-page="10"
+                :items-per-page="50"
                 hover
                 sorter
                 pagination
+                table-filter
+                cleaner
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -50,6 +57,9 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
+                      <p class="text-muted">Full Name: {{ item.fullName }}</p>
+                      <p class="text-muted">Email: {{ item.email }}</p>
+
                       <CButton
                         size="sm"
                         color="info"
@@ -72,9 +82,20 @@
               </CDataTable>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="addNew"
+              <!-- <CButton type="submit" size="sm" color="primary" @click="addNew"
                 ><CIcon name="cil-check-circle" /> Add New</CButton
+              > -->
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="addNew"
               >
+                Add New
+              </CButton>
+              <!-- <CButton class="ml-1" color="primary" @click="download">
+                Download
+              </CButton> -->
             </CCardFooter>
           </CCard>
           <CModal
@@ -83,7 +104,7 @@
             :show.sync="warningModal"
             @update:show="onDeleteConfirmation"
           >
-            Are you sure you want to delete this {{ itemToDelete.code }} ?
+            Are you sure you want to delete this {{ itemToDelete.fullName }} ?
           </CModal>
         </CCol>
       </CRow>
@@ -92,25 +113,31 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import ProfileApi from "../../lib/profileApi";
 
 const items = [];
 const fields = [
-  // { key: "accountNo"},
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "fullName", _style: "min-width:200px;" },
+  { key: "email", _style: "min-width:200px;" },
+  { key: "role" },
   {
     key: "show_details",
     label: "",
-    _style: "width:2%",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
 ];
 
 export default {
-  name: "ProductList",
+  name: "AgentList",
   data() {
     return {
       loading: true,
@@ -121,7 +148,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new ProfileApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -131,24 +158,16 @@ export default {
     self.refreshTable();
   },
   computed: {
-    computedItems() {
+    computedProfileItems() {
       return this.items.map((item) => {
         return {
           ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
+          role: item.appUser.role,
         };
       });
     },
   },
-
   methods: {
-    getChartOfAccountName(item) {
-      try {
-        return item.chartAccount.name;
-      } catch (error) {
-        return "N/A";
-      }
-    },
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -158,7 +177,7 @@ export default {
       });
     },
     toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+      this.$set(item, "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -180,19 +199,20 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/Employee/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
       var self = this;
       if (accept) {
         this.api
-          .delete(self.itemToDelete.id)
+          .deleteProfile(self.itemToDelete.id)
           .then((response) => {
             self.refreshTable();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
           });
       }
       self.itemToDelete = {};
@@ -203,7 +223,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/Employee" });
     },
     toast(header, message, color) {
       var self = this;

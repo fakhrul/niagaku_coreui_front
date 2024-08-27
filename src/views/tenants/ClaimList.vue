@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Claim </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -33,6 +33,7 @@
               >
                 <template #show_details="{ item, index }">
                   <td class="py-2">
+
                     <CButton
                       color="primary"
                       variant="outline"
@@ -92,25 +93,29 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import ClaimApi from "@/lib/claimApi";
 
 const items = [];
 const fields = [
   // { key: "accountNo"},
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  { key: "profileName" },
+  { key: "businessName" },
+  { key: "date" },
+  { key: "claimNo" },
+  { key: "totalAmount" },
+  { key: "claimStateDescription" },
+  
   {
     key: "show_details",
     label: "",
-    _style: "width:2%",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
 ];
 
 export default {
-  name: "ProductList",
+  name: "ClaimList",
   data() {
     return {
       loading: true,
@@ -121,33 +126,50 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new ClaimApi(),
       warningModal: false,
       itemToDelete: {},
     };
-  },
-  mounted() {
-    var self = this;
-    self.refreshTable();
   },
   computed: {
     computedItems() {
       return this.items.map((item) => {
         return {
           ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
+          profileName: item.profile.fullName,
+          businessName: item.business.name,
+          totalAmount: this.getTotalAmount(item)
         };
       });
     },
+   
   },
-
+  mounted() {
+    var self = this;
+    self.refreshTable();
+  },
   methods: {
-    getChartOfAccountName(item) {
+    getTotalAmount(item){
       try {
-        return item.chartAccount.name;
+        const totalAmount = item.items.reduce((sum, claim) => sum + claim.amount, 0);
+      return totalAmount.toFixed(2);
+        
       } catch (error) {
-        return "N/A";
-      }
+        return 0;
+      } 
+    },
+    setDefault(item) {
+      var self = this;
+      self.api
+        .updateDefaultClaim(item)
+        .then((response) => {
+          // self.obj = response.result;
+          // auth.setDefaultClaimName(item);
+          self.refreshTable();
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
     },
     toast(header, message, color) {
       var self = this;
@@ -168,9 +190,10 @@ export default {
       var self = this;
       self.loading = false;
       self.api
-        .getListByCurrentBusiness()
+        .getListByCurrentUser()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -180,7 +203,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/employee/Claim/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +226,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/employee/Claim" });
     },
     toast(header, message, color) {
       var self = this;

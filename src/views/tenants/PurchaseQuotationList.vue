@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Quotation Received </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="items"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -92,25 +92,25 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import PurchaseQuotationApi from "@/lib/purchaseQuotationApi";
 
 const items = [];
 const fields = [
-  // { key: "accountNo"},
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  { key: "date"},
+  { key: "orderNo"},
   {
     key: "show_details",
     label: "",
-    _style: "width:2%",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
 ];
 
+
+
 export default {
-  name: "ProductList",
+  name: "PurchaseQuotationList",
   data() {
     return {
       loading: true,
@@ -121,7 +121,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new PurchaseQuotationApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -130,25 +130,7 @@ export default {
     var self = this;
     self.refreshTable();
   },
-  computed: {
-    computedItems() {
-      return this.items.map((item) => {
-        return {
-          ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
-        };
-      });
-    },
-  },
-
   methods: {
-    getChartOfAccountName(item) {
-      try {
-        return item.chartAccount.name;
-      } catch (error) {
-        return "N/A";
-      }
-    },
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -180,7 +162,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/PurchaseQuotation/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +185,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/PurchaseQuotation" });
     },
     toast(header, message, color) {
       var self = this;

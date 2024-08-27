@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Pay Slip </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -42,6 +42,8 @@
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
                     </CButton>
+
+                    
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -92,14 +94,15 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import PaySlipApi from "@/lib/paySlipApi";
 
 const items = [];
 const fields = [
   // { key: "accountNo"},
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  { key: "profileName" },
+  { key: "businessName" },
+  { key: "totalAmount" },
+  { key: "statusDescription" },
   {
     key: "show_details",
     label: "",
@@ -109,8 +112,10 @@ const fields = [
   },
 ];
 
+
+
 export default {
-  name: "ProductList",
+  name: "PaySlipList",
   data() {
     return {
       loading: true,
@@ -121,7 +126,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new PaySlipApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -135,19 +140,16 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
+          profileName: item.profile.fullName,
+          businessName: item.business.name,
         };
       });
     },
+   
   },
-
   methods: {
-    getChartOfAccountName(item) {
-      try {
-        return item.chartAccount.name;
-      } catch (error) {
-        return "N/A";
-      }
+    setDefault(item){
+
     },
     toast(header, message, color) {
       var self = this;
@@ -180,7 +182,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/PaySlip/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +205,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/PaySlip" });
     },
     toast(header, message, color) {
       var self = this;

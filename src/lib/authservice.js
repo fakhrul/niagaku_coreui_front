@@ -28,7 +28,7 @@ class AuthService {
         }
     }
     getUserName(){
-        console.log(this.user);
+        // console.log(this.user);
         return this.user.userData.userName;
     }
 

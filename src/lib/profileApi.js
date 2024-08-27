@@ -3,6 +3,25 @@ let apiUrl = process.env.VUE_APP_API_URL;
 
 class ProfileApi {
 
+
+    getListByCurrentBusiness() {
+        var url = apiUrl + 'profiles/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    
+    createProfileEmployee(data) {
+        var url = apiUrl + 'profiles/employee';
+        return api.call('post', url, data)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
     createProfileAppUser(data) {
         var url = apiUrl + 'profiles/ProfileAppUser';
         return api.call('post', url, data)
@@ -67,7 +86,7 @@ class ProfileApi {
                 return data
             });
     }
- 
+
     createProfile(data) {
         var url = apiUrl + 'profiles';
         return api.call('post', url, data)

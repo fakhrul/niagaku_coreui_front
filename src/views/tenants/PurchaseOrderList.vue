@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Purchase Order </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -31,6 +31,17 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_status="{ item }">
+                  <td>
+                    <CBadge
+                      :color="
+                        getPurchaseOrderStatusBadgeColor(item.statusDescription)
+                      "
+                      >{{ item.statusDescription }}</CBadge
+                    >
+                  </td>
+                </template>
+
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -92,25 +103,27 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import PurchaseOrderApi from "@/lib/purchaseOrderApi";
 
 const items = [];
 const fields = [
-  // { key: "accountNo"},
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  { key: "orderNumber" },
+  { key: "vendorName" },
+  { key: "grandTotal" },
+
+  { key: "show_status", label: "Status" },
+  // { key: "statusDescription" },
   {
     key: "show_details",
     label: "",
-    _style: "width:2%",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
 ];
 
 export default {
-  name: "ProductList",
+  name: "PurchaseOrderList",
   data() {
     return {
       loading: true,
@@ -121,7 +134,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new PurchaseOrderApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -135,19 +148,44 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
+          vendorName: this.getVendorName(item),
+          grandTotal: this.getGrandTotal(item),
         };
       });
     },
   },
 
   methods: {
-    getChartOfAccountName(item) {
+    getVendorName(item) {
       try {
-        return item.chartAccount.name;
+        return item.vendor.name;
       } catch (error) {
         return "N/A";
       }
+    },
+    getGrandTotal(purchaseorder) {
+      console.log("grandTotal", purchaseorder);
+      var total = 0;
+      for (var i = 0; i < purchaseorder.items.length; i++) {
+        var item = purchaseorder.items[i];
+        total += item.price * item.quantity;
+      }
+      return total.toFixed(2);
+    },
+    getPurchaseOrderStatusBadgeColor(status) {
+      return status === "Draft"
+        ? "secondary"
+        : status === "Accepted"
+        ? "primary"
+        : status === "Sent"
+        ? "success"
+        : status === "Rejected"
+        ? "warning"
+        : status === "ShowRoom"
+        ? "info"
+        : status === "Cancelled"
+        ? "danger"
+        : "secondary";
     },
     toast(header, message, color) {
       var self = this;
@@ -171,6 +209,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -180,7 +219,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/PurchaseOrder/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +242,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/PurchaseOrder" });
     },
     toast(header, message, color) {
       var self = this;

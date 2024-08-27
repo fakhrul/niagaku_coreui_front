@@ -114,7 +114,6 @@ export default {
     uploaded(data) {
       // this.uploadedFiles = data.uploadedFiles;
 
-      console.log('uploaded', data);
       var url = "/Documents/File/" + data.uploadedFiles[0].id;
       this.obj.logoUrl = url;
     },
@@ -132,12 +131,10 @@ export default {
     },
     getChopImageUrl() {
       var url = this.removeTrailingSlash(apiUrl) + this.obj.companyChopUrl;
-      console.log(url);
       return url;
     },
     getImageUrl() {
       var url = this.removeTrailingSlash(apiUrl) + this.obj.logoUrl;
-      console.log(url);
       return url;
     },
 

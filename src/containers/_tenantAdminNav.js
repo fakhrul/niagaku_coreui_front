@@ -109,31 +109,31 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Quotation',
-            to: '/tenants/expenseList',
+            to: '/tenants/purchaseQuotationList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Order',
-            to: '/tenants/expenseList',
+            to: '/tenants/purchaseOrderList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Bill',
-            to: '/tenants/expenseList',
+            name: 'Bill/Purchase Invoice',
+            to: '/tenants/billList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Receipt',
-            to: '/tenants/expenseList',
+            to: '/tenants/receiptList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Vendor/Supplier',
-            to: '/tenants/expenseList',
+            to: '/tenants/vendorList',
             icon: 'cilBookmark'
           },
           {
@@ -142,7 +142,13 @@ export default [
             to: '/tenants/otherExpenseList',
             icon: 'cilBookmark'
           },
-        ]
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Product/Service',
+            to: '/tenants/purchaseProductList',
+            icon: 'cilBookmark'
+          },
+ ]
       },
 
       {
@@ -186,19 +192,19 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Employee',
-            to: '/tenants/expenseList',
+            to: '/tenants/employeeList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'PaySlip',
-            to: '/tenants/expenseList',
+            to: '/tenants/paySlipList',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Claims',
-            to: '/tenants/expenseList',
+            to: '/tenants/claimList',
             icon: 'cilBookmark'
           },
           // {
@@ -215,96 +221,26 @@ export default [
           // },
         ]
       },
-      //
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Expenses'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Purchase Quotation',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Purchase Order',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Bill',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Receipt',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Vendor/Supplier',
-      //   to: '/tenants/expenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Other Expenses',
-      //   to: '/tenants/otherExpenseList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Invoicing'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Quotation',
-      //   to: '/tenants/quotationList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Invoice',
-      //   to: '/tenants/billList',
-      //   icon: 'cilBookmark'
-      // },
-
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Bookkeeping'],
+        _children: ['My Records'],
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Bill',
-        to: '/tenants/billList',
+        name: 'PaySlip',
+        to: '/employee/paySlipList',
         icon: 'cilBookmark'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Chart of Account',
-        to: '/tenants/chartOfAccountList',
-        icon: 'cilBookmark'
-      },
-
-
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Bookkeeping'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Bill',
-        to: '/tenants/billList',
+        name: 'Claims',
+        to: '/employee/claimList',
         icon: 'cilBookmark'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Chart of Account',
-        to: '/tenants/chartOfAccountList',
+        name: 'Receipts',
+        to: '/employee/receiptList',
         icon: 'cilBookmark'
       },
 

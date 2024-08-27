@@ -15,36 +15,34 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Product </strong> Information </CCardHeader>
+          <CCardHeader>
+            <strong> Purchase Quotation </strong> Information
+          </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Name" horizontal v-model="obj.name" />
-              <!-- <CInput label="Description" horizontal v-model="obj.description" /> -->
+              <CInput label="Order No" horizontal v-model="obj.orderNo" />
+              <CInput
+                horizontal
+                label="Date"
+                type="date"
+                :value="computeDate"
+                @change="setDate"
+              />
               <CRow form class="form-group">
                 <CCol tag="label" sm="3" class="col-form-label">
-                  Description
+                  BOL Documents
                 </CCol>
                 <CCol sm="9">
-                  <CTextarea
-                    placeholder=""
-                    rows="5"
-                    v-model="obj.description"
-                  />
+                  <CLink target="_blank" :href="getDocumentUrl()">{{
+                    getDocumentName()
+                  }}</CLink>
                 </CCol>
               </CRow>
 
               <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Chart of Account
-                </CCol>
+                <CCol tag="label" sm="3" class="col-form-label"> </CCol>
                 <CCol sm="9">
-                  <v-select
-                    style="width: 100%"
-                    v-model="selectedChartOfAccount"
-                    :label="'name'"
-                    :options="chartOfAccountItems"
-                    placeholder="Select COA"
-                  />
+                  <WidgetsUploadDocument @uploaded="uploaded" />
                 </CCol>
               </CRow>
             </CForm>
@@ -61,46 +59,79 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import PurchaseQuotationApi from "@/lib/purchaseQuotationApi";
+import moment from "moment";
+import WidgetsUploadDocument from "../widgets/WidgetsUploadDocument.vue";
 
 export default {
-  name: "Product",
+  name: "PurchaseQuotation",
   components: {
-    vSelect,
+    WidgetsUploadDocument,
   },
   data: () => {
     return {
-      coaApi: new ChartOfAccountApi(),
-      selectedChartOfAccount: null,
-      chartOfAccountItems: [],
-
+      uploadedFiles: [],
+      orderDate: null,
       organizationTypeList: [],
       infoList: [],
-      obj: {},
+      obj: {
+        date: null,
+        orderNo: "",
+      },
       submitted: false,
-      api: new ProductApi(),
+      api: new PurchaseQuotationApi(),
     };
   },
   mounted() {
     var self = this;
-    self.refreshChartOfAccount();
+    self.initializeDefaultDate();
     self.resetObj();
   },
-  computed: {},
-  methods: {
-    refreshChartOfAccount() {
-      var self = this;
-      self.coaApi
-        .getListByCurrentBusiness()
-        .then((response) => {
-          self.chartOfAccountItems = response.result;
-        })
-        .catch(({ data }) => {});
+  computed: {
+    computeDate() {
+      return moment(this.orderDate).format("YYYY-MM-DD");
     },
+  },
+  methods: {
+    initializeDefaultDate() {
+      const today = new Date();
+      this.orderDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0
+      );
+      this.obj.date = this.orderDate;
+    },
+    getDocumentUrl() {
+      var self = this;
+      return apiUrl + "documents/file/" + this.obj.documentId;
+    },
+    getDocumentName() {
+      if (this.obj.document == null) return "Unknown";
+      if (this.obj.document.fileName == null) return "Unknown";
 
+      return this.obj.document.fileName;
+    },
+    uploaded(data) {
+      var self = this;
+      self.uploadedFiles = data.uploadedFiles;
+      console.log(self.uploadedFiles);
+      self.obj.documentId = self.uploadedFiles[0].id;
+      // self.api
+      //   .createReceiptImage(self.uploadedFiles)
+      //   .then((response) => {
+      //     self.resetObj();
+      //   })
+      //   .catch(({ data }) => {
+      //     self.toast("Error", helper.getErrorMessage(data), "danger");
+      //   });
+    },
+    setDate(e) {
+      this.orderDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -108,9 +139,9 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            this.orderDate = self.obj.date;
+
             console.log(self.obj);
-            self.selectedChartOfAccount = self.obj.chartAccount;
-            console.log(self.selectedChartOfAccount);
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -121,14 +152,13 @@ export default {
     },
     onSubmit() {
       var self = this;
-      self.obj.chartAccount = self.selectedChartOfAccount;
-      self.obj.chartAccountId = self.selectedChartOfAccount.id;
+      self.obj.date = self.orderDate;
 
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/purchaseQuotationList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -137,7 +167,7 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/purchaseQuotationList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");

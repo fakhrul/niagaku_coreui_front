@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import PurchaseProductApi from "@/lib/purchaseProductApi";
 
 const items = [];
 const fields = [
@@ -110,7 +110,7 @@ const fields = [
 ];
 
 export default {
-  name: "ProductList",
+  name: "PurchaseProductList",
   data() {
     return {
       loading: true,
@@ -121,7 +121,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new PurchaseProductApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -180,7 +180,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/PurchaseProduct/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +203,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/PurchaseProduct" });
     },
     toast(header, message, color) {
       var self = this;

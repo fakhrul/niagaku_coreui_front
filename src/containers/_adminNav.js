@@ -46,7 +46,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Bill',
+        name: 'Bill/Purchase Invoice',
         to: '/tenants/billList',
         icon: 'cilBookmark'
       },
@@ -58,22 +58,22 @@ export default [
       },
 
 
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Bookkeeping'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Bill',
-        to: '/tenants/billList',
-        icon: 'cilBookmark'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Chart of Account',
-        to: '/tenants/chartOfAccountList',
-        icon: 'cilBookmark'
-      },
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Bookkeeping'],
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Bill',
+      //   to: '/tenants/billList',
+      //   icon: 'cilBookmark'
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Chart of Account',
+      //   to: '/tenants/chartOfAccountList',
+      //   icon: 'cilBookmark'
+      // },
 
       {
         _name: 'CSidebarNavTitle',

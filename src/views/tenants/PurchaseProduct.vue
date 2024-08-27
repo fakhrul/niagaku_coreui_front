@@ -61,13 +61,13 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import PurchaseProductApi from "@/lib/purchaseProductApi";
 import ChartOfAccountApi from "@/lib/chartOfAccountApi";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
 export default {
-  name: "Product",
+  name: "PurchaseProduct",
   components: {
     vSelect,
   },
@@ -81,7 +81,7 @@ export default {
       infoList: [],
       obj: {},
       submitted: false,
-      api: new ProductApi(),
+      api: new PurchaseProductApi(),
     };
   },
   mounted() {
@@ -128,7 +128,7 @@ export default {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/purchaseproductList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -137,7 +137,7 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/productList" });
+            self.$router.push({ path: "/tenants/purchaseproductList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");

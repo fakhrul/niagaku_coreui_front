@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader> <strong> Vendor </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="items"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -42,6 +42,8 @@
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
                     </CButton>
+
+                    
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -92,14 +94,13 @@
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
+import VendorApi from "@/lib/vendorApi";
 
 const items = [];
 const fields = [
   // { key: "accountNo"},
   { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
+  { key: "contactName" },
   {
     key: "show_details",
     label: "",
@@ -109,8 +110,10 @@ const fields = [
   },
 ];
 
+
+
 export default {
-  name: "ProductList",
+  name: "VendorList",
   data() {
     return {
       loading: true,
@@ -121,7 +124,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new VendorApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -130,24 +133,9 @@ export default {
     var self = this;
     self.refreshTable();
   },
-  computed: {
-    computedItems() {
-      return this.items.map((item) => {
-        return {
-          ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
-        };
-      });
-    },
-  },
-
   methods: {
-    getChartOfAccountName(item) {
-      try {
-        return item.chartAccount.name;
-      } catch (error) {
-        return "N/A";
-      }
+    setDefault(item){
+
     },
     toast(header, message, color) {
       var self = this;
@@ -180,7 +168,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Product/${item.id}`,
+        path: `/tenants/Vendor/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -203,7 +191,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/Vendor" });
     },
     toast(header, message, color) {
       var self = this;
