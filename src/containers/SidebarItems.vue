@@ -251,40 +251,7 @@ export default {
               }
             ]
           },
-          {
-            _name: 'CSidebarNavDropdown',
-            name: 'Plugins',
-            route: '/plugins',
-            icon: 'cil-input-power',
-            items: [{
-                name: 'Draggable',
-                to: '/plugins/draggable',
-                icon: 'cil-cursor-move',
-                badge: {
-                  color: 'danger',
-                  text: 'PRO'
-                }
-              },
-              {
-                name: 'Calendar',
-                to: '/plugins/calendar',
-                icon: 'cil-calendar',
-                badge: {
-                  color: 'danger',
-                  text: 'PRO'
-                }
-              },
-              {
-                name: 'Spinners',
-                to: '/plugins/spinners',
-                icon: 'cil-circle',
-                badge: {
-                  color: 'danger',
-                  text: 'PRO'
-                }
-              }
-            ]
-          },
+          
           {
             _name: 'CSidebarNavDropdown',
             name: 'Tables',

@@ -15,76 +15,16 @@
       </CToaster>
       <CCard>
         <CCardBody>
-          <CRow>
-            <CCol sm="5">
-              <h4 class="card-title mb-0">Your Drawings</h4>
-              <div class="small text-muted">
-                Total Drawing: {{ items.length }}
-              </div>
-            </CCol>
-            <CCol sm="7">
-              <CButton class="float-right" color="primary" @click="addNew">
-                <CIcon :content="$options.freeSet.cilPlus" />
-              </CButton>
-            </CCol>
-          </CRow>
-          <CRow class="text-center" style="margin-top: 20px">
-            <template v-for="item in items">
-              <CCol class="mb-5" col="2" sm="2" :key="item.id">
-                <div @click="onLoadWorkspace(item)">
-                  {{ item.name }}
-                  <CImg
-                    thumbnail
-                    :src="floorPlanUrl(item)"
-                    height="150"
-                    width="150"
-                    style="margin-top: 10px"
-                  />
-                </div>
-                <!-- <CIcon :height="42" :content="icon" />
-                    <div>{{ toKebabCase(iconName) }}</div> -->
-              </CCol>
-            </template>
-          </CRow>
+         
         </CCardBody>
       </CCard>
     </div>
-    <div>
-      <CModal
-        title="Add New Drawing"
-        :show.sync="addNewPopup"
-        size="xl"
-        @update:show="onAddNewConfirmation"
-        :closeOnBackdrop="false"
-      >
-        <CRow>
-          <CCol sm="12">
-            <CForm>
-              <CInput label="Name" horizontal v-model="newObj.name" />
-              <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label"> Image </CCol>
-                <CCol sm="9">
-                  <WidgetsUploadImage
-                    :floorPlanUrl="newFloorPlanUrl"
-                    @uploaded="uploaded"
-                  />
-                </CCol>
-              </CRow>
-            </CForm>
-            <CButton type="submit" size="sm" color="primary" @click="submit"
-              ><CIcon name="cil-check-circle" /> Submit</CButton
-            >
-          </CCol>
-        </CRow>
-      </CModal>
-    </div>
+    
   </div>
 </template>
 
 <script>
-import FloorPlanApi from "../lib/floorPlanApi";
 import { freeSet } from "@coreui/icons";
-import WidgetsUploadImage from "./widgets/WidgetsUploadImage.vue";
 
 const items = [];
 const fields = [
@@ -102,7 +42,6 @@ export default {
   name: "Dashboard",
   freeSet,
   components: {
-    WidgetsUploadImage,
   },
   data() {
     return {
@@ -118,22 +57,12 @@ export default {
         documentId: null,
       },
       fields,
-      api: new FloorPlanApi(),
     };
   },
   mounted() {
     var self = this;
-    self.refreshTable();
   },
-  computed: {
-    newFloorPlanUrl() {
-      var self = this;
-      return (
-        apiUrl + "documents/file/" + self.newObj.documentId
-      );
-    },
-  },
-
+  
   methods: {
     toast(header, message, color) {
       var self = this;

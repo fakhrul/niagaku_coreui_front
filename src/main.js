@@ -11,8 +11,6 @@ import VueKonva from 'vue-konva';
 import AuthService from './lib/authservice'
 import Api from './lib/api'
 import Helper from './utils/helper.js'
-import BusinessHelper from './lib/businessHelper'
-import DrawingHelper from './lib/drawingHelper'
 import "./index.css";
 import 'material-icons/iconfont/material-icons.css';
 //import opencv from './opencv.js';
