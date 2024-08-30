@@ -226,9 +226,9 @@ export default {
 
     floorPlanUrl() {
       var self = this;
-      console.log('process.env.VUE_APP_API_URL',process.env.VUE_APP_API_URL);
+      console.log('apiUrl',apiUrl);
   return (
-        process.env.VUE_APP_API_URL + "documents/file/" + self.obj.documentId
+        apiUrl + "documents/file/" + self.obj.documentId
       );
     },
   },

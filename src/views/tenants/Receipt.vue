@@ -573,7 +573,7 @@ export default {
     billImageUrl() {
       var self = this;
       return (
-        process.env.VUE_APP_API_URL + "documents/file/" + self.obj.documentId
+        apiUrl + "documents/file/" + self.obj.documentId
       );
     },
     computeBillDate() {

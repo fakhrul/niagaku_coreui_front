@@ -1493,7 +1493,7 @@ export default {
       var fullUrl = "";
       if (this.obj)
         fullUrl =
-          process.env.VUE_APP_API_URL + "documents/file/" + this.obj.documentId;
+          apiUrl + "documents/file/" + this.obj.documentId;
 
       console.log(fullUrl);
       return fullUrl;

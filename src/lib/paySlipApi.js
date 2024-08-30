@@ -1,5 +1,3 @@
-let apiUrl = process.env.VUE_APP_API_URL;
-
 
 class PaySlipApi {
 
@@ -15,6 +13,15 @@ class PaySlipApi {
 
     getSlipTypes() {
         var url = apiUrl + 'paySlips/types';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    
+    getListByCurrentProfile(){
+        var url = apiUrl + 'paySlips/currentUser/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data

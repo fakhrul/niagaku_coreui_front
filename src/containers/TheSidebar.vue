@@ -43,7 +43,7 @@ export default {
   adminNav,
   data: () => {
     return {
-      logoUrl: "img/logo.png",
+      logoUrl: "/img/logo.png",
     };
   },
   computed: {

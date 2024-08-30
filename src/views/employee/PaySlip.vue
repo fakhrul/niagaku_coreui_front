@@ -15,18 +15,171 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
+          <CCardHeader> <strong> Pay Slip </strong> Information </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Category" horizontal v-model="obj.category" />
-              <CInput label="Account No" horizontal v-model="obj.accountNo" />
-              <CInput label="Name" horizontal v-model="obj.name" />
+              <CInput
+                label="Full Name"
+                horizontal
+                v-model="obj.profile.fullName"
+                readonly
+              />
+
+              <!-- <CSelect
+                horizontal
+                :value.sync="selectedSlipType"
+                :options="slipTypes"
+                label="Slip Type"
+                
+              /> -->
+              <CInput
+                label="Slip Type"
+                horizontal
+                v-model="obj.paySlipTypeDescription"
+                readonly
+              />
+              <!-- <CSelect
+                horizontal
+                :value.sync="selectedSlipState"
+                :options="slipStates"
+                label="Slip State"
+              /> -->
+              <CInput
+                label="State"
+                horizontal
+                v-model="obj.statusDescription"
+                readonly
+              />
+              <CInput
+                horizontal
+                label="Date"
+                type="date"
+                :value="computeDate"
+                @change="setDate"
+                readonly
+              />
+
+              <CInput label="Reference" horizontal v-model="obj.reference"  readonly />
+              <CInput label="PayPeriod" horizontal v-model="obj.payPeriod" readonly/>
+              <CInput label="EpfNo" horizontal v-model="obj.epfNo" readonly/>
+              <CInput label="SocsoNo" horizontal v-model="obj.socsoNo" readonly/>
+              <CInput label="TaxNo" horizontal v-model="obj.taxNo" readonly/>
+              <CInput label="BankName" horizontal v-model="obj.bankName" readonly/>
+              <CInput
+                label="BankAccountName"
+                horizontal
+                v-model="obj.bankAccountName"
+                readonly
+              />
+              <CInput
+                label="BankAccountNo"
+                horizontal
+                v-model="obj.bankAccountNo"
+                readonly
+              />
+              <CInput
+                label="TotalAmount"
+                horizontal
+                v-model="obj.totalAmount"
+                readonly
+              />
+              <CInput
+                label="GrossAmount"
+                horizontal
+                v-model="obj.grossAmount"
+                readonly
+              />
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label"> Is EPF? </CCol>
+                <CCol sm="9">
+                  <CSwitch
+                    class="mr-1"
+                    color="primary"
+                    :checked.sync="obj.isEnableEpf"
+                  />
+                </CCol>
+              </CRow>
+              <CInput
+                label="EmployerEpfAmount"
+                horizontal
+                v-model="obj.employerEpfAmount"
+                readonly
+              />
+              <CInput
+                label="EmployeeEpfAmount"
+                horizontal
+                v-model="obj.employeeEpfAmount"
+                readonly
+              />
+
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label">
+                  Is SOCSO?
+                </CCol>
+                <CCol sm="9">
+                  <CSwitch
+                    class="mr-1"
+                    color="primary"
+                    :checked.sync="obj.isEnableSocso"
+                  />
+                </CCol>
+              </CRow>
+              <CInput
+                label="EmployeeSocsoAmount"
+                horizontal
+                v-model="obj.employeeSocsoAmount"
+                readonly
+              />
+              <CInput
+                label="EmployerSocsoAmount"
+                horizontal
+                v-model="obj.employerSocsoAmount"
+                readonly
+              />
+
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label">
+                  Is Zakat?
+                </CCol>
+                <CCol sm="9">
+                  <CSwitch
+                    class="mr-1"
+                    color="primary"
+                    :checked.sync="obj.isEnableZakat"
+                  />
+                </CCol>
+              </CRow>
+              <CInput
+                label="ZakatAmount"
+                horizontal
+                v-model="obj.zakatAmount"
+                readonly
+              />
+
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label"> Is TAX? </CCol>
+                <CCol sm="9">
+                  <CSwitch
+                    class="mr-1"
+                    color="primary"
+                    :checked.sync="obj.isEnableTax"
+                  />
+                </CCol>
+              </CRow>
+              <CInput label="TaxAmount" horizontal v-model="obj.taxAmount" readonly />
+
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label"> Remarks </CCol>
+                <CCol sm="9">
+                  <CTextarea placeholder="" rows="5" v-model="obj.remarks" readonly/>
+                </CCol>
+              </CRow>
             </CForm>
           </CCardBody>
           <CCardFooter>
-            <CButton type="submit" size="sm" color="primary" @click="submit"
-              ><CIcon name="cil-check-circle" /> Submit</CButton
-            >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -35,28 +188,111 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import PaySlipApi from "@/lib/paySlipApi";
+import moment from "moment";
+import ProfileApi from "../../lib/profileApi";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 export default {
-  name: "ChartOfAccount",
+  name: "PaySlip",
+  components: {
+    vSelect,
+  },
   data: () => {
     return {
-      organizationTypeList: [],
+      selectedSlipState: 0,
+      slipStates: [],
+
+      profileApi: new ProfileApi(),
+
+      selectedEmployee: null,
+      employeeItems: [],
+
+      date: Date(),
+
+      selectedSlipType: 0,
+      slipTypes: [],
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
-      api: new ChartOfAccountApi(),
+      api: new PaySlipApi(),
     };
   },
   mounted() {
     var self = this;
+    this.fetchSlipStates();
+    this.fetchSlipTypes();
+    this.refreshEmployee();
+    this.initializeDefaultDate();
     self.resetObj();
   },
   computed: {
-    
+    computeDate() {
+      return moment(this.orderDate).format("YYYY-MM-DD");
+    },
   },
   methods: {
+    cancel() {
+      this.$router.push({ path: "/employee/paySlipList" });
+    },
+    refreshEmployee() {
+      var self = this;
+      self.profileApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.employeeItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+
+    initializeDefaultDate() {
+      const today = new Date();
+      this.date = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0
+      );
+    },
+
+    setDate(e) {
+      this.date = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+    fetchSlipStates() {
+      var self = this;
+      self.api
+        .getSlipStates()
+        .then((response) => {
+          var obj = response.result;
+          this.slipStates = obj.map((state) => ({
+            value: state.id,
+            label: state.name,
+          }));
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
+    fetchSlipTypes() {
+      var self = this;
+      self.api
+        .getSlipTypes()
+        .then((response) => {
+          var obj = response.result;
+          this.slipTypes = obj.map((state) => ({
+            value: state.id,
+            label: state.name,
+          }));
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -64,6 +300,11 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            console.log(self.obj);
+            self.selectedSlipType = self.obj.paySlipType;
+            self.selectedSlipState = self.obj.status;
+            this.date = self.obj.date;
+            self.selectedEmployee = self.obj.profile;
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -74,11 +315,17 @@ export default {
     },
     onSubmit() {
       var self = this;
+      self.obj.paySlipType = self.selectedSlipType;
+      self.obj.status = self.selectedSlipState;
+      self.obj.date = self.date;
+      // self.obj.chartAccount = self.selectedChartOfAccount;
+      self.obj.profileId = self.selectedEmployee.id;
+
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            self.$router.push({ path: "/tenants/payslipList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -87,7 +334,7 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/chartOfAccountList" });
+            self.$router.push({ path: "/tenants/payslipList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -129,10 +376,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

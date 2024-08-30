@@ -112,8 +112,8 @@ import moment from "moment";
 const items = [];
 const fields = [
   { key: "name" },
-  { key: "domainName" },
-  { key: "tenantNo" },
+  // { key: "domainName" },
+  { key: "tenantEmail" },
   { key: "totalBusiness" },
   { key: "totalUser" },
   { key: "subsriptionType" },
@@ -154,15 +154,38 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
+          totalUser:  this.getTotalProfile(item),
+          tenantEmail: this.getTenantEmail(item),
+          totalBusiness: this.getTotalBusiness(item),
           createdOn: this.getDisplayDateTime(item.createdOn),
         };
       });
     },
   },
   methods: {
+    getTotalProfile(item) {
+      try {
+        return item.profiles.length;
+      } catch (error) {
+        return 0;
+      }
+    },getTotalBusiness(item) {
+      try {
+        return item.businesses.length;
+      } catch (error) {
+        return 0;
+      }
+    },
+    getTenantEmail(item) {
+      try {
+        return item.tenantAdmin.email;
+      } catch (error) {
+        return "N/A";
+      }
+    },
     getImage(item) {
       var url =
-        process.env.VUE_APP_API_URL + "documents/file/" + item.documentId;
+        apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 

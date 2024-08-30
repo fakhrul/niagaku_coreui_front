@@ -120,7 +120,7 @@ export default {
           // Handle an exception.
         });
 
-      // var jimpSrc = await Jimp.read("img/lena.jpg");
+      // var jimpSrc = await Jimp.read("/img/lena.jpg");
       // console.log("jimpSrc", jimpSrc.bitmap);
       // const response = await fetch("https://reqres.in/api/users")
       // const { data: users } = await response.json()

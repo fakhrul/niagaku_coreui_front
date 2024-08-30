@@ -1,10 +1,8 @@
 import * as axios from 'axios';
 
-const BASE_URL = process.env.VUE_APP_API_URL;
-
 class FileUploadApi {
     uploadDocument(formData) {
-        const url = `${BASE_URL}Documents/UploadFile`;
+        const url = `${apiUrl}Documents/UploadFile`;
         return axios.post(url, formData)
             .then(x => x.data);
     }

@@ -22,10 +22,10 @@ Vue.prototype.$log = console.log.bind(console)
 
 Vue.use(VueKonva);
 
+window.apiUrl = window.config.API_URL;
 window.api = new Api();
 window.auth = new AuthService();
 window.helper = new Helper();
-window.apiUrl = process.env.VUE_APP_API_URL || window.config.API_URL;
 
 // window.business = new BusinessHelper();
 // window.drawing = new DrawingHelper();

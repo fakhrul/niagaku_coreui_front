@@ -102,10 +102,16 @@ const MlDownload = () => import('@/views/admins/MlDownload')
 
 const TenantList = () => import('@/views/admins/TenantList')
 const Tenant = () => import('@/views/admins/Tenant')
+const PackageList = () => import('@/views/admins/PackageList')
+const Package = () => import('@/views/admins/Package')
 
 
 const BusinessList = () => import('@/views/tenants/BusinessList')
 const Business = () => import('@/views/tenants/Business')
+
+const SubscriptionList = () => import('@/views/tenants/SubscriptionList')
+const Subscription = () => import('@/views/tenants/Subscription')
+
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
 
@@ -152,11 +158,15 @@ const TenantClaim = () => import('@/views/tenants/Claim')
 const EmployeeList = () => import('@/views/tenants/EmployeeList')
 const Employee = () => import('@/views/tenants/Employee')
 
+const VerifyEmail = () => import('@/views/pages/VerifyEmail')
+const RegisterCompleted = () => import('@/views/pages/RegisterCompleted')
+
+
 
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'hash', // https://router.vuejs.org/api/#mode
+  mode: 'history', // https://router.vuejs.org/api/#mode
   linkActiveClass: 'active',
   scrollBehavior: () => ({ y: 0 }),
   routes: configRoutes()
@@ -164,20 +174,42 @@ const router = new Router({
 
 
 router.beforeEach((to, from, next) => {
-  var isAuth = auth.check();
-  //console.log(isAuth)
+  var isAuth = auth.check(); // Your function to check if the user is authenticated
+  console.log(from.name, to.name);
+
   if (!isAuth) {
-    if (to.name == 'Login') {
+    // Allow unauthenticated access to Login, Register, and VerifyEmail routes
+    if (to.name === 'Login' ||
+      to.name === 'Register' ||
+      to.name === 'RegisterCompleted' ||
+      to.name === 'VerifyEmail') {
       next();
+    } else {
+      next({ name: 'Login' }); // Redirect to Login if the route is protected and user is not authenticated
     }
-    else {
-      next({ name: 'Login' });
-    }
+  } else {
+    next(); // Allow navigation if the user is authenticated
   }
-  else {
-    next();
-  }
-})
+});
+
+
+// router.beforeEach((to, from, next) => {
+//   var isAuth = auth.check();
+//   console.log(from.name, to.name);
+
+//   if (!isAuth) {
+//     if (to.name == 'Login' || 
+//     to.name == 'Register') {
+//       next();
+//     }
+//     else {
+//       next({ name: 'Login' });
+//     }
+//   }
+//   else {
+//     next();
+//   }
+// })
 
 export default router
 
@@ -281,6 +313,24 @@ function configRoutes() {
               component: Tenant
             },
 
+            //
+            {
+              path: '/admins/packageList',
+              name: 'PackageList',
+              component: PackageList
+            },
+            {
+              path: '/admins/package/:id',
+              name: 'PackageById',
+              component: Package
+            },
+            {
+              path: '/admins/package',
+              name: 'Package',
+              component: Package
+            },
+
+            //
             {
               path: 'user/:id',
               name: 'UserById',
@@ -351,7 +401,23 @@ function configRoutes() {
               name: 'Business',
               component: Business
             },
-
+            //
+            {
+              path: '/tenants/subscriptionList',
+              name: 'SubscriptionList',
+              component: SubscriptionList
+            },
+            {
+              path: '/tenants/subscription/:id',
+              name: 'SubscriptionById',
+              component: Subscription
+            },
+            {
+              path: '/tenants/subscription',
+              name: 'Subscription',
+              component: Subscription
+            },
+            //
             {
               path: '/tenants/quotation',
               name: 'Quotation',
@@ -966,9 +1032,20 @@ function configRoutes() {
           component: Login
         },
         {
-          path: 'register',
+          path: '/register',
           name: 'Register',
           component: Register
+        },
+
+        {
+          path: 'verifyEmail', // Correctly define the path
+          name: 'VerifyEmail', // Correctly define the name
+          component: VerifyEmail,
+        },
+        {
+          path: 'registerCompleted', // Correctly define the path
+          name: 'RegisterCompleted', // Correctly define the name
+          component: RegisterCompleted,
         },
 
         // {

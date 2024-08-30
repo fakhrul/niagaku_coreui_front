@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Pay Slip </strong> List </CCardHeader>
+            <CCardHeader> <strong> Subscription </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="items"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -33,6 +33,7 @@
               >
                 <template #show_details="{ item, index }">
                   <td class="py-2">
+              
                     <CButton
                       color="primary"
                       variant="outline"
@@ -42,8 +43,6 @@
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
                     </CButton>
-
-                    
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -89,48 +88,125 @@
           </CModal>
         </CCol>
       </CRow>
+      <!-- <CRow>
+        <CCol sm="12">
+          <CCard>
+            <CCardHeader> <strong> User </strong> List </CCardHeader>
+            <CCardBody>
+              <CDataTable
+                :items="computedProfileItems"
+                :fields="profilefields"
+                column-filter
+                items-per-page-select
+                :items-per-page="10"
+                hover
+                sorter
+                pagination
+                :loading="profileLoading"
+              >
+                <template #show_details="{ item }">
+                  <td>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      square
+                      size="sm"
+                      @click="onEditProfile(item)"
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      square
+                      size="sm"
+                      @click="showDeleteProfileConfirmation(item)"
+                    >
+                      Delete
+                    </CButton>
+                  </td>
+                </template>
+              </CDataTable>
+            </CCardBody>
+            <CCardFooter>
+              <CButton
+                type="submit"
+                size="sm"
+                color="primary"
+                @click="addNewProfile"
+                ><CIcon name="cil-check-circle" /> Add New</CButton
+              >
+            </CCardFooter>
+          </CCard>
+          <CModal
+            title="Confirm Delete"
+            color="warning"
+            :show.sync="warningProfileModal"
+            @update:show="onDeleteProfileConfirmation"
+          >
+            Are you sure you want to delete this {{ itemToDelete.code }} ?
+          </CModal>
+        </CCol>
+      </CRow> -->
     </div>
   </div>
 </template>
 
 <script>
-import PaySlipApi from "@/lib/paySlipApi";
-import moment from "moment";
+import SubscriptionApi from "@/lib/subscriptionApi";
+// import ProfileApi from "@/lib/profileApi";
 
 const items = [];
 const fields = [
-{ key: "date" },
-  { key: "profileName" },
-  { key: "paySlipTypeDescription" },
-  { key: "businessName" },
-  { key: "totalAmount" },
+  // { key: "accountNo"},
+  { key: "startDate" },
+  { key: "endDate" },
+  { key: "packageDescription" },
   { key: "statusDescription" },
-  { key: "paymentMethodDescription" },
-  { key: "remarks" },
+  { key: "amount" },
   {
     key: "show_details",
     label: "",
-    _style: "width:2%",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
 ];
 
-
+// const profileItems = [];
+const profilefields = [
+  { key: "fullName" },
+  { key: "email" },
+  { key: "subscription" },
+  { key: "role" },
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:150px",
+    sorter: false,
+    filter: false,
+  },
+];
 
 export default {
-  name: "PaySlipList",
+  name: "SubscriptionList",
   data() {
     return {
+      warningProfileModal: false,
+      profileLoading: true,
+      profileItems: [],
+      profilefields,
       loading: true,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
+
       infoList: [],
       fields,
       details: [],
       collapseDuration: 0,
-      api: new PaySlipApi(),
+      api: new SubscriptionApi(),
+      // profileApi: new ProfileApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -138,25 +214,79 @@ export default {
   mounted() {
     var self = this;
     self.refreshTable();
+    // self.refreshProfileTable();
   },
   computed: {
-    computedItems() {
-      return this.items.map((item) => {
+    computedProfileItems() {
+      return this.profileItems.map((item) => {
         return {
           ...item,
-          date: this.getDisplayDateTime(item.date),
-          profileName: item.profile.fullName,
-          businessName: item.business.name,
+          subscription:item.defaultSubscription.name,
+          role: item.appUser.role,
         };
       });
     },
-   
   },
+
   methods: {
-    getDisplayDateTime(dt) {
-      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
+    /// For Profile List
+    onEditProfile(item) {
+      var self = this;
+      self.$router.push({
+        path: `/admins/tenant/${item.id}`,
+      });
     },
-        toast(header, message, color) {
+    onDeleteProfileConfirmation(status, evt, accept) {
+      var self = this;
+      if (accept) {
+        this.api
+          .delete(self.itemToDelete.id)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      self.itemToDelete = {};
+    },
+    showDeleteProfileConfirmation(item) {
+      var self = this;
+      self.itemToDelete = item;
+      self.warningProfileModal = true;
+    },
+    addNewProfile() {
+      this.$router.push({ path: "/admins/Tenant" });
+    },
+    // refreshProfileTable() {
+    //   var self = this;
+    //   self.profileLoading = false;
+    //   self.profileApi
+    //     .getListByCurrentTenant()
+    //     .then((response) => {
+    //       self.profileItems = response.result;
+    //       console.log(self.profileItems);
+    //       self.profileLoading = false;
+    //     })
+    //     .catch(({ data }) => {
+    //       self.toast("Error", helper.getErrorMessage(data), "danger");
+    //     });
+    // },
+
+    setDefault(item) {
+      var self = this;
+      self.api
+        .updateDefaultSubscription(item)
+        .then((response) => {
+          // self.obj = response.result;
+          // auth.setDefaultSubscriptionName(item);
+          self.refreshTable();
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+    toast(header, message, color) {
       var self = this;
       self.infoList.push({
         header: header,
@@ -171,13 +301,16 @@ export default {
         this.collapseDuration = 0;
       });
     },
+   
+
     refreshTable() {
       var self = this;
       self.loading = false;
       self.api
-        .getListByCurrentBusiness()
+        .getListByCurrentTenant()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -187,7 +320,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/PaySlip/${item.id}`,
+        path: `/tenants/Subscription/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -210,7 +343,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/PaySlip" });
+      this.$router.push({ path: "/tenants/Subscription" });
     },
     toast(header, message, color) {
       var self = this;

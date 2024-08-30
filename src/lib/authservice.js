@@ -1,5 +1,4 @@
 import axios from 'axios'
-let apiUrl = process.env.VUE_APP_API_URL;
 
 class AuthService {
     constructor() {
@@ -20,24 +19,17 @@ class AuthService {
                 this.user = data;
             });
     }
-    getDefaultBusinessName(){
+    getDefaultBusinessName() {
         try {
             return this.user.userData.profile.defaultBusiness.name;
         } catch (error) {
             return "Unknown";
         }
     }
-    getUserName(){
+    getUserName() {
         // console.log(this.user);
         return this.user.userData.userName;
     }
-
-    // setDefaultBusinessName(data){
-    //     console.log('setDefaultBusinessName');
-    //     console.log(data);
-    //     this.user.userData.profile.defaultBusiness = data;
-    //     this.user.userData.profile.defaultBusinessId = data.Id;
-    // }
 
     doLogin(data) {
         var url = apiUrl + 'Account/login';
@@ -50,10 +42,25 @@ class AuthService {
     }
 
     register(data) {
-        var url = apiUrl + 'Account/Register';
+
+        var url = apiUrl + 'Account/register';
+
         return api.call('post', url, data)
             .then((response) => {
-                // console.log(response.data);
+                return response.data
+            });
+
+    }
+
+    verifyEmail(data) {
+        // Convert object to URL parameters using URLSearchParams
+        const params = new URLSearchParams(data);
+        const queryString = params.toString();
+
+        var url = apiUrl + 'Account/verifyEmail?' + queryString;
+        console.log(url);
+        return api.call('post', url, data)
+            .then((response) => {
                 return response.data
             });
 

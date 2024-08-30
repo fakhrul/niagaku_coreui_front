@@ -17,24 +17,128 @@
         <CCard>
           <CCardHeader> <strong> Claim </strong> Information </CCardHeader>
           <CCardBody>
-            <CForm>
-              <CInput label="No" horizontal v-model="obj.claimNo" />
-              <CInput label="Name" horizontal v-model="obj.profile.fullName" />
-              <CInput label="Business" horizontal v-model="obj.business.name" />
-              <CInput label="Date" horizontal v-model="obj.date" />
-              <CInput
-                label="Total Amount"
-                horizontal
-                v-model="obj.totalAmount"
-              />
-              <!-- <CInput label="State" horizontal v-model="obj.claimState" /> -->
-              <CSelect
-                horizontal
-                :value.sync="selectedClaimState"
-                :options="claimStates"
-                label="Claim State"
-              />
-            </CForm>
+            <CRow>
+              <CCol>
+                <CInput label="Claim No" horizontal v-model="obj.claimNo" />
+              </CCol>
+              <CCol>
+                <CInput
+                  horizontal
+                  label="Date"
+                  type="date"
+                  :value="computeDate"
+                  @change="setDate"
+                />
+              </CCol>
+              <CCol>
+                <CSelect
+                  horizontal
+                  :value.sync="selectedClaimState"
+                  :options="claimStates"
+                  label="Claim State"
+                />
+              </CCol>
+            </CRow>
+            <CRow>
+              <CCol>
+                <CDataTable :items="computedClaimItems" :fields="claimFields">
+                  <template #show_index="{ index }">
+                    <td class="py-2">
+                      {{ index + 1 }}
+                    </td>
+                  </template>
+                  <template #show_date="{ item }">
+                    <td>
+                      <CInput type="date" v-model="item.date" />
+                    </td>
+                  </template>
+
+                  <template #show_item="{ item }">
+                    <td>
+                      <CInput v-model="item.name" min="1"></CInput>
+                    </td>
+                  </template>
+                  <template #show_description="{ item }">
+                    <td>
+                      <CTextarea
+                        placeholder=""
+                        v-model="item.description"
+                        rows="1"
+                      />
+                    </td>
+                  </template>
+                  <template #show_quantity="{ item }">
+                    <td>
+                      <CInput v-model="item.quantity" min="1"></CInput>
+                    </td>
+                  </template>
+                  <template #show_unit="{ item }">
+                    <td>
+                      <CInput v-model="item.unit" min="1"></CInput>
+                    </td>
+                  </template>
+                  <template #show_price="{ item }">
+                    <td>
+                      <CInput
+                        v-model="item.amount"
+                        min="0"
+                        step="0.01"
+                      ></CInput>
+                    </td>
+                  </template>
+                  <template #show_total="{ item }">
+                    <td>
+                      {{ getTotalItemPrice(item) }}
+                    </td>
+                  </template>
+                  <template #show_move="{ item, index }">
+                    <td class="py-2">
+                      <CButton
+                        color="primary"
+                        size="sm"
+                        @click="moveItem(index, 'up')"
+                        :disabled="index === 0"
+                      >
+                        ↑
+                      </CButton>
+                      <CButton
+                        color="primary"
+                        size="sm"
+                        @click="moveItem(index, 'down')"
+                        :disabled="index === computedClaimItems.length - 1"
+                      >
+                        ↓
+                      </CButton>
+                    </td>
+                  </template>
+                  <template #show_remove="{ item }">
+                    <td class="py-2">
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                        square
+                        size="sm"
+                        @click="onRemoveClaimItem(item)"
+                      >
+                        Remove
+                      </CButton>
+                    </td>
+                  </template>
+
+                  <template #footer>
+                    <td>
+                      <CButton @click="addNewItem()" color="primary"
+                        >Add</CButton
+                      >
+                    </td>
+                    <td colspan="6" class="text-right">
+                      <strong>Grand Total:</strong>
+                    </td>
+                    <td>{{ grandTotal.toFixed(2) }}</td>
+                  </template>
+                </CDataTable>
+              </CCol>
+            </CRow>
           </CCardBody>
           <CCardFooter>
             <CButton type="submit" size="sm" color="primary" @click="submit"
@@ -45,86 +149,14 @@
       </CCol>
     </CRow>
     <CRow>
-      <CCol sm="12">
-        <CCard>
-          <CCardHeader> <strong> Claim </strong> Details </CCardHeader>
-          <CCardBody>
-            <CDataTable :items="computedClaimItems" :fields="claimFields">
-              <template #show_index="{ index }">
-                <td class="py-2">
-                  {{ index + 1 }}
-                </td>
-              </template>
-              <template #show_item="{ item }">
-                <td>
-                  <CInput v-model="item.name" min="1"></CInput>
-
-                 
-                </td>
-              </template>
-              <template #show_description="{ item }">
-                <td>
-                  <CTextarea
-                    placeholder=""
-                    v-model="item.description"
-                    rows="1"
-                  />
-                </td>
-              </template>
-              <template #show_quantity="{ item }">
-                <td>
-                  <CInput v-model="item.quantity" min="1"></CInput>
-                </td>
-              </template>
-              <template #show_unit="{ item }">
-                <td>
-                  <CInput v-model="item.unit" min="1"></CInput>
-                </td>
-              </template>
-              <template #show_price="{ item }">
-                <td>
-                  <CInput v-model="item.amount" min="0" step="0.01"></CInput>
-                </td>
-              </template>
-              <template #show_total="{ item }">
-                <td>
-                  {{ getTotalItemPrice(item) }}
-                </td>
-              </template>
-              <template #show_remove="{ item }">
-                <td class="py-2">
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                    square
-                    size="sm"
-                    @click="onRemoveClaimItem(item)"
-                  >
-                    Remove
-                  </CButton>
-                </td>
-              </template>
-
-              <template #footer>
-                <td>
-                  <CButton @click="addNewItem()" color="primary">Add</CButton>
-                </td>
-                <td colspan="5" class="text-right">
-                  <strong>Grand Total:</strong>
-                </td>
-                <td>{{ grandTotal.toFixed(2) }}</td>
-              </template>
-            </CDataTable>
-          </CCardBody>
-          <CCardFooter> </CCardFooter>
-        </CCard>
-      </CCol>
+      <CCol sm="12"> </CCol>
     </CRow>
   </div>
 </template>
 
 <script>
 import ClaimApi from "@/lib/claimApi";
+import moment from "moment";
 
 const claimItems = [];
 const claimFields = [
@@ -135,9 +167,10 @@ const claimFields = [
     sorter: false,
     filter: false,
   },
-  // { key: "productName", label: "Item" },
+  // { key: "position", label: "Position" },
+  // { key: "date", label: "date" },
   {
-    key: "date",
+    key: "show_date",
     label: "Date",
   },
   {
@@ -169,6 +202,10 @@ const claimFields = [
     label: "Total",
   },
   {
+    key: "show_move",
+    _style: "width:1%",
+  },
+  {
     key: "show_remove",
     _style: "width:1%",
   },
@@ -178,6 +215,8 @@ export default {
   name: "Claim",
   data: () => {
     return {
+      date: Date(),
+
       // Quotation Itm
       claimItems: claimItems.map((item, id) => {
         return { ...item, id };
@@ -204,13 +243,18 @@ export default {
   mounted() {
     var self = this;
     this.fetchClaimStates();
+    this.initializeDefaultDate();
     self.resetObj();
   },
   computed: {
+    computeDate() {
+      return moment(this.date).format("YYYY-MM-DD");
+    },
     computedClaimItems() {
       return this.claimItems.map((item) => {
         return {
           ...item,
+          date: moment(item.date).format("YYYY-MM-DD"),
           // productName: item.product.name,
           // totalAmountPerItem: this.getTotalItemPrice(item),
         };
@@ -226,6 +270,23 @@ export default {
     },
   },
   methods: {
+    moveItem(index, direction) {
+      const newIndex = direction === "up" ? index - 1 : index + 1;
+      if (newIndex >= 0 && newIndex < this.computedClaimItems.length) {
+        const temp = this.computedClaimItems[index];
+        this.$set(
+          this.computedClaimItems,
+          index,
+          this.computedClaimItems[newIndex]
+        );
+        this.$set(this.computedClaimItems, newIndex, temp);
+
+        // Update positions after swapping
+        this.computedClaimItems[index].position = index + 1;
+        this.computedClaimItems[newIndex].position = newIndex + 1;
+      }
+    },
+
     onRemoveClaimItem(item) {
       var self = this;
       if (self.computedClaimItems != null) {
@@ -235,7 +296,44 @@ export default {
           }
         }
       }
+
+      this.updatePositions(); // Update positions after removal
     },
+
+    updatePositions() {
+      this.computedClaimItems.forEach((item, index) => {
+        item.position = index + 1;
+      });
+    },
+
+    setItemDate(e) {
+      console.log(e);
+    },
+    initializeDefaultDate() {
+      const today = new Date();
+      this.date = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0
+      );
+    },
+
+    setDate(e) {
+      this.date = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+    // onRemoveClaimItem(item) {
+    //   var self = this;
+    //   if (self.computedClaimItems != null) {
+    //     for (var i = 0; i < self.computedClaimItems.length; i++) {
+    //       if (self.computedClaimItems[i].id === item.id) {
+    //         self.computedClaimItems.splice(i, 1);
+    //       }
+    //     }
+    //   }
+    // },
     generateGUID() {
       return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
         /[xy]/g,
@@ -248,13 +346,25 @@ export default {
     },
 
     addNewItem() {
+      const today = new Date();
+      const newPosition = this.computedClaimItems.length + 1;
       this.computedClaimItems.push({
         id: this.generateGUID(),
+        date: new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          0,
+          0,
+          0
+        ),
         name: "",
         amount: 0,
         unit: "L.S.",
         quantity: 0,
         description: "",
+
+        position: newPosition,
       });
     },
     getTotalItemPrice(item) {
@@ -275,8 +385,8 @@ export default {
             value: state.id,
             label: state.name,
           }));
-
           console.log(this.claimStates);
+          self.selectedClaimState = 0;
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -294,54 +404,62 @@ export default {
 
             // Set selectedClaimState to match the current state of the claim
             self.selectedClaimState = self.obj.claimState;
+            if (self.obj.items.length > 0) {
+              if (self.obj.items[0].position == 0) {
+                for (var i = 0; i < self.obj.items.length; i++) {
+                  self.obj.items[i].position = i + 1;
+                }
+              }
+            }
 
-            // var claimState ={
-            //   value: self.obj.claimState,
-            //   label: self.obj.claimStateDescription,
-            // };
-            // console.log(claimState);
-            // self.selectedClaimState = self.obj.claimState;
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
           });
       } else {
         self.obj = self.getEmptyObj();
+        this.api
+          .getNextReferenceNumber()
+          .then((response) => {
+            self.obj.claimNo = response.result;
+            console.log(response.result);
+          })
+          .catch(({ data }) => {});
       }
     },
     onSubmit() {
       var self = this;
+      self.obj.date = self.date;
+      self.obj.claimState = self.selectedClaimState;
+      for (let i = 0; i < self.computedClaimItems.length; i++)
+        self.computedClaimItems[i].date = new Date(
+          self.computedClaimItems[i].date + "T00:00:00"
+        );
+      self.obj.items = self.computedClaimItems;
 
-      console.log(self.selectedClaimState);
-      if (self.selectedClaimState) {
-        self.obj.claimState = self.selectedClaimState;
-        self.obj.items = self.computedClaimItems;
-
-        if (!self.obj.id) {
-          this.api
-            .create(self.obj)
-            .then((response) => {
-              self.toast("Success", "Update Success", "success");
-              this.resetObj();
-              // self.$router.push({ path: "/employee/claimList" });
-            })
-            .catch(({ data }) => {
-              self.toast("Error", helper.getErrorMessage(data), "danger");
-            });
-        } else {
-          this.api
-            .update(self.obj)
-            .then((response) => {
-              // self.$router.push({ path: "/employee/claimList" });
-              self.toast("Success", "Update Success", "success");
-              this.resetObj();
-            })
-            .catch(({ data }) => {
-              self.toast("Error", helper.getErrorMessage(data), "danger");
-            });
-        }
+      console.log(self.obj.items);
+      if (!self.obj.id) {
+        this.api
+          .create(self.obj)
+          .then((response) => {
+            self.toast("Success", "Update Success", "success");
+            this.resetObj();
+            // self.$router.push({ path: "/employee/claimList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
       } else {
-        self.toast("Error", "Please select a valid claim state.", "danger");
+        this.api
+          .update(self.obj)
+          .then((response) => {
+            // self.$router.push({ path: "/employee/claimList" });
+            self.toast("Success", "Update Success", "success");
+            this.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
       }
     },
     onReset() {
@@ -373,7 +491,8 @@ export default {
     },
     getEmptyObj() {
       return {
-        // code: "",
+        claimNo: "",
+        claimState: 0,
         // name: "",
         // decsription: "",
       };

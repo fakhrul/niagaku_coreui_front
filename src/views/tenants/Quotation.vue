@@ -111,11 +111,11 @@
                     :items="computedQuotationItems"
                     :fields="quotationFields"
                   >
-                    <template #show_drag="{ item, index }">
+                    <!-- <template #show_drag="{ item, index }">
                       <td>
                         <i class="cil-cursor-move">Move</i>
                       </td>
-                    </template>
+                    </template> -->
 
                     <template #show_index="{ index }">
                       <td class="py-2">

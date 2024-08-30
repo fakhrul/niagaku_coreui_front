@@ -1,17 +1,24 @@
-class ChartOfAccountApi {
 
-    getListByCurrentBusiness()
-    {
-        var url = apiUrl + 'chartAccounts/currentBusiness/';
+class SubscriptionApi {
+
+    getSubscriptionStatus() {
+        var url = apiUrl + 'subscriptions/statuses';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
+    }
 
+    getListByCurrentTenant() {
+        var url = apiUrl + 'subscriptions/currentUser/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
     }
 
     getList() {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'subscriptions';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -20,32 +27,14 @@ class ChartOfAccountApi {
 
 
     get(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'subscriptions/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
-    getNext(id) {
-        var url = apiUrl + 'chartAccounts/nextTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-    
-    getPrev(id) {
-        var url = apiUrl + 'chartAccounts/prevTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-
     create(data) {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'subscriptions';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -53,14 +42,23 @@ class ChartOfAccountApi {
 
     }
     update(data) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'subscriptions/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
+
+    updateDefaultSubscription(data) {
+        var url = apiUrl + 'subscriptions/updateDefaultSubscription/';
+        return api.call('put', url + data.id, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     delete(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'subscriptions/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -69,4 +67,4 @@ class ChartOfAccountApi {
 
 }
 
-export default ChartOfAccountApi;
+export default SubscriptionApi;

@@ -1,17 +1,32 @@
-class ChartOfAccountApi {
 
-    getListByCurrentBusiness()
-    {
-        var url = apiUrl + 'chartAccounts/currentBusiness/';
+class PackageApi {
+
+    getListByActive(){
+        var url = apiUrl + 'packages/active/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
+    }
 
+    getListByCurrentBusiness(){
+        var url = apiUrl + 'packages/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    getListByCurrentTenant(){
+        var url = apiUrl + 'packages/currentUser/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
     }
 
     getList() {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'packages';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -20,32 +35,14 @@ class ChartOfAccountApi {
 
 
     get(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'packages/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
-    getNext(id) {
-        var url = apiUrl + 'chartAccounts/nextTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-    
-    getPrev(id) {
-        var url = apiUrl + 'chartAccounts/prevTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-
     create(data) {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'packages';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -53,14 +50,14 @@ class ChartOfAccountApi {
 
     }
     update(data) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'packages/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
     delete(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'packages/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -69,4 +66,4 @@ class ChartOfAccountApi {
 
 }
 
-export default ChartOfAccountApi;
+export default PackageApi;

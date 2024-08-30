@@ -30,6 +30,194 @@
       </CCol>
     </CRow>
     <CRow>
+      <CCol>
+        <CCard>
+          <CCardHeader> <strong> Subscription </strong> List </CCardHeader>
+          <CCardBody>
+            <CDataTable
+              :items="obj.subscriptions"
+              :fields="subsriptionFields"
+              column-filter
+              items-per-page-select
+              :items-per-page="10"
+              hover
+              sorter
+              pagination
+              :loading="subscrptionLoading"
+            >
+              <template #show_details="{ item, index }">
+                <td class="py-2">
+                  <CButton
+                    color="primary"
+                    variant="outline"
+                    square
+                    size="sm"
+                    @click="toggleDetails(item, index)"
+                  >
+                    {{ Boolean(item._toggled) ? "Hide" : "Show" }}
+                  </CButton>
+                </td>
+              </template>
+              <template #details="{ item }">
+                <CCollapse
+                  :show="Boolean(item._toggled)"
+                  :duration="collapseDuration"
+                >
+                  <CCardBody>
+                    <CButton
+                      size="sm"
+                      color="info"
+                      class="ml-1"
+                      @click="onEdit(item)"
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      size="sm"
+                      color="danger"
+                      class="ml-1"
+                      @click="showDeleteConfirmation(item)"
+                    >
+                      Delete
+                    </CButton>
+                  </CCardBody>
+                </CCollapse>
+              </template>
+            </CDataTable>
+          </CCardBody>
+          <CCardFooter>
+            <CButton
+              type="submit"
+              size="sm"
+              color="primary"
+              @click="addNewSubscription"
+              ><CIcon name="cil-check-circle" /> Add New</CButton
+            >
+          </CCardFooter>
+        </CCard>
+        <!-- <CModal
+          title="Subsription"
+          color="primary"
+          :show.sync="editSubsriptionModal"
+          @update:show="onDeleteConfirmation"
+        >
+          Are you sure you want to delete this {{ itemToDelete.code }} ?
+        </CModal> -->
+        <CModal
+          :show.sync="editSubsriptionModal"
+          :no-close-on-backdrop="true"
+          :centered="true"
+          title="Subsription"
+          size="lg"
+          color="primary"
+        >
+          <CRow>
+            <CCol>
+              <CForm>
+                <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Package
+                  </CCol>
+                  <CCol sm="9">
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedPackage"
+                      :label="'name'"
+                      :options="packageItems"
+                      placeholder="Select Package"
+                    />
+                  </CCol>
+                </CRow>
+
+                <CInput
+                  horizontal
+                  label="Start Date"
+                  type="date"
+                  :value="computeSubscriptionStartDate"
+                  @change="setSubscriptionStartDate"
+                />
+
+                <CInput
+                  horizontal
+                  label="End Date"
+                  type="date"
+                  :value="computeSubscriptionEndDate"
+                  @change="setSubscriptionEndDate"
+                />
+
+                <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Is Active?
+                  </CCol>
+                  <CCol sm="9">
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="subscription.isActive"
+                    />
+                  </CCol>
+                </CRow>
+
+                <CInput
+                  label="Amount"
+                  horizontal
+                  v-model="subscription.amount"
+                />
+                <CInput label="Unit" horizontal v-model="subscription.unit" />
+                <CInput
+                  label="Currency"
+                  horizontal
+                  v-model="subscription.currency"
+                />
+                <CInput
+                  label="PaymentMethod"
+                  horizontal
+                  v-model="subscription.paymentMethod"
+                />
+                <CInput
+                  label="ReferralCodeUsed"
+                  horizontal
+                  v-model="subscription.referralCodeUsed"
+                />
+                <!-- <CInput
+                  label="Package"
+                  horizontal
+                  v-model="obj.packageDescription"
+                /> -->
+                <!-- <CInput
+                  label="Status"
+                  horizontal
+                  v-model="subscription.statusDescription"
+                /> -->
+                <CSelect
+                  horizontal
+                  :value.sync="selectedSubscriptionStatus"
+                  :options="subscriptionStatuses"
+                  label="Status"
+                />
+              </CForm>
+            </CCol>
+          </CRow>
+
+          <template #header>
+            <h6 class="modal-title">Subscritpion</h6>
+            <CButtonClose
+              @click="editSubsriptionModal = false"
+              class="text-white"
+            />
+          </template>
+          <template #footer>
+            <CButton @click="editSubsriptionModal = false" color="danger"
+              >Cancel</CButton
+            >
+            <CButton @click="updateSubscription" color="success"
+              >Accept</CButton
+            >
+          </template>
+        </CModal>
+      </CCol>
+    </CRow>
+    <CRow>
       <CCol sm="12">
         <CCard>
           <CCardHeader> <strong> Business </strong> List </CCardHeader>
@@ -70,7 +258,11 @@
             </CDataTable>
           </CCardBody>
           <CCardFooter>
-            <CButton type="submit" size="sm" color="primary" @click="addNewBussiness"
+            <CButton
+              type="submit"
+              size="sm"
+              color="primary"
+              @click="addNewBussiness"
               ><CIcon name="cil-check-circle" /> Add New</CButton
             >
           </CCardFooter>
@@ -127,7 +319,11 @@
             </CDataTable>
           </CCardBody>
           <CCardFooter>
-            <CButton type="submit" size="sm" color="primary" @click="addNewProfile"
+            <CButton
+              type="submit"
+              size="sm"
+              color="primary"
+              @click="addNewProfile"
               ><CIcon name="cil-check-circle" /> Add New</CButton
             >
           </CCardFooter>
@@ -142,13 +338,26 @@
         </CModal>
       </CCol>
     </CRow>
-
   </div>
 </template>
 
 <script>
+import SubscriptionApi from "../../lib/subscriptionApi";
 import TenantApi from "../../lib/tenantApi";
 import moment from "moment";
+import PackageApi from "@/lib/packageApi";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+const subsriptionFields = [
+  { key: "name" },
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:150px",
+    sorter: false,
+    filter: false,
+  },
+];
 
 const businessfields = [
   { key: "name" },
@@ -176,13 +385,27 @@ const profilefields = [
 
 export default {
   name: "Tenant",
-  components: {},
+  components: {
+    vSelect,
+  },
   data: () => {
     return {
+      subscrptionLoading: false,
+      subscriptionApi: new SubscriptionApi(),
+      selectedSubscriptionStatus: 0,
+      subscriptionStatuses: [],
+      packageApi: new PackageApi(),
+      selectedPackage: null,
+      packageItems: [],
+
+      subscriptionStartDate: Date(),
+      subscriptionEndDate: Date(),
+      subscription: {},
+      editSubsriptionModal: false,
+      subsriptionFields,
       profilefields,
       profileloading: false,
       warningProfileModal: false,
-      
 
       warningBusinessModal: false,
       itemToDelete: {},
@@ -195,10 +418,19 @@ export default {
     };
   },
   mounted() {
+    this.refreshPackages();
+    this.fetchSubscriptionStatus();
+
     this.resetObj();
   },
 
   computed: {
+    computeSubscriptionStartDate() {
+      return moment(this.subscriptionStartDate).format("YYYY-MM-DD");
+    },
+    computeSubscriptionEndDate() {
+      return moment(this.subscriptionEndDate).format("YYYY-MM-DD");
+    },
     computedProfileItems() {
       return this.obj.profiles.map((item) => {
         return {
@@ -207,11 +439,107 @@ export default {
         };
       });
     },
-
   },
   watch: {},
 
   methods: {
+    updateSubscription() {
+      this.subscription.packageId = this.selectedPackage.id;
+      this.subscription.status = this.selectedSubscriptionStatus;
+      this.subscription.tenantId = this.obj.id;
+      console.log(this.subscription);
+      this.addOrUpdateSubscription(this.subscription);
+    },
+    addOrUpdateSubscription(editObj)
+    {
+      var self = this;
+      if (!editObj.id) {
+        this.subscriptionApi
+          .create(editObj)
+          .then((response) => {
+            // self.$router.push({ path: "/tenants/subscriptionList" });
+            self.resetObj();
+            self.editSubsriptionModal = false;
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      } else {
+        this.subscriptionApi
+          .update(editObj)
+          .then((response) => {
+            self.toast("Success", "Database had been update", "success");
+            self.resetObj();
+            self.editSubsriptionModal = false;
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+    setSubscriptionStartDate(e) {
+      this.subscriptionStartDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+    setSubscriptionEndDate(e) {
+      this.subscriptionEndDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+
+    fetchSubscriptionStatus() {
+      var self = this;
+      self.subscriptionApi
+        .getSubscriptionStatus()
+        .then((response) => {
+          var obj = response.result;
+          this.subscriptionStatuses = obj.map((state) => ({
+            value: state.id,
+            label: state.name,
+          }));
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
+    refreshPackages() {
+      var self = this;
+      self.packageApi
+        .getListByActive()
+        .then((response) => {
+          self.packageItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+
+    addNewSubscription() {
+      const today = new Date();
+
+      this.selectedPackage = this.packageItems[0];
+      this.subscription = {
+        startDate: new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          0,
+          0,
+          0
+        ),
+        endDate: new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          0,
+          0,
+          0
+        ),
+        isActive: true,
+        amount: 0,
+        unit: "",
+        currency: "RM",
+        paymentMethod: "N/A",
+        referralCodeUsed: "",
+      };
+      this.editSubsriptionModal = true;
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -315,8 +643,6 @@ export default {
     },
     // End For Businss list
 
-
-    
     /// For Profile List
     onEditProfile(item) {
       var self = this;
@@ -347,7 +673,6 @@ export default {
       this.$router.push({ path: "/admins/Tenant" });
     },
     // End For Businss list
-
   },
 };
 </script>

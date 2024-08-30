@@ -1,6 +1,3 @@
-let apiUrl = process.env.VUE_APP_API_URL;
-
-
 class ExitStairDoorApi {
 
     getListByFloorPlanId(id){

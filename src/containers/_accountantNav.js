@@ -212,32 +212,32 @@ export default [
       //   icon: 'cilBookmark'
       // },
 
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Administrator'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Users',
-        to: '/admins/userList',
-        icon: 'cilUser'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Machine Learning',
-        to: '/admins/mlDownload',
-        icon: 'cilUser'
-      },
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Experiment'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'OpenCV',
-        to: '/openCV/openCV',
-        icon: 'cilBookmark'
-      },
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Administrator'],
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Users',
+      //   to: '/admins/userList',
+      //   icon: 'cilUser'
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Machine Learning',
+      //   to: '/admins/mlDownload',
+      //   icon: 'cilUser'
+      // },
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Experiment'],
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'OpenCV',
+      //   to: '/openCV/openCV',
+      //   icon: 'cilBookmark'
+      // },
     ]
   }
 ]

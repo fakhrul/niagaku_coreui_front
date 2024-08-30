@@ -13,7 +13,7 @@ const sampleCode = {
   '  <meta name="description" content=""/>\n' +
   '  <meta name="author" content="Łukasz Holeczek"/>\n' +
   '  <meta name="keyword" content=""/>\n' +
-  '  <link rel="shortcut icon" href="img/favicon.png"/>\n' +
+  '  <link rel="shortcut icon" href="/img/favicon.png"/>\n' +
   '\n' +
   '  <title></title>\n' +
   '\n' +

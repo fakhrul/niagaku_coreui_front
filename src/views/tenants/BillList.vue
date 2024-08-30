@@ -165,7 +165,7 @@ export default {
   methods: {
     getImage(item) {
       var url =
-        process.env.VUE_APP_API_URL + "documents/file/" + item.documentId;
+        apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 

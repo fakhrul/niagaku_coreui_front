@@ -24,7 +24,7 @@
               <CCardBody>
                 <CForm class="mb-2 text-center">
                   <CImg :src="logoUrl" width="300" class="mb-2"></CImg>
-                  <h5>Billing Record & Analysis System</h5>
+                  <h5>NiagaKu.COM</h5>
                   <CInput
                     placeholder="Username"
                     autocomplete="username email"
@@ -37,7 +37,7 @@
                   <CInput
                     placeholder="Password"
                     type="password"
-                    autocomplete="curent-password"
+                    autocomplete="current-password"
                     v-model="loginObj.password"
                   >
                     <template #prepend-content
@@ -53,14 +53,20 @@
                         >Login</CButton
                       >
                     </CCol>
-                    <!-- <CCol col="6" class="text-right">
-                      <CButton color="link" class="px-0"
+                    <CCol col="6" class="text-right">
+                      <CButton
+                        color="link"
+                        class="px-0"
+                        @click="navigateTo('/forgot-password')"
                         >Forgot password?</CButton
                       >
-                      <CButton color="link" class="d-lg-none"
+                      <CButton
+                        color="link"
+                        class="px-0"
+                        @click="navigateTo('/register')"
                         >Register now!</CButton
                       >
-                    </CCol> -->
+                    </CCol>
                   </CRow>
                 </CForm>
               </CCardBody>
@@ -104,14 +110,13 @@
                     </ul>
                   </CCol>
                 </CRow>
+                
               </CCardFooter>
-
             </CCard>
           </CCardGroup>
           <CRow>
             <CCol class="text-right">
               version 1.12
-              <!-- <CLink @click="gotToAdmin">Admin Login</CLink> -->
             </CCol>
           </CRow>
         </CCol>
@@ -126,12 +131,12 @@ export default {
   data: () => {
     return {
       infoList: [],
-      logoUrl: "img/logo.png",
+      logoUrl: "/img/logo.png",
       loginObj: {
         email: "admin@niagaku.com",
         password: "qwe123",
-        // authenticated: true,
       },
+      loading: false,
     };
   },
   computed: {
@@ -141,39 +146,40 @@ export default {
   },
   methods: {
     gotToAdmin() {
-      var self = this;
-      self.$router.push({ path: "/pages/tenantLogin" });
+      this.$router.push({ path: "/pages/tenantLogin" });
     },
-
     login() {
-      var self = this;
+      this.loading = true;
       let data = {
-        email: self.loginObj.email,
-        password: self.loginObj.password,
+        email: this.loginObj.email,
+        password: this.loginObj.password,
       };
       auth
         .doLogin(data)
         .then((response) => {
-          //      console.log(response.result);
-          console.log(response);
+          this.loading = false;
           auth.recordLogin(response.accessToken, response, false);
-          self.$router.push({ path: "/" });
-          // self.$router.push({ path: "/" });
+          this.$router.push({ path: "/" });
         })
-        .catch(({ data }) => {
-          //alert(data.exceptionMessage);
-          //      console.log(data);
-          self.toast(
-            "Error",
-            data.responseException.exceptionMessage.title,
-            "danger"
-          );
+        .catch((error) => {
+          this.loading = false;
+          let errorMessage = "An unknown error occurred.";
+          if (
+            error.data &&
+            error.data.responseException &&
+            error.data.responseException.exceptionMessage
+          ) {
+            errorMessage = error.data.responseException.exceptionMessage.title;
+          }
+          this.toast("Error", errorMessage, "danger");
         });
     },
-
+    navigateTo(path) {
+      // Generic method to handle all navigation actions
+      this.$router.push({ path: path });
+    },
     toast(header, message, color) {
-      var self = this;
-      self.infoList.push({
+      this.infoList.push({
         header: header,
         message: message,
         color: color,

@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Expense </strong> List </CCardHeader>
+            <CCardHeader> <strong> Package </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="items"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -31,17 +31,6 @@
                 pagination
                 :loading="loading"
               >
-                <template #show_image="{ item }">
-                  <td class="py-2">
-                    <CImg
-                      thumbnail
-                      :src="getImage(item)"
-                      height="70"
-                      width="70"
-                    />
-                  </td>
-                </template>
-
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -61,9 +50,6 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
-                      <!-- <p class="text-muted">Code: {{ item.code }}</p>
-                      <p class="text-muted">Name: {{ item.name }}</p>
-                       -->
                       <CButton
                         size="sm"
                         color="info"
@@ -106,17 +92,17 @@
 </template>
 
 <script>
-import BillApi from "@/lib/expenseApi";
-import moment from "moment";
+import PackageApi from "@/lib/packageApi";
 
 const items = [];
 const fields = [
-  { key: "createdOn" },
-  { key: "date" },
+  // { key: "accountNo"},
   { key: "name" },
-  { key: "totalAmount" },
-
-
+  { key: "price" },
+  { key: "referrerCommission" },
+  { key: "totalMonth" },
+  { key: "isActive" },
+  { key: "autoRenew" },
   {
     key: "show_details",
     label: "",
@@ -127,18 +113,22 @@ const fields = [
 ];
 
 export default {
-  name: "BillList",
+  name: "PackageList",
   data() {
     return {
-      loading: false,
+      warningProfileModal: false,
+      profileLoading: true,
+      profileItems: [],
+      loading: true,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
+
       infoList: [],
       fields,
       details: [],
       collapseDuration: 0,
-      api: new BillApi(),
+      api: new PackageApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -148,26 +138,16 @@ export default {
     self.refreshTable();
   },
   computed: {
-    computedItems() {
-      return this.items.map((item) => {
+    computedProfileItems() {
+      return this.profileItems.map((item) => {
         return {
           ...item,
-          createdOn: this.getDisplayDateTime(item.createdOn),
-          date: this.getDisplayDateTime(item.date),
         };
       });
     },
   },
-  methods: {
-    getImage(item) {
-      var url =
-        apiUrl + "documents/file/" + item.documentId;
-      return url;
-    },
 
-    getDisplayDateTime(dt) {
-      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
-    },
+  methods: {
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -176,38 +156,32 @@ export default {
         color: color,
       });
     },
-    toggleDetails(item) {
-      this.$set(item, "_toggled", !item._toggled);
+    toggleDetails(item, index) {
+      this.$set(this.items[index], "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
       });
     },
+
     refreshTable() {
       var self = this;
-      self.loading = true;
-      // self.items = floorPlanData;
+      self.loading = false;
       self.api
         .getList()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
-          self.loading = false;
         });
     },
-    // onAddLocation(item) {
-    //   var self = this;
-    //   self.$router.push({
-    //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
-    //   });
-    // },
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Bill/${item.id}`,
+        path: `/admins/Package/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -220,7 +194,6 @@ export default {
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       }
       self.itemToDelete = {};
@@ -231,7 +204,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/admins/Package" });
     },
     toast(header, message, color) {
       var self = this;

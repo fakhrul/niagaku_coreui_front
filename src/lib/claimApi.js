@@ -1,8 +1,11 @@
-let apiUrl = process.env.VUE_APP_API_URL;
-
-
 class ClaimApi {
-
+    getNextReferenceNumber() {
+        var url = apiUrl + 'claims/nextclaimno';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
 
     getListByCurrentUser() {
         var url = apiUrl + 'claims/currentUser/';

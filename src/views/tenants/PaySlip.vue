@@ -216,7 +216,7 @@ export default {
   },
   computed: {
     computeDate() {
-      return moment(this.orderDate).format("YYYY-MM-DD");
+      return moment(this.date).format("YYYY-MM-DD");
     },
   },
   methods: {
@@ -284,6 +284,7 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            console.log(self.obj);
             self.selectedSlipType = self.obj.paySlipType;
             self.selectedSlipState = self.obj.status;
             this.date = self.obj.date;

@@ -128,9 +128,8 @@ export default {
   computed: {
     newFloorPlanUrl() {
       var self = this;
-      console.log('process.env.VUE_APP_API_URL',process.env.VUE_APP_API_URL);
       return (
-        process.env.VUE_APP_API_URL + "documents/file/" + self.newObj.documentId
+        apiUrl + "documents/file/" + self.newObj.documentId
       );
     },
   },
@@ -179,9 +178,8 @@ export default {
       }
     },
     floorPlanUrl(item) {
-      console.log('process.env.VUE_APP_API_URL',process.env.VUE_APP_API_URL);
 
-      return process.env.VUE_APP_API_URL + "documents/file/" + item.documentId;
+      return apiUrl + "documents/file/" + item.documentId;
     },
     onAddNewWorkspace() {
       alert("In Development");
