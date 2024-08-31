@@ -25,6 +25,16 @@ class BusinessApi {
                 return data
             });
     }
+
+    createByCurrentTenant(data)
+    {
+        var url = apiUrl + 'businesses/currentTennant';
+        return api.call('post', url, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+    
     create(data) {
         var url = apiUrl + 'businesses';
         return api.call('post', url, data)

@@ -154,7 +154,7 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          totalUser:  this.getTotalProfile(item),
+          totalUser: this.getTotalProfile(item),
           tenantEmail: this.getTenantEmail(item),
           totalBusiness: this.getTotalBusiness(item),
           createdOn: this.getDisplayDateTime(item.createdOn),
@@ -169,7 +169,8 @@ export default {
       } catch (error) {
         return 0;
       }
-    },getTotalBusiness(item) {
+    },
+    getTotalBusiness(item) {
       try {
         return item.businesses.length;
       } catch (error) {
@@ -184,8 +185,7 @@ export default {
       }
     },
     getImage(item) {
-      var url =
-        apiUrl + "documents/file/" + item.documentId;
+      var url = apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 
@@ -237,17 +237,39 @@ export default {
     onDeleteConfirmation(status, evt, accept) {
       var self = this;
       if (accept) {
-        this.api
-          .delete(self.itemToDelete.id)
+        var tenantId = self.itemToDelete.id;
+        auth
+          .deleteByTenant(self.itemToDelete.id)
           .then((response) => {
-            self.refreshTable();
+            console.log('authdelete', response);
+            console.log('authdelete', tenantId);
+            this.api
+              .delete(tenantId)
+              .then((response) => {
+                self.refreshTable();
+              })
+              .catch(({ data }) => {
+                self.toast("Error", helper.getErrorMessage(data), "danger");
+              });
           })
-          .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
+          .catch((error) => {
+            this.loading = false;
+            let errorMessage = "An unknown error occurred.";
+            if (
+              error.data &&
+              error.data.responseException &&
+              error.data.responseException.exceptionMessage
+            ) {
+              errorMessage =
+                error.data.responseException.exceptionMessage.title;
+            }
+            this.toast("Error", errorMessage, "danger");
           });
+
+        //
+        self.itemToDelete = {};
       }
-      self.itemToDelete = {};
+      
     },
     showDeleteConfirmation(item) {
       var self = this;

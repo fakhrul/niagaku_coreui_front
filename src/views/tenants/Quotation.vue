@@ -30,7 +30,7 @@
                   placement="bottom-end"
                   toggler-text="Change Status"
                   color="primary"
-                  class="m-2 d-inline-block"
+                  class="m-2 d-inline-block tour-cdropdown"
                   size="sm"
                 >
                   <template v-for="status in quotationStatuses">
@@ -38,9 +38,32 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
-            
                 </CDropdown>
-         
+                <!-- Start Tour Button -->
+                <CButton size="sm" color="info" @click="startTour">
+                  Guide
+                </CButton>
+
+                <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                  <!-- Slot for custom dropdown toggler content -->
+                  <template #toggler>
+                    <CButton color="link" class="mr-2">
+                      <CIcon name="cilHelp"/>
+                      <!-- Replace 'cil-help' with the desired icon -->
+                    </CButton>
+                  </template>
+                  <!-- <CIcon name="cil-x-circle"/> -->
+                  <CDropdownItem>Onboarding Tour</CDropdownItem>
+                  <CDropdownItem>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem>Video Tutorial</CDropdownItem>
+                  <CDropdownItem>Live Chat</CDropdownItem>
+                  <CDropdownItem>Send Feedback</CDropdownItem>
+                </CDropdown>
               </div>
             </CCardHeader>
             <CCardBody>
@@ -229,7 +252,12 @@
               </CRow>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="submit"
+              <CButton
+                type="submit"
+                size="sm"
+                color="primary"
+                @click="submit"
+                class="tour-submit-button"
                 ><CIcon name="cil-check-circle" /> Submit</CButton
               >
             </CCardFooter>
@@ -250,7 +278,9 @@
       >
         <CRow>
           <CCol>
-            <WidgetsReportQuotation :quotation="previewObj"></WidgetsReportQuotation>
+            <WidgetsReportQuotation
+              :quotation="previewObj"
+            ></WidgetsReportQuotation>
           </CCol>
         </CRow>
       </CModal>
@@ -259,6 +289,9 @@
 </template>
 
 <script>
+import Shepherd from "shepherd.js";
+import "shepherd.js/dist/css/shepherd.css"; // Import Shepherd.js default style
+
 import QuotationApi from "@/lib/quotationApi";
 import CustomerApi from "@/lib/customerApi";
 import ProductApi from "@/lib/productApi";
@@ -318,7 +351,14 @@ export default {
   },
   data: () => {
     return {
-      previewObj: null,
+      previewObj: {
+        business: {
+          name: "",
+          address: "",
+        },
+        items: [],
+        note: "",
+      },
       quotationPreviewPopup: false,
       quotationStatuses: [],
       issuedDate: Date(),
@@ -378,6 +418,66 @@ export default {
     },
   },
   methods: {
+    startTour() {
+      const tour = new Shepherd.Tour({
+        useModalOverlay: true,
+        cancelIcon: {
+          enabled: true,
+        },
+        defaultStepOptions: {
+          scrollTo: { behavior: "smooth", block: "center" },
+          // classes: 'shadow-md bg-purple-dark',
+          classes: "class-1 class-2",
+        },
+      });
+
+      // Step 1: Explain Quotation Header
+      tour.addStep({
+        id: "quotation-header",
+        text: "This is the quotation header where you can see the quotation number and status.",
+        attachTo: {
+          element: ".card-header-actions",
+          on: "bottom",
+        },
+        buttons: [{ text: "Next", action: tour.next }],
+      });
+
+      // Step 2: Change Status
+      tour.addStep({
+        id: "change-status",
+        text: "Use this dropdown to change the status of the quotation.",
+        attachTo: { element: ".tour-cdropdown", on: "bottom" },
+        buttons: [
+          { text: "Back", action: tour.back },
+          { text: "Next", action: tour.next },
+        ],
+      });
+
+      // Step 3: Preview Button
+      tour.addStep({
+        id: "preview-button",
+        text: "Click this button to preview the quotation before submission.",
+        attachTo: { element: ".preview-button", on: "bottom" },
+        buttons: [
+          { text: "Back", action: tour.back },
+          { text: "Next", action: tour.next },
+        ],
+      });
+
+      // Step 4: Submit Button
+      tour.addStep({
+        id: "tour-submit-button",
+        text: "Click here to submit your completed quotation.",
+        attachTo: { element: ".tour-submit-button", on: "right" },
+        buttons: [
+          { text: "Back", action: tour.back },
+          { text: "Finish", action: tour.complete },
+        ],
+      });
+
+      // Start the tour
+      tour.start();
+    },
     changeState(item) {
       var self = this;
       self.obj.status = item.id;
@@ -406,7 +506,6 @@ export default {
     },
 
     preview() {
-
       this.previewObj = this.obj;
       this.previewObj.items = this.computedQuotationItems;
       this.quotationPreviewPopup = true;
@@ -513,7 +612,6 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.customerItems = response.result;
-
         })
         .catch(({ data }) => {});
     },

@@ -14,6 +14,16 @@ class TenantApi {
                 return data
             });
     }
+    
+    // createWithPassword(data) {
+    //     var url = apiUrl + 'tenants/pass';
+    //     return api.call('post', url, data)
+    //         .then(({ data }) => {
+    //             return data
+    //         });
+
+    // }
+
     create(data) {
         var url = apiUrl + 'tenants';
         return api.call('post', url, data)

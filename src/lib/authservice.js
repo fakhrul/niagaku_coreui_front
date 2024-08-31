@@ -52,6 +52,14 @@ class AuthService {
 
     }
 
+    deleteByTenant(id) {
+        var url = apiUrl + 'Account/deleteByTenant/';
+        return api.call('delete', url + id)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     verifyEmail(data) {
         // Convert object to URL parameters using URLSearchParams
         const params = new URLSearchParams(data);

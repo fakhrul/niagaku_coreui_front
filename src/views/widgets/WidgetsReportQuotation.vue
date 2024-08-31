@@ -1,6 +1,6 @@
 <template>
   <div ref="pdfContent" class="pdf-content">
-    <CCard >
+    <CCard>
       <CCardHeader class="no-print">
         <div class="float-right no-print">
           <a href="#" class="btn btn-sm btn-info ml-1" @click="printContent">
@@ -55,8 +55,12 @@
               <th>#</th>
               <th>Item & Description</th>
               <th class="text-center">Quantity</th>
-              <th class="text-center">Price ({{ quotation.business.currency }})</th>
-              <th class="text-center">Total ({{ quotation.business.currency }})</th>
+              <th class="text-center">
+                Price ({{ quotation.business.currency }})
+              </th>
+              <th class="text-center">
+                Total ({{ quotation.business.currency }})
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -108,7 +112,6 @@
           <p v-html="formatNote(quotation.note)"></p>
         </div>
 
-     
         <!--
         <div class="vehicle-details">
           <p><strong>Chassis No:</strong> {{ getVehicleChasisNo() }}</p>
@@ -271,13 +274,18 @@ export default {
     },
     getImageChopUrl() {
       var url =
-        this.removeTrailingSlash(apiUrl) + this.quotation.business.companyChopUrl;
+        this.removeTrailingSlash(apiUrl) +
+        this.quotation.business.companyChopUrl;
       return url;
     },
     getImageUrl() {
-      var url =
-        this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
-      return url;
+      try {
+        var url =
+          this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
+        return url;
+      } catch (error) {
+        return "";
+      }
     },
     formatAddress(address) {
       return address.replace(/\n/g, "<br />");
