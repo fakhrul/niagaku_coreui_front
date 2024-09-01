@@ -2,6 +2,15 @@
 class ProfileApi {
 
 
+    getListByBusinessId(id)
+    {
+        var url = apiUrl + 'profiles/business/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     getListByCurrentBusiness() {
         var url = apiUrl + 'profiles/currentBusiness/';
         return api.call('get', url)

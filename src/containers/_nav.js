@@ -22,35 +22,9 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Receipts',
         to: '/employee/receiptList',
-        icon: 'cilBookmark'
+        icon: 'cibSuperuser'
       },
 
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Purchase'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Bill',
-      //   to: '/tenants/billList',
-      //   icon: 'cilBookmark'
-      // }, 
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Chart of Account',
-      //   to: '/tenants/chartOfAccountList',
-      //   icon: 'cilBookmark'
-      // }, 
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Experiment'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'OpenCV',
-      //   to: '/openCV/openCV',
-      //   icon: 'cilBookmark'
-      // }, 
     ]
   }
 ]

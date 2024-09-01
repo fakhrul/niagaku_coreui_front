@@ -18,6 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
+            
             <CCardHeader> <strong> Tenant </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable

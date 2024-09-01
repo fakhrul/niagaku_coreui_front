@@ -134,7 +134,7 @@ export default {
       logoUrl: "/img/logo.png",
       loginObj: {
         email: "admin@niagaku.com",
-        password: "qwe123",
+        password: "",
       },
       loading: false,
     };

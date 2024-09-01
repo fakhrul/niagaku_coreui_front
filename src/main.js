@@ -12,7 +12,8 @@ import AuthService from './lib/authservice'
 import Api from './lib/api'
 import Helper from './utils/helper.js'
 import "./index.css";
-import 'material-icons/iconfont/material-icons.css';
+// import 'material-icons/iconfont/material-icons.css';
+import 'material-design-icons-iconfont/dist/material-design-icons.css';
 //import opencv from './opencv.js';
 
 Vue.use(CoreuiVuePro)

@@ -10,7 +10,7 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Tenants',
         to: '/admins/tenantList',
-        icon: 'cilBookmark'
+        icon: '<i class="material-icons">help_outline</i>'
       },
       {
         _name: 'CSidebarNavItem',

@@ -17,6 +17,14 @@ class BusinessApi {
             });
     }
 
+    
+    getDefaultLogoUrl() {
+        var url = apiUrl + 'businesses/defaultlogo/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
 
     get(id) {
         var url = apiUrl + 'businesses/';
@@ -34,7 +42,7 @@ class BusinessApi {
                 return data
             });
     }
-    
+
     create(data) {
         var url = apiUrl + 'businesses';
         return api.call('post', url, data)

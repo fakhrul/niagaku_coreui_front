@@ -20,12 +20,7 @@
             <CCardBody>
               <CForm>
                 <CInput label="Name" horizontal v-model="obj.fullName" />
-                <!-- <CInput
-                  label="Role"
-                  horizontal
-                  v-model="obj.appUser.role"
-                  readonly
-                /> -->
+               
                 <CSelect
                   label="Role"
                   horizontal

@@ -40,9 +40,9 @@
                   </template>
                 </CDropdown>
                 <!-- Start Tour Button -->
-                <CButton size="sm" color="info" @click="startTour">
+                <!-- <CButton size="sm" color="info" @click="startTour">
                   Guide
-                </CButton>
+                </CButton> -->
 
                 <CDropdown
                   size="sm"
@@ -52,17 +52,18 @@
                 >
                   <!-- Slot for custom dropdown toggler content -->
                   <template #toggler>
-                    <CButton color="link" class="mr-2">
-                      <CIcon name="cilHelp"/>
-                      <!-- Replace 'cil-help' with the desired icon -->
+                    <CButton color="link">
+                      <!-- Use Material Design Icon -->
+                      <i class="material-icons">help_outline</i>
                     </CButton>
                   </template>
                   <!-- <CIcon name="cil-x-circle"/> -->
-                  <CDropdownItem>Onboarding Tour</CDropdownItem>
-                  <CDropdownItem>Help Center & FAQ</CDropdownItem>
-                  <CDropdownItem>Video Tutorial</CDropdownItem>
-                  <CDropdownItem>Live Chat</CDropdownItem>
-                  <CDropdownItem>Send Feedback</CDropdownItem>
+                  <CDropdownItem @click="startTour">Onboarding Tour</CDropdownItem>
+                  <CDropdownItem disabled>Quick Info</CDropdownItem>
+                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+                  <CDropdownItem disabled>Live Chat</CDropdownItem>
+                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
                 </CDropdown>
               </div>
             </CCardHeader>
