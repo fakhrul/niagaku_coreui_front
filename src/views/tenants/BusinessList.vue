@@ -41,12 +41,11 @@
                   color="link"
                   class="m-0 d-inline-block"
                 >
-                  <template #toggler>
+                  <!-- <template #toggler>
                     <CButton color="link">
-                      <!-- Use Material Design Icon -->
                       <i class="material-icons">help_outline</i>
                     </CButton>
-                  </template>
+                  </template> -->
                   <CDropdownItem disabled @click="startTour"
                     >Onboarding Tour</CDropdownItem
                   >

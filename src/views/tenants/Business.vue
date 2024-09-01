@@ -257,7 +257,8 @@ Malaysia"
                   :show.sync="warningProfileModal"
                   @update:show="onDeleteProfileConfirmation"
                 >
-                  Are you sure you want to delete this {{ itemToDelete.code }} ?
+                  Are you sure you want to delete this
+                  {{ itemToDelete.fullName }} , email {{ itemToDelete.email }} ?
                 </CModal>
                 <CModal
                   :show.sync="editProfileModal"
@@ -315,7 +316,6 @@ Malaysia"
                     </CCol>
                   </CRow>
 
-                  
                   <template #header>
                     <h6 class="modal-title">Add Or Update Profile</h6>
                     <CButtonClose
@@ -324,9 +324,7 @@ Malaysia"
                     />
                   </template>
                   <template #footer>
-                    <CButton
-                      @click="editProfileModal = false"
-                      color="danger"
+                    <CButton @click="editProfileModal = false" color="danger"
                       >Cancel</CButton
                     >
                     <CButton @click="updateProfile" color="success"
@@ -705,18 +703,21 @@ export default {
     },
     /// For Profile List
     onEditProfile(item) {
-      var self = this;
-      self.$router.push({
-        path: `/admins/tenant/${item.id}`,
-      });
+      // var self = this;
+      this.profile = item;
+      this.isResetPassword = false;
+      this.editProfileModal = true;
+      // self.$router.push({
+      //   path: `/admins/tenant/${item.id}`,
+      // });
     },
     onDeleteProfileConfirmation(status, evt, accept) {
       var self = this;
       if (accept) {
-        this.api
-          .delete(self.itemToDelete.id)
+        this.profileApi
+          .deleteProfile(self.itemToDelete.id)
           .then((response) => {
-            self.resetObj();
+            self.refreshProfileTable();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");

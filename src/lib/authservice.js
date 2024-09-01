@@ -40,6 +40,34 @@ class AuthService {
             });
 
     }
+    
+    resendVerificationEmail(data) {
+        var url = apiUrl + 'Account/resendverification';
+        return api.call('post', url, data)
+            .then((response) => {
+                return response.data
+            });
+
+    }
+
+    
+    sendForgotPassword(data) {
+        var url = apiUrl + 'Account/forgotPassword';
+        return api.call('post', url, data)
+            .then((response) => {
+                return response.data
+            });
+    }
+
+    
+    resetPassword(data) {
+        var url = apiUrl + 'Account/resetPassword';
+        return api.call('post', url, data)
+            .then((response) => {
+                return response.data
+            });
+
+    }
 
     register(data) {
 

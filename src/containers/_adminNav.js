@@ -10,13 +10,13 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Tenants',
         to: '/admins/tenantList',
-        icon: '<i class="material-icons">help_outline</i>'
+        icon: 'cibSuperuser'
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Packages',
         to: '/admins/packageList',
-        icon: 'cilBookmark'
+        icon: 'cilSpa'
       },
       // {
       //   _name: 'CSidebarNavTitle',

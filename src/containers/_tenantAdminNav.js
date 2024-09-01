@@ -10,13 +10,13 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Subscription',
         to: '/tenants/subscriptionList',
-        icon: 'cilBookmark'
+        icon: 'cilTags'
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Business',
         to: '/tenants/businessList',
-        icon: 'cilBookmark'
+        icon: 'cilIndustry'
       },
    {
         _name: 'CSidebarNavTitle',
@@ -26,127 +26,89 @@ export default [
         _name: 'CSidebarNavDropdown',
         name: 'Incomes',
         route: '/tenants/incomeDashBoard',
-        icon: 'cil-layers',
+        icon: 'cilBarChart',
         _children: [
           {
             _name: 'CSidebarNavItem',
             name: 'Quotation',
             to: '/tenants/quotationList',
-            icon: 'cilBookmark'
+            icon: 'cilFile'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Sales Order',
+            name: 'Sale Order',
             to: '/tenants/salesOrderList',
-            icon: 'cilBookmark'
+            icon: 'cilCart'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Invoice',
+            name: 'Sale Invoice',
             to: '/tenants/invoiceList',
-            icon: 'cilBookmark'
+            icon: 'cilMoney'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Customer',
             to: '/tenants/customerList',
-            icon: 'cilBookmark'
+            icon: 'cilAddressBook'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Product/Service',
             to: '/tenants/productList',
-            icon: 'cilBookmark'
+            icon: 'cilDevices'
           },
         ]
       },
 
-
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Incomes'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Quotation',
-      //   to: '/tenants/quotationList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Sales Order',
-      //   to: '/tenants/salesOrderList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Invoice',
-      //   to: '/tenants/invoiceList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Customer',
-      //   to: '/tenants/customerList',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Product/Service',
-      //   to: '/tenants/productList',
-      //   icon: 'cilBookmark'
-      // },
-
-
-      //
       {
         _name: 'CSidebarNavDropdown',
         name: 'Expenses',
         route: '/parameters',
-        icon: 'cil-layers',
+        icon: 'cilChartLine',
         moduleName: 'MasterData', // This will be used for filtering
         _children: [
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Quotation',
             to: '/tenants/purchaseQuotationList',
-            icon: 'cilBookmark'
+            icon: 'cilFile'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Order',
             to: '/tenants/purchaseOrderList',
-            icon: 'cilBookmark'
+            icon: 'cilCart'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Bill/Purchase Invoice',
+            name: 'Purchase Invoice (Bill)',
             to: '/tenants/billList',
-            icon: 'cilBookmark'
+            icon: 'cilMoney'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Receipt',
+            name: 'Receipts',
             to: '/tenants/receiptList',
-            icon: 'cilBookmark'
+            icon: 'cilImageBroken'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Vendor/Supplier',
+            name: 'Vendor (Supplier)',
             to: '/tenants/vendorList',
-            icon: 'cilBookmark'
+            icon: 'cilTruck'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Other Expenses',
             to: '/tenants/otherExpenseList',
-            icon: 'cilBookmark'
+            icon: 'cilExternalLink'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Product/Service',
             to: '/tenants/purchaseProductList',
-            icon: 'cilBookmark'
+            icon: 'cilDevices'
           },
  ]
       },
@@ -161,29 +123,29 @@ export default [
             _name: 'CSidebarNavItem',
             name: 'Transactions',
             to: '/tenants/expenseList',
-            icon: 'cilBookmark'
+            icon: 'cilListRich'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Banking',
+            name: 'Banks',
             to: '/tenants/expenseList',
-            icon: 'cilBookmark'
+            icon: 'cilBank'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Reconcilation',
             to: '/tenants/expenseList',
-            icon: 'cilBookmark'
+            icon: 'cilListLowPriority'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Chart Of Account',
             to: '/tenants/chartOfAccountList',
-            icon: 'cilBookmark'
+            icon: 'cilTransfer'
           },
         ]
       },
-      {
+      {   
         _name: 'CSidebarNavDropdown',
         name: 'Payroll',
         route: '/parameters',
@@ -193,32 +155,21 @@ export default [
             _name: 'CSidebarNavItem',
             name: 'Employee',
             to: '/tenants/employeeList',
-            icon: 'cilBookmark'
+            icon: 'cilPeople'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'PaySlip',
             to: '/tenants/paySlipList',
-            icon: 'cilBookmark'
+            icon: 'cilCalendarCheck'
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Claims',
             to: '/tenants/claimList',
-            icon: 'cilBookmark'
+            icon: 'cilRestaurant'
           },
-          // {
-          //   _name: 'CSidebarNavItem',
-          //   name: 'Reconcilation',
-          //   to: '/tenants/expenseList',
-          //   icon: 'cilBookmark'
-          // },
-          // {
-          //   _name: 'CSidebarNavItem',
-          //   name: 'Chart Of Account',
-          //   to: '/tenants/expenseList',
-          //   icon: 'cilBookmark'
-          // },
+       
         ]
       },
       {
@@ -229,47 +180,21 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'PaySlip',
         to: '/employee/paySlipList',
-        icon: 'cilBookmark'
+        icon: 'cilCalendarCheck'
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Claims',
         to: '/employee/claimList',
-        icon: 'cilBookmark'
+        icon: 'cilRestaurant'
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Receipts',
         to: '/employee/receiptList',
-        icon: 'cilBookmark'
+        icon: 'cilImageBroken'
       },
 
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Administrator'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Users',
-      //   to: '/admins/userList',
-      //   icon: 'cilUser'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Machine Learning',
-      //   to: '/admins/mlDownload',
-      //   icon: 'cilUser'
-      // },
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Experiment'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'OpenCV',
-      //   to: '/openCV/openCV',
-      //   icon: 'cilBookmark'
-      // },
     ]
   }
 ]

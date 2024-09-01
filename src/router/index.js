@@ -12,6 +12,9 @@ const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
 const Register = () => import('@/views/pages/Register')
+const ForgotPassword = () => import('@/views/pages/ForgotPassword')
+// const ForgotPasswordCompleted = () => import('@/views/pages/ForgotPasswordCompleted')
+const ResetPassword = () => import('@/views/pages/ResetPassword')
 
 const OpenCV = () => import('@/views/tenants/OpenCV')
 const BillList = () => import('@/views/tenants/BillList')
@@ -108,6 +111,8 @@ router.beforeEach((to, from, next) => {
     if (to.name === 'Login' ||
       to.name === 'Register' ||
       to.name === 'RegisterCompleted' ||
+      to.name === 'ForgotPassword' ||
+      to.name === 'ResetPassword' ||
       to.name === 'VerifyEmail') {
       next();
     } else {
@@ -916,11 +921,20 @@ function configRoutes() {
           name: 'Register',
           component: Register
         },
-
+        {
+          path: '/forgotPassword',
+          name: 'ForgotPassword',
+          component: ForgotPassword
+        },
         {
           path: 'verifyEmail', // Correctly define the path
           name: 'VerifyEmail', // Correctly define the name
           component: VerifyEmail,
+        },
+        {
+          path: 'resetPassword', // Correctly define the path
+          name: 'ResetPassword', // Correctly define the name
+          component: ResetPassword,
         },
         {
           path: 'registerCompleted', // Correctly define the path

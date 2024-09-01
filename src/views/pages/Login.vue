@@ -57,7 +57,7 @@
                       <CButton
                         color="link"
                         class="px-0"
-                        @click="navigateTo('/forgot-password')"
+                        @click="navigateTo('/forgotPassword')"
                         >Forgot password?</CButton
                       >
                       <CButton
@@ -76,40 +76,34 @@
                     <p>{{ version }}</p>
                   </CCol>
                 </CRow>
-                <CRow>
+                <!-- <CRow>
                   <CCol>
                     <h3>System Admin</h3>
                     <ul>
                       <li>admin@niagaku.com</li>
                     </ul>
                   </CCol>
-                </CRow>
+                </CRow> -->
                 <CRow>
                   <CCol>
-                    <h3>Tenant 1</h3>
+                    <h3>Demo Account</h3>
                     <ul>
-                      <li>tenant1@niagaku.com</li>
-                      <li>accountant1_1@tenant1.com</li>
-                      <li>accountant1_2@tenant1.com</li>
-                      <li>staff1_1@tenant1.com</li>
-                      <li>staff1_2@tenant1.com</li>
-                      <li>staff1_3@tenant1.com</li>
+                      <li>tenant1@niagaku.com (Admin)</li>
+                      <li>accountant1_1@tenant1.com (Accountant)</li>
+                      <li>staff1_1@tenant1.com (Normal Staff)</li>
                     </ul>
                   </CCol>
                 </CRow>
-                <CRow>
+                <!-- <CRow>
                   <CCol>
                     <h3>Tenant 2</h3>
                     <ul>
-                      <li>tenant2@niagaku.com</li>
-                      <li>accountant1_1@tenant2.com</li>
-                      <li>accountant1_2@tenant2.com</li>
-                      <li>staff1_1@tenant2.com</li>
-                      <li>staff1_2@tenant2.com</li>
-                      <li>staff1_3@tenant2.com</li>
+                      <li>tenant2@niagaku.com (Tenant Owner)</li>
+                      <li>accountant1_1@tenant2.com (Accountant)</li>
+                      <li>staff1_1@tenant2.com (Normal Staff)</li>
                     </ul>
                   </CCol>
-                </CRow>
+                </CRow> -->
                 
               </CCardFooter>
             </CCard>
@@ -133,7 +127,7 @@ export default {
       infoList: [],
       logoUrl: "/img/logo.png",
       loginObj: {
-        email: "admin@niagaku.com",
+        email: "tenant1@niagaku.com",
         password: "",
       },
       loading: false,
