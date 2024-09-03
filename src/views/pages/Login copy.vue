@@ -1,9 +1,17 @@
 <template>
-  <div class="c-app d-flex align-items-center min-vh-100" :class="{ 'c-dark-theme': $store.state.darkMode }">
+  <div
+    class="c-app d-flex align-items-center min-vh-100"
+    :class="{ 'c-dark-theme': $store.state.darkMode }"
+  >
     <CContainer fluid>
       <CToaster :autohide="3000">
         <template v-for="info in infoList">
-          <CToast :key="info.message" :show="true" :header="info.header" :color="info.color">
+          <CToast
+            :key="info.message"
+            :show="true"
+            :header="info.header"
+            :color="info.color"
+          >
             {{ info.message }}.
           </CToast>
         </template>
@@ -15,22 +23,24 @@
             <CCardBody class="p-4">
               <div class="text-center mb-4">
                 <img src="/img/logo.png" alt="Niaga-ku Logo" class="img-fluid mb-3" style="max-height: 80px;" />
-                <h1 class="text-primary" style="color: #756CFB;">Register</h1>
-                <p class="text-muted">Create your account to get started with Niaga-ku</p>
+                <h1 class="text-primary" style="color: #756CFB;">Login</h1>
+                <p class="text-muted">Sign in to your account</p>
               </div>
-              <CForm>
-                <!-- Enhanced input fields with branding colors -->
+              <CForm class="text-center">
                 <CInput
                   placeholder="Email"
-                  autocomplete="email"
-                  prepend="@"
+                  autocomplete="username email"
                   v-model="loginObj.email"
                   :invalid="!isValidEmail && loginObj.email.length > 0"
                   @input="validateEmail"
                   aria-label="Email Address"
                   class="mb-3"
                   style="border-color: #756CFB;"
-                />
+                >
+                  <template #prepend-content>
+                    <CIcon name="cil-user" />
+                  </template>
+                </CInput>
                 <CSmall v-if="!isValidEmail && loginObj.email.length > 0" class="text-danger">
                   Please enter a valid email address.
                 </CSmall>
@@ -38,7 +48,7 @@
                 <CInput
                   placeholder="Password"
                   type="password"
-                  autocomplete="new-password"
+                  autocomplete="current-password"
                   v-model="loginObj.password"
                   :invalid="!isValidPassword && loginObj.password.length > 0"
                   @input="validatePassword"
@@ -54,41 +64,30 @@
                   Password must be at least 8 characters long.
                 </CSmall>
 
-                <CInput
-                  placeholder="Repeat password"
-                  type="password"
-                  autocomplete="new-password"
-                  v-model="loginObj.passwordConfirmation"
-                  :invalid="!passwordsMatch && loginObj.passwordConfirmation.length > 0"
-                  @input="validatePasswordConfirmation"
-                  aria-label="Confirm Password"
-                  class="mb-3"
-                  style="border-color: #756CFB;"
-                >
-                  <template #prepend-content>
-                    <CIcon name="cil-lock-locked" />
-                  </template>
-                </CInput>
-                <CSmall v-if="!passwordsMatch && loginObj.passwordConfirmation.length > 0" class="text-danger">
-                  Passwords do not match.
-                </CSmall>
-
-                <!-- Enhanced button with branding color -->
-                <CButton :color="loading ? 'secondary' : 'success'" :disabled="loading" block @click.prevent="register" style="background-color: #756CFB; border-color: #756CFB;">
-                  <CSpinner v-if="loading" size="sm" /> Create Account
+                <CButton :color="loading ? 'secondary' : 'success'" :disabled="loading" block @click.prevent="login" style="background-color: #756CFB; border-color: #756CFB;">
+                  <CSpinner v-if="loading" size="sm" /> Login
                 </CButton>
-              </CForm>
-               <!-- Link to Go Back to Login Page -->
-               <p class=" text-center mt-4">
-                <a
-                  href="#"
-                  @click.prevent="navigateToLogin"
-                  style="color: #756cfb"
-                  >Already registered? Log in here.</a
-                >
-              </p>
 
+                <div class="d-flex justify-content-between mt-3">
+                  <CButton color="link" class="px-0" @click="navigateTo('/forgotPassword')">
+                    Forgot password?
+                  </CButton>
+                  <CButton color="link" class="px-0" @click="navigateTo('/register')">
+                    Register now!
+                  </CButton>
+                </div>
+              </CForm>
             </CCardBody>
+
+            <!-- <CCardFooter class="text-center">
+              <p class="mb-2">{{ version }}</p>
+              <h3>Demo Account</h3>
+              <ul class="list-unstyled">
+                <li>tenant1@niagaku.com (Admin)</li>
+                <li>accountant1_1@tenant1.com (Accountant)</li>
+                <li>staff1_1@tenant1.com (Normal Staff)</li>
+              </ul>
+            </CCardFooter> -->
           </CCard>
         </CCol>
       </CRow>
@@ -98,53 +97,58 @@
 
 <script>
 export default {
-  name: 'Register',
+  name: "Login",
   data: () => {
     return {
       infoList: [],
       loginObj: {
         email: "",
         password: "",
-        passwordConfirmation: "",
       },
       loading: false,
       isValidEmail: true,
       isValidPassword: true,
-      passwordsMatch: true,
     };
   },
-  methods: {
-    navigateToLogin() {
-      this.$router.push({ path: "/login" });
+  computed: {
+    version() {
+      return process.env.VUE_APP_VERSION;
     },
-
-    register() {
-      if (!this.isValidEmail || !this.isValidPassword || !this.passwordsMatch) {
+  },
+  methods: {
+    login() {
+      if (!this.isValidEmail || !this.isValidPassword) {
         this.toast("Error", "Please fix the errors before submitting.", "danger");
         return;
       }
 
       this.loading = true;
-      var registerDto = {
+      let data = {
         email: this.loginObj.email,
         password: this.loginObj.password,
-        passwordConfirmation: this.loginObj.passwordConfirmation,
       };
-
       auth
-        .register(registerDto)
+        .doLogin(data)
         .then((response) => {
           this.loading = false;
-          this.$router.push({ path: "/pages/registerCompleted" });
+          auth.recordLogin(response.accessToken, response, false);
+          this.$router.push({ path: "/" });
         })
         .catch((error) => {
           this.loading = false;
           let errorMessage = "An unknown error occurred.";
-          if (error.response && error.response.data && error.response.data.message) {
-            errorMessage = error.response.data.message;
+          if (
+            error.data &&
+            error.data.responseException &&
+            error.data.responseException.exceptionMessage
+          ) {
+            errorMessage = error.data.responseException.exceptionMessage.title;
           }
           this.toast("Error", errorMessage, "danger");
         });
+    },
+    navigateTo(path) {
+      this.$router.push({ path: path });
     },
     toast(header, message, color) {
       this.infoList.push({
@@ -160,9 +164,6 @@ export default {
     validatePassword() {
       this.isValidPassword = this.loginObj.password.length >= 8;
     },
-    validatePasswordConfirmation() {
-      this.passwordsMatch = this.loginObj.password === this.loginObj.passwordConfirmation;
-    },
   },
-}
+};
 </script>
