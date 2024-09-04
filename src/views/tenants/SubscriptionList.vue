@@ -1,5 +1,70 @@
 <template>
   <div class="wrapper">
+    <!-- Upgrade Subscription Modal -->
+    <CModal
+      title="Upgrade Subscription"
+      color="primary"
+      :show.sync="showUpgradeModal"
+      size="lg"
+    >
+      <div>
+        <h5>Select a Subscription Package</h5>
+        <CRow form class="form-group">
+          <CCol v-for="(item, index) in packageItems" :key="item.id">
+            <CJumbotron :header="item.name" lead="">
+              <p class="lead">
+                <strong>{{ item.name }}</strong>
+              </p>
+              <hr class="my-4" />
+              <p>
+                {{ item.description }}
+              </p>
+              <CButton
+                :color="isSelectedColor(item)"
+                @click="onSelectPackage(item)"
+                >Select</CButton
+              >
+            </CJumbotron>
+          </CCol>
+        </CRow>
+
+        <div>
+          <!-- <CInputGroup>
+            <CInputGroupPrepend>
+              <CInputGroupText>Package</CInputGroupText>
+            </CInputGroupPrepend>
+            <CSelect v-model="selectedPackage">
+              <option disabled value="">Please select a package</option>
+              <option value="PRO_MONTHLY">Monthly PRO - RM1/month</option>
+              <option value="PRO_ANNUAL">Annual PRO - RM10/year</option>
+            </CSelect>
+          </CInputGroup> -->
+        </div>
+        <div class="mt-4">
+          <CSelect
+                  label="Payment Method"
+                  horizontal
+                  :options="['Online Banking']"
+                  :value.sync="selectedPaymentMethod"
+                />
+          <!-- <CInputGroup>
+            <CInputGroupPrepend>
+              <CInputGroupText>Payment Method</CInputGroupText>
+            </CInputGroupPrepend>
+            <CSelect v-model="selectedPaymentMethod">
+              <option disabled value="">Please select a payment method</option>
+              <option value="credit_card">Credit/Debit Card</option>
+              <option value="fpx">Online Banking (FPX)</option>
+              <option value="e_wallet">E-Wallet (Touch 'n Go, GrabPay, etc.)</option>
+            </CSelect>
+          </CInputGroup> -->
+        </div>
+      </div>
+      <div class="mt-4">
+        <CButton color="primary" @click="proceedToPayment">Next</CButton>
+      </div>
+    </CModal>
+
     <div>
       <CToaster :autohide="3000">
         <template v-for="info in infoList">
@@ -16,12 +81,57 @@
     </div>
     <div>
       <CRow>
-        <CCol sm="12">
+        <!-- Active Subscription Card -->
+        <CCol sm="12" lg="12">
+          <CCard accent-color="primary">
+            <CCardHeader>
+              <strong>Active Subscription</strong>
+            </CCardHeader>
+            <CCardBody>
+              <div v-if="activeSubscription">
+                <p>
+                  <strong>Plan Name:</strong>
+                  {{ activeSubscription.packageName }}
+                </p>
+                <p>
+                  <strong>Start Date:</strong>
+                  {{ activeSubscription.startDate }}
+                </p>
+                <p>
+                  <strong>End Date:</strong> {{ activeSubscription.endDate }}
+                </p>
+                <p>
+                  <strong>Is Active:</strong>
+                  {{ activeSubscription.isActiveYesNo }}
+                </p>
+                <p><strong>Amount:</strong> {{ activeSubscription.amount }}</p>
+                <!-- Conditional Upgrade Button for Free Plan -->
+                <CButton
+                  v-if="activeSubscription.packageName === 'Free'"
+                  size="sm"
+                  color="success"
+                  class="ml-1"
+                  @click="upgradeToPro(activeSubscription)"
+                >
+                  Upgrade
+                </CButton>
+              </div>
+              <div v-else>
+                <p>No active subscription found.</p>
+              </div>
+            </CCardBody>
+          </CCard>
+        </CCol>
+
+        <!-- Subscription History Table -->
+        <CCol sm="12" lg="12">
           <CCard>
-            <CCardHeader> <strong> Subscription </strong> List </CCardHeader>
+            <CCardHeader>
+              <strong>Subscription History</strong>
+            </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="items"
+                :items="computedSubscriptionHistory"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -33,7 +143,6 @@
               >
                 <template #show_details="{ item, index }">
                   <td class="py-2">
-              
                     <CButton
                       color="primary"
                       variant="outline"
@@ -51,6 +160,16 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
+                      <p>
+                        <strong>Subscription Plan:</strong>
+                        {{ item.packageDescription }}
+                      </p>
+                      <p>
+                        <strong>Status:</strong> {{ item.statusDescription }}
+                      </p>
+                      <p><strong>Start Date:</strong> {{ item.startDate }}</p>
+                      <p><strong>End Date:</strong> {{ item.endDate }}</p>
+                      <p><strong>Amount:</strong> {{ item.amount }}</p>
                       <CButton
                         size="sm"
                         color="info"
@@ -72,282 +191,208 @@
                 </template>
               </CDataTable>
             </CCardBody>
-            <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="addNew"
-                ><CIcon name="cil-check-circle" /> Add New</CButton
-              >
-            </CCardFooter>
           </CCard>
-          <CModal
-            title="Confirm Delete"
-            color="warning"
-            :show.sync="warningModal"
-            @update:show="onDeleteConfirmation"
-          >
-            Are you sure you want to delete this {{ itemToDelete.code }} ?
-          </CModal>
         </CCol>
-      </CRow>
-      <!-- <CRow>
-        <CCol sm="12">
+
+        <!-- Invoices and Payments Table -->
+        <CCol sm="12" lg="12">
           <CCard>
-            <CCardHeader> <strong> User </strong> List </CCardHeader>
+            <CCardHeader>
+              <strong>Invoices and Payments</strong>
+            </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedProfileItems"
-                :fields="profilefields"
+                :items="invoices"
+                :fields="invoiceFields"
                 column-filter
                 items-per-page-select
                 :items-per-page="10"
                 hover
                 sorter
                 pagination
-                :loading="profileLoading"
-              >
-                <template #show_details="{ item }">
-                  <td>
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                      square
-                      size="sm"
-                      @click="onEditProfile(item)"
-                    >
-                      Edit
-                    </CButton>
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                      square
-                      size="sm"
-                      @click="showDeleteProfileConfirmation(item)"
-                    >
-                      Delete
-                    </CButton>
-                  </td>
-                </template>
-              </CDataTable>
+                :loading="loading"
+              />
             </CCardBody>
-            <CCardFooter>
-              <CButton
-                type="submit"
-                size="sm"
-                color="primary"
-                @click="addNewProfile"
-                ><CIcon name="cil-check-circle" /> Add New</CButton
-              >
-            </CCardFooter>
           </CCard>
-          <CModal
-            title="Confirm Delete"
-            color="warning"
-            :show.sync="warningProfileModal"
-            @update:show="onDeleteProfileConfirmation"
-          >
-            Are you sure you want to delete this {{ itemToDelete.code }} ?
-          </CModal>
         </CCol>
-      </CRow> -->
+
+        <!-- Modal for Delete Confirmation -->
+        <CModal
+          title="Confirm Delete"
+          color="warning"
+          :show.sync="warningModal"
+          @update:show="onDeleteConfirmation"
+        >
+          Are you sure you want to delete this {{ itemToDelete.code }} ?
+        </CModal>
+      </CRow>
     </div>
   </div>
 </template>
 
 <script>
 import SubscriptionApi from "@/lib/subscriptionApi";
-// import ProfileApi from "@/lib/profileApi";
-
-const items = [];
-const fields = [
-  // { key: "accountNo"},
-  { key: "startDate" },
-  { key: "endDate" },
-  { key: "packageDescription" },
-  { key: "statusDescription" },
-  { key: "amount" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-];
-
-// const profileItems = [];
-const profilefields = [
-  { key: "fullName" },
-  { key: "email" },
-  { key: "subscription" },
-  { key: "role" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:150px",
-    sorter: false,
-    filter: false,
-  },
-];
+import PackageApi from "@/lib/packageApi";
 
 export default {
   name: "SubscriptionList",
   data() {
     return {
-      warningProfileModal: false,
-      profileLoading: true,
-      profileItems: [],
-      profilefields,
-      loading: true,
-      items: items.map((item, id) => {
-        return { ...item, id };
-      }),
+      packageItems: [],
+      packageApi: new PackageApi(),
 
+      showUpgradeModal: false, // To control the visibility of the modal
+      selectedPackage: "", // To hold the selected package
+      selectedPaymentMethod: "Online Banking", // To hold the selected payment method
+
+      loading: true,
+      subscriptionHistory: [],
+      invoices: [],
+      fields: [
+        { key: "startDate", label: "Start Date" },
+        { key: "endDate", label: "End Date" },
+        { key: "packageName", label: "Plan" },
+        { key: "isActiveYesNo", label: "Active" },
+        { key: "statusDescription", label: "State" },
+        { key: "amount", label: "Amount" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+      ],
+      invoiceFields: [
+        { key: "invoiceNumber", label: "Invoice Number" },
+        { key: "issueDate", label: "Issue Date" },
+        { key: "dueDate", label: "Due Date" },
+        { key: "amount", label: "Amount" },
+        { key: "status", label: "Status" },
+        { key: "paymentDate", label: "Payment Date" },
+      ],
       infoList: [],
-      fields,
-      details: [],
       collapseDuration: 0,
       api: new SubscriptionApi(),
-      // profileApi: new ProfileApi(),
       warningModal: false,
       itemToDelete: {},
     };
   },
   mounted() {
-    var self = this;
-    self.refreshTable();
-    // self.refreshProfileTable();
+    this.fetchPackageList();
+    this.refreshTable();
   },
   computed: {
-    computedProfileItems() {
-      return this.profileItems.map((item) => {
+    activeSubscription() {
+      return this.computedSubscriptionHistory.find(
+        (sub) => sub.isActive === true
+      );
+    },
+    computedSubscriptionHistory() {
+      return this.subscriptionHistory.map((item) => {
         return {
           ...item,
-          subscription:item.defaultSubscription.name,
-          role: item.appUser.role,
+          isActiveYesNo: item.isActive ? "YES" : "NO",
+          packageName: item.package.name,
         };
       });
     },
   },
-
   methods: {
-    /// For Profile List
-    onEditProfile(item) {
-      var self = this;
-      self.$router.push({
-        path: `/admins/tenant/${item.id}`,
-      });
-    },
-    onDeleteProfileConfirmation(status, evt, accept) {
-      var self = this;
-      if (accept) {
-        this.api
-          .delete(self.itemToDelete.id)
-          .then((response) => {
-            self.resetObj();
-          })
-          .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
-          });
+    isSelectedColor(item) {
+      console.log(item);
+      console.log(this.selectedPackage);
+      try {
+        if (item.id == this.selectedPackage.id) return "success";
+        else return "light";
+      } catch (error) {
+        return "light";
       }
-      self.itemToDelete = {};
     },
-    showDeleteProfileConfirmation(item) {
-      var self = this;
-      self.itemToDelete = item;
-      self.warningProfileModal = true;
+    onSelectPackage(item) {
+      this.selectedPackage = item;
     },
-    addNewProfile() {
-      this.$router.push({ path: "/admins/Tenant" });
-    },
-    // refreshProfileTable() {
-    //   var self = this;
-    //   self.profileLoading = false;
-    //   self.profileApi
-    //     .getListByCurrentTenant()
-    //     .then((response) => {
-    //       self.profileItems = response.result;
-    //       console.log(self.profileItems);
-    //       self.profileLoading = false;
-    //     })
-    //     .catch(({ data }) => {
-    //       self.toast("Error", helper.getErrorMessage(data), "danger");
-    //     });
-    // },
-
-    setDefault(item) {
-      var self = this;
-      self.api
-        .updateDefaultSubscription(item)
+    fetchPackageList() {
+      this.packageApi
+        .getListByActive()
         .then((response) => {
-          // self.obj = response.result;
-          // auth.setDefaultSubscriptionName(item);
-          self.refreshTable();
+          this.packageItems = response.result;
+          console.log(this.packageItems);
         })
         .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
+          this.toast("Error", "Failed to load subscriptions", "danger");
         });
     },
-    toast(header, message, color) {
-      var self = this;
-      self.infoList.push({
-        header: header,
-        message: message,
-        color: color,
-      });
+
+    refreshTable() {
+      this.loading = true;
+      this.api
+        .getListByCurrentTenant()
+        .then((response) => {
+          this.subscriptionHistory = response.result;
+          this.invoices = response.invoices; // Assuming invoices are part of the response
+          this.loading = false;
+        })
+        .catch(({ data }) => {
+          this.toast("Error", "Failed to load subscriptions", "danger");
+          this.loading = false;
+        });
     },
+    upgradeToPro(item) {
+      this.showUpgradeModal = true; // Show the upgrade modal
+    },
+    proceedToPayment() {
+      if (!this.selectedPackage || !this.selectedPaymentMethod) {
+        this.toast(
+          "Warning",
+          "Please select a package and a payment method.",
+          "warning"
+        );
+        return;
+      }
+
+      console.log(
+        "Proceeding to payment with:",
+        this.selectedPackage,
+        this.selectedPaymentMethod
+      );
+      // Logic to handle the payment process via API calls or redirect to payment gateway
+
+      this.showUpgradeModal = false; // Close the modal after selecting options
+      this.toast("Success", "Proceeding to payment!", "success");
+    },
+
     toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+      this.$set(this.subscriptionHistory[index], "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
       });
     },
-   
-
-    refreshTable() {
-      var self = this;
-      self.loading = false;
-      self.api
-        .getListByCurrentTenant()
-        .then((response) => {
-          self.items = response.result;
-          console.log(self.items);
-          self.loading = false;
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
-    },
     onEdit(item) {
-      var self = this;
-      self.$router.push({
+      this.$router.push({
         path: `/tenants/Subscription/${item.id}`,
       });
     },
+    showDeleteConfirmation(item) {
+      this.itemToDelete = item;
+      this.warningModal = true;
+    },
     onDeleteConfirmation(status, evt, accept) {
-      var self = this;
       if (accept) {
         this.api
-          .delete(self.itemToDelete.id)
-          .then((response) => {
-            self.refreshTable();
+          .delete(this.itemToDelete.id)
+          .then(() => {
+            this.refreshTable();
           })
           .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
+            this.toast("Error", "Failed to delete subscription", "danger");
           });
       }
-      self.itemToDelete = {};
-    },
-    showDeleteConfirmation(item) {
-      var self = this;
-      self.itemToDelete = item;
-      self.warningModal = true;
-    },
-    addNew() {
-      this.$router.push({ path: "/tenants/Subscription" });
+      this.itemToDelete = {};
     },
     toast(header, message, color) {
-      var self = this;
-      self.infoList.push({
+      this.infoList.push({
         header: header,
         message: message,
         color: color,
