@@ -11,17 +11,12 @@
       class="ml-3 d-md-down-none"
       @click="$store.commit('toggleSidebarDesktop')"
     />
-    <CHeaderBrand class="mx-auto d-lg-none" to="/">
-      <!-- <CIcon name="logo" height="48" alt="Logo"/> -->
-      <CImg :src="logoUrl" height="48"></CImg>
-    </CHeaderBrand>
-    <CHeaderNav class="d-md-down-none mr-auto">
-      <!-- <CHeaderNavItem class="px-3">
-        <CHeaderNavLink to="/dashboard">
-          Dashboard
-        </CHeaderNavLink>
-      </CHeaderNavItem>
+   
+    <CHeaderNav class="mr-auto">
       <CHeaderNavItem class="px-3">
+        <TheHeaderDropdownBusiness></TheHeaderDropdownBusiness>
+      </CHeaderNavItem>
+   <!--   <CHeaderNavItem class="px-3">
         <CHeaderNavLink to="/users" exact>
           Users
         </CHeaderNavLink>
@@ -29,12 +24,12 @@
       <CHeaderNavItem class="px-3">
         <CHeaderNavLink>
           Settings
-        </CHeaderNavLink>
-      </CHeaderNavItem> -->
+        </CHeaderNavLink> 
+      </CHeaderNavItem>-->
     </CHeaderNav>
     <CHeaderNav>
-      {{ userName }} ( {{businessName}})
-      <!-- <CHeaderNavItem class="px-3 c-d-legacy-none">
+      
+     <CHeaderNavItem class="px-3 c-d-legacy-none">
         <button
           @click="() => $store.commit('toggle', 'darkMode')"
           class="c-header-nav-btn"
@@ -42,9 +37,9 @@
           <CIcon v-if="$store.state.darkMode" name="cil-sun"/>
           <CIcon v-else name="cil-moon"/>
         </button>
-      </CHeaderNavItem> -->
-      <!-- <TheHeaderDropdownNotif/>
-      <TheHeaderDropdownTasks/>
+      </CHeaderNavItem>  <!-- -->
+    <!--   <TheHeaderDropdownNotif/> -->
+       <!--<TheHeaderDropdownTasks/>
       <TheHeaderDropdownMssgs/> -->
       <TheHeaderDropdownAccnt/>
       <!-- <CHeaderNavItem class="px-3">
@@ -68,6 +63,7 @@ import TheHeaderDropdownAccnt from './TheHeaderDropdownAccnt'
 import TheHeaderDropdownNotif from './TheHeaderDropdownNotif'
 import TheHeaderDropdownTasks from './TheHeaderDropdownTasks'
 import TheHeaderDropdownMssgs from './TheHeaderDropdownMssgs'
+import TheHeaderDropdownBusiness from './TheHeaderDropdownBusiness'
 
 export default {
   name: 'TheHeader',
@@ -75,7 +71,8 @@ export default {
     TheHeaderDropdownAccnt,
     TheHeaderDropdownNotif,
     TheHeaderDropdownTasks,
-    TheHeaderDropdownMssgs
+    TheHeaderDropdownMssgs,
+    TheHeaderDropdownBusiness
   },
    data: () => {
     return {

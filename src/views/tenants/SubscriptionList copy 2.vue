@@ -10,19 +10,16 @@
       <div>
         <h5>Select a Subscription Package</h5>
         <CRow>
-          <CCol v-for="(item, index) in packageItems" :key="item.id" sm="12" xl="4">
+          <CCol v-for="(item, index) in packageItems" :key="item.id" sm="auto">
             <CCard>
-              <CCardBody align="center">
+              <CCardBody>
                 <strong>{{ item.name }}</strong>
                 <hr class="my-2" />
                 <p v-html="formatHtml(item.description)"></p>
-                <hr class="my-2" />
-                <h5>RM {{ item.price.toFixed(2)  }}</h5>
                 <CButton
-                  block
+                block
                   :color="isSelectedColor(item)"
                   @click="onSelectPackage(item)"
-                  disabled
                   >Select</CButton
                 >
               </CCardBody>
@@ -42,12 +39,12 @@
             </CSelect>
           </CInputGroup> -->
         </div>
-        <div class="mt-4" v-if="selectedPackage">
+        <div class="mt-4">
           <CSelect
             label="Payment Method"
-            :options="['Please Select', 'Online', 'CreditCard']"
+            horizontal
+            :options="['Cash', 'CreditCard']"
             :value.sync="selectedPaymentMethod"
-            
           />
           <!-- <CInputGroup>
             <CInputGroupPrepend>
@@ -62,30 +59,14 @@
           </CInputGroup> -->
         </div>
         <!-- CreditCard Payment Element -->
-        <!-- <div v-if="selectedPaymentMethod === 'CreditCard'" class="mt-4">
+        <div v-if="selectedPaymentMethod === 'CreditCard'" class="mt-4">
           <div ref="cardElement" id="card-element" class="my-2"></div>
           <div id="card-errors" role="alert" class="text-danger"></div>
-        </div> -->
-        <div v-if="selectedPaymentMethod === 'CreditCard'" class="mt-4">
-            <!-- Updated Stripe Element container -->
-            <div ref="cardElement" id="card-element" class="stripe-input"></div>
-          <CAlert
-            v-if="cardError"
-            color="danger"
-            id="card-errors"
-            role="alert"
-            class="mt-2"
-          >
-            {{ cardError }}
-          </CAlert>
-          <CButton color="primary" class="mt-3" @click="proceedToPayment"
-            >Pay Now</CButton
-          >
         </div>
       </div>
-      <!-- <div class="mt-4">
+      <div class="mt-4">
         <CButton color="primary" @click="proceedToPayment">Next</CButton>
-      </div> -->
+      </div>
     </CModal>
 
     <div>
@@ -117,11 +98,11 @@
                   {{ activeSubscription.packageName }}
                 </p>
                 <p>
-                  <strong>Begin:</strong>
+                  <strong>Start Date:</strong>
                   {{ activeSubscription.startDate }}
                 </p>
                 <p>
-                  <strong>Expiry:</strong> {{ activeSubscription.endDate }}
+                  <strong>End Date:</strong> {{ activeSubscription.endDate }}
                 </p>
                 <p>
                   <strong>Is Active:</strong>
@@ -130,7 +111,6 @@
                 <p><strong>Amount:</strong> {{ activeSubscription.amount }}</p>
                 <!-- Conditional Upgrade Button for Free Plan -->
                 <CButton
-                disabled
                   v-if="activeSubscription.packageName === 'Free'"
                   size="sm"
                   color="success"
@@ -259,7 +239,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import SubscriptionApi from "@/lib/subscriptionApi";
 import PackageApi from "@/lib/packageApi";
 import PaymentApi from "@/lib/paymentApi";
-import moment from "moment";
 
 export default {
   name: "SubscriptionList",
@@ -268,13 +247,13 @@ export default {
       paymentApi: new PaymentApi(),
       stripe: null, // Stripe instance
       cardElement: null, // Stripe Card Element
-      cardError: "", // Holds any Stripe error messages
+
       packageItems: [],
       packageApi: new PackageApi(),
 
       showUpgradeModal: false, // To control the visibility of the modal
       selectedPackage: "", // To hold the selected package
-      selectedPaymentMethod: "Please Select", // To hold the selected payment method
+      selectedPaymentMethod: "CreditCard", // To hold the selected payment method
 
       loading: true,
       subscriptionHistory: [],
@@ -312,18 +291,8 @@ export default {
   mounted() {
     this.fetchPackageList();
     this.refreshTable();
-    // this.initializeStripe(); // Initialize Stripe on component mount
+    this.initializeStripe(); // Initialize Stripe on component mount
   },
-  watch: {
-    selectedPaymentMethod(newMethod) {
-      if (newMethod === "CreditCard") {
-        this.initializeStripe();
-      } else {
-        this.destroyStripe();
-      }
-    },
-  },
-
   computed: {
     activeSubscription() {
       return this.computedSubscriptionHistory.find(
@@ -341,52 +310,18 @@ export default {
     },
   },
   methods: {
-    getDisplayDate(dt) {
-      return moment(dt).format("DD/MM/YYYY");
-    },
-        formatHtml(item) {
+    formatHtml(item) {
       return item.replace(/\n/g, "<br />");
     },
-    destroyStripe() {
-      if (this.cardElement) {
-        this.cardElement.unmount();
-        this.cardElement = null;
-      }
-    },
-
     initializeStripe() {
-      loadStripe("pk_test_Wx2rVD350hgX6aUVtgqtKOVo")
+      loadStripe(
+        "pk_test_51PvDfsQvD3YSn135RE5NlOUWEGXHtxdupV6JVoahVZc6eAcRYayp8a2dBFernW727GY2GtQO1XkcaruTlFaXmjPn00KiQWYJGD"
+      )
         .then((stripeInstance) => {
           this.stripe = stripeInstance;
           const elements = this.stripe.elements();
-
-          this.cardElement = elements.create("card", {
-            style: {
-              base: {
-                color: "#32325d",
-                fontFamily: 'Roboto, "Helvetica Neue", Helvetica, sans-serif',
-                fontSmoothing: "antialiased",
-                fontSize: "16px",
-                "::placeholder": {
-                  color: "#aab7c4",
-                },
-              },
-              invalid: {
-                color: "#fa755a",
-                iconColor: "#fa755a",
-              },
-            },
-          });
-
+          this.cardElement = elements.create("card");
           this.cardElement.mount(this.$refs.cardElement);
-
-          this.cardElement.on("change", (event) => {
-            if (event.error) {
-              this.cardError = event.error.message;
-            } else {
-              this.cardError = "";
-            }
-          });
         })
         .catch((error) => {
           this.toast(
@@ -507,7 +442,6 @@ export default {
         });
     },
     upgradeToPro(item) {
-      this.selectedPaymentMethod = "Please Select"
       this.showUpgradeModal = true; // Show the upgrade modal
     },
 
@@ -550,17 +484,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.stripe-input {
-  border: 1px solid #ced4da; /* Matches CoreUI form input border */
-  border-radius: 4px;
-  padding: 10px; /* Padding around the Stripe element for better UX */
-  width: 100%; /* Ensures the Stripe element takes the full width */
-  background-color: #fff; /* Matches CoreUI input background */
-}
-
-#card-element {
-  width: 100%; /* Ensure the card input field takes the full width */
-}
-</style>

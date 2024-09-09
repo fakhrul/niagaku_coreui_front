@@ -275,6 +275,10 @@ export default {
   },
 
   methods: {
+    startTour()
+    {
+
+    },
     /// For Profile List
     onEditProfile(item) {
       var self = this;

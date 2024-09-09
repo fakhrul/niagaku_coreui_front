@@ -50,13 +50,6 @@
                   color="link"
                   class="m-0 d-inline-block"
                 >
-                  <!-- Slot for custom dropdown toggler content -->
-                  <template #toggler>
-                    <CButton color="link">
-                      <!-- Use Material Design Icon -->
-                      <i class="material-icons">help_outline</i>
-                    </CButton>
-                  </template>
                   <!-- <CIcon name="cil-x-circle"/> -->
                   <CDropdownItem @click="startTour">Onboarding Tour</CDropdownItem>
                   <CDropdownItem disabled>Quick Info</CDropdownItem>
@@ -69,11 +62,12 @@
             </CCardHeader>
             <CCardBody>
               <CRow>
-                <CCol
-                  ><CFormGroup wrapperClasses="input-group pt-2">
+                <CCol sm="12" lg="4"
+                  ><CFormGroup wrapperClasses="input-group pt-2 mb-2">
                     <template #label>Customer </template>
                     <template #input>
                       <v-select
+                      
                         style="width: 100%"
                         v-model="selectedCustomer"
                         :label="'name'"
@@ -83,13 +77,13 @@
                     </template>
                   </CFormGroup>
                 </CCol>
-                <CCol
+                <CCol sm="12"  lg="2"
                   ><CInput
                     label="Quotation No"
                     placeholder=""
                     v-model="obj.quotationNumber"
                 /></CCol>
-                <CCol>
+                <CCol sm="12"  lg="2">
                   <CInput
                     label="Date"
                     type="date"
@@ -104,14 +98,14 @@
                   class="mr-2"
                 /> -->
                 </CCol>
-                <CCol>
+                <CCol sm="12"  lg="2">
                   <CInput
                     label="Expiry"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
                 /></CCol>
-                <CCol>
+                <CCol sm="12"  lg="2">
                   <CInput label="Reference" v-model="obj.reference"
                 /></CCol>
               </CRow>
@@ -310,7 +304,7 @@ const quotationFields = [
     sorter: false,
     filter: false,
   },
-  { key: "position", label: "Position" },
+  // { key: "position", label: "Position" },
   // { key: "productName", label: "Item" },
   {
     key: "show_item",

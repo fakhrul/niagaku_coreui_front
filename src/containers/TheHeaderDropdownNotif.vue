@@ -3,7 +3,7 @@
     placement="bottom-end"
     :caret="false"
     in-nav
-    class="c-header-nav-item d-md-down-none mx-2"
+    class="c-header-nav-items"
     add-menu-classes="pt-0"
   >
     <template #toggler>

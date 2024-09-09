@@ -34,6 +34,7 @@
 import adminNav from "./_adminNav";
 import tenantAdminNav from "./_tenantAdminNav";
 import accountantNav from "./_accountantNav";
+import { mapState } from "vuex"; // Import Vuex helpers
 
 import nav from "./_nav";
 
@@ -43,10 +44,15 @@ export default {
   adminNav,
   data: () => {
     return {
-      logoUrl: "/img/logo.png",
+      //logoUrl: "/img/logo.png",
     };
   },
   computed: {
+     ...mapState({
+      // logoUrl: (state) => state.logoUrl, // Access the logo from Vuex
+      logoUrl: (state) => state.logoUrl || "/logo.png", // Access the logo from Vuex
+      primaryColor: (state) => state.primaryColor || "#756CFB", // Access the primary color from Vuex
+    }),
     show() {
       return this.$store.state.sidebarShow;
     },

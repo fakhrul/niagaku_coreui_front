@@ -10,12 +10,12 @@
         <div class="c-avatar">
           <img src="/img/avatars/6.jpg" class="c-avatar-img" />
         </div>
-      </CHeaderNavLink>
-    </template>
+      </CHeaderNavLink> </template
+    ><!--
     <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>Account</strong>
     </CDropdownHeader>
-    <!-- <CDropdownItem>
+ <CDropdownItem>
       <CIcon name="cil-bell"/> Updates
       <CBadge color="info" class="mfs-auto">{{ itemsCount }}</CBadge>
     </CDropdownItem>
@@ -30,32 +30,32 @@
     <CDropdownItem>
       <CIcon name="cil-comment-square" /> Comments
       <CBadge color="warning" class="mfs-auto">{{ itemsCount }}</CBadge>
-    </CDropdownItem>
-    <CDropdownHeader
-      tag="div"
-      class="text-center"
-      color="light"
-    >
+    </CDropdownItem> -->
+    <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>Settings</strong>
     </CDropdownHeader>
-    <CDropdownItem>
+    <CDropdownItem @click="navigateTo('/general/profile')">
       <CIcon name="cil-user" /> Profile
     </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-settings" /> Settings
+    <CDropdownItem @click="navigateTo('/tenants/subscriptionList')">
+      <CIcon
+        name="cilTags"
+        
+      />
+      Subsriptions
     </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-dollar" /> Payments
-      <CBadge color="secondary" class="mfs-auto">{{ itemsCount }}</CBadge>
+    <CDropdownItem  @click="navigateTo('/tenants/businessList')">
+      <CIcon name="cilIndustry" /> Business
+      <!-- <CBadge color="secondary" class="mfs-auto">{{ itemsCount }}</CBadge> -->
     </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-file" /> Projects
-      <CBadge color="primary" class="mfs-auto">{{ itemsCount }}</CBadge>
+    <CDropdownItem  @click="navigateTo('/tenants/branding')">
+      <CIcon name="cil-file" /> Branding
+      <!-- <CBadge color="primary" class="mfs-auto">{{ itemsCount }}</CBadge> -->
     </CDropdownItem>
-    <CDropdownDivider/>
-    <CDropdownItem>
+    <CDropdownDivider />
+    <!-- <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
-    </CDropdownItem> -->
+    </CDropdownItem>     -->
     <CDropdownItem @click="onLogout">
       <CIcon name="cil-lock-locked" /> Logout
     </CDropdownItem>
@@ -71,6 +71,9 @@ export default {
     };
   },
   methods: {
+    navigateTo(path) {
+      this.$router.push({ path: path });
+    },
     onProfile() {
       this.$router.push({ path: "/general/profile" });
     },

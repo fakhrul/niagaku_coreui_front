@@ -87,6 +87,10 @@ const TenantClaim = () => import('@/views/tenants/Claim')
 const EmployeeList = () => import('@/views/tenants/EmployeeList')
 const Employee = () => import('@/views/tenants/Employee')
 
+
+const Branding = () => import('@/views/tenants/Branding')
+const BrandingEdit = () => import('@/views/tenants/BrandingEdit')
+
 const VerifyEmail = () => import('@/views/pages/VerifyEmail')
 const RegisterCompleted = () => import('@/views/pages/RegisterCompleted')
 
@@ -592,6 +596,19 @@ function configRoutes() {
               name: 'Employee',
               component: Employee
             },
+
+            //
+            {
+              path: '/tenants/brandingEdit',
+              name: 'BrandingEdit',
+              component: BrandingEdit
+            },
+            {
+              path: '/tenants/branding',
+              name: 'branding',
+              component: Branding
+            },
+
 
           ]
         },

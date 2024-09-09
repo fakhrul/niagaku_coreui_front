@@ -99,6 +99,17 @@
                           />
                         </CCol>
                         <CCol md="6">
+                          <CInput
+                            label="Short Name"
+                            v-model="obj.shortName"
+                            placeholder="XYZ"
+                            required
+                            was-validated
+                            v-c-tooltip.hover="{
+                              content: `Your Company Short Name.`,
+                              placement: 'right-end',
+                            }"
+                          />
                           <CTextarea
                             label="Address"
                             placeholder="No. 123, Jalan Example

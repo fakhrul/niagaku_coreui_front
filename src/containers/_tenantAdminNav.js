@@ -18,7 +18,7 @@ export default [
         to: '/tenants/businessList',
         icon: 'cilIndustry'
       },
-   {
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Company'],
       },
@@ -67,50 +67,79 @@ export default [
         route: '/parameters',
         icon: 'cilChartLine',
         moduleName: 'MasterData', // This will be used for filtering
+       
         _children: [
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Quotation',
             to: '/tenants/purchaseQuotationList',
-            icon: 'cilFile'
+            icon: 'cilFile',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Order',
             to: '/tenants/purchaseOrderList',
-            icon: 'cilCart'
+            icon: 'cilCart',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Purchase Invoice (Bill)',
             to: '/tenants/billList',
-            icon: 'cilMoney'
+            icon: 'cilMoney',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Receipts',
             to: '/tenants/receiptList',
-            icon: 'cilImageBroken'
+            icon: 'cilImageBroken',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Vendor (Supplier)',
             to: '/tenants/vendorList',
-            icon: 'cilTruck'
+            icon: 'cilTruck',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Other Expenses',
             to: '/tenants/otherExpenseList',
-            icon: 'cilExternalLink'
+            icon: 'cilExternalLink',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Product/Service',
             to: '/tenants/purchaseProductList',
-            icon: 'cilDevices'
+            icon: 'cilDevices',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
- ]
+        ]
       },
 
       {
@@ -123,29 +152,45 @@ export default [
             _name: 'CSidebarNavItem',
             name: 'Transactions',
             to: '/tenants/expenseList',
-            icon: 'cilListRich'
+            icon: 'cilListRich',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Banks',
             to: '/tenants/expenseList',
-            icon: 'cilBank'
+            icon: 'cilBank',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Reconcilation',
             to: '/tenants/expenseList',
-            icon: 'cilListLowPriority'
+            icon: 'cilListLowPriority',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Chart Of Account',
             to: '/tenants/chartOfAccountList',
-            icon: 'cilTransfer'
+            icon: 'cilTransfer',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
         ]
       },
-      {   
+      {
         _name: 'CSidebarNavDropdown',
         name: 'Payroll',
         route: '/parameters',
@@ -155,21 +200,33 @@ export default [
             _name: 'CSidebarNavItem',
             name: 'Employee',
             to: '/tenants/employeeList',
-            icon: 'cilPeople'
+            icon: 'cilPeople',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'PaySlip',
             to: '/tenants/paySlipList',
-            icon: 'cilCalendarCheck'
+            icon: 'cilCalendarCheck',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
           {
             _name: 'CSidebarNavItem',
             name: 'Claims',
             to: '/tenants/claimList',
-            icon: 'cilRestaurant'
+            icon: 'cilRestaurant',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
           },
-       
+
         ]
       },
       {
@@ -180,19 +237,31 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'PaySlip',
         to: '/employee/paySlipList',
-        icon: 'cilCalendarCheck'
+        icon: 'cilCalendarCheck',
+        badge: {
+          color: 'danger',
+          text: 'PRO'
+        }
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Claims',
         to: '/employee/claimList',
-        icon: 'cilRestaurant'
+        icon: 'cilRestaurant',
+        badge: {
+          color: 'danger',
+          text: 'PRO'
+        }
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Receipts',
         to: '/employee/receiptList',
-        icon: 'cilImageBroken'
+        icon: 'cilImageBroken',
+        badge: {
+          color: 'danger',
+          text: 'PRO'
+        }
       },
 
     ]
