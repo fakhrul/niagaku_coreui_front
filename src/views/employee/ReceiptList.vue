@@ -1,84 +1,151 @@
 <template>
   <div class="wrapper">
-    <!-- <CRow form class="form-group">
-      <CCol >
-        <CImg
-          :src="getImageUrl()"
-          class="mb-2"
-          thumbnail
-        ></CImg>
-      </CCol>
-    </CRow> -->
+    <div>
+      <CToaster :autohide="3000">
+        <template v-for="info in infoList">
+          <CToast
+            :key="info.message"
+            :show="true"
+            :header="info.header"
+            :color="info.color"
+          >
+            {{ info.message }}.
+          </CToast>
+        </template>
+      </CToaster>
+    </div>
+    <div>
+      <CRow>
+        <CCol sm="12">
+          <CCard>
+            <CCardHeader> <strong> Bill </strong> List </CCardHeader>
+            <CCardBody>
+              <CDataTable
+                :items="computedItems"
+                :fields="fields"
+                column-filter
+                items-per-page-select
+                :items-per-page="10"
+                hover
+                sorter
+                pagination
+                :loading="loading"
+              >
+                <template #show_image="{ item }">
+                  <td class="py-2">
+                    <CImg
+                      thumbnail
+                      :src="getImage(item)"
+                      height="70"
+                      width="70"
+                    />
+                  </td>
+                </template>
 
-    <CRow form class="form-group">
-      <CCol sm="12">
-        <WidgetsUploadImage :billImageUrl="billImageUrl" @uploaded="uploaded" />
-      </CCol>
-    </CRow>
-    <CRow>
-      <CCol v-for="(days, month) in groupedReceipts" :key="month" sm="12">
-        <CCard>
-          <CCardHeader>{{ month }}</CCardHeader>
-          <CCardBody>
-            <div v-for="(receipts, day) in days" :key="day">
-              <h4>{{ day }}</h4>
-              <CRow>
-                <CCol v-for="receipt in receipts" :key="receipt.id"  xl="2" md="4" sm="6" xs="12" class="mb-4">
-                  <!-- <img
-                    :src="getImageUrl(receipt)"
-                    alt="Receipt Image"
-                    width="100%"
-                  /> -->
-
-                  <CImg
-                    :src="getImageUrl(receipt)"
-                    class="mb-2"
-                    thumbnail
-                    width="100px"
-                    @click="onImageClick(receipt)"
-                  ></CImg>
-
-                  <CButton color="danger" @click="deleteReceipt(receipt.id)"
-                    >Delete</CButton
+                <template #show_details="{ item, index }">
+                  <td class="py-2">
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      square
+                      size="sm"
+                      @click="toggleDetails(item, index)"
+                    >
+                      {{ Boolean(item._toggled) ? "Hide" : "Show" }}
+                    </CButton>
+                  </td>
+                </template>
+                <template #details="{ item }">
+                  <CCollapse
+                    :show="Boolean(item._toggled)"
+                    :duration="collapseDuration"
                   >
-                </CCol>
-              </CRow>
-            </div>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
-    <!-- <CCard>
-      <CCardHeader>Add New Receipt</CCardHeader>
-      <CCardBody>
-        <CInput v-model="newReceipt.date" placeholder="Date (YYYY-MM-DD)" />
-        <CInput v-model="newReceipt.imageUrl" placeholder="Image URL" />
-        <CButton color="primary" @click="addReceipt">Add</CButton>
-      </CCardBody>
-    </CCard> -->
+                    <CCardBody>
+                      <!-- <p class="text-muted">Code: {{ item.code }}</p>
+                      <p class="text-muted">Name: {{ item.name }}</p>
+                       -->
+                      <CButton
+                        size="sm"
+                        color="info"
+                        class="ml-1"
+                        @click="onEdit(item)"
+                      >
+                        Edit
+                      </CButton>
+                      <CButton
+                        size="sm"
+                        color="danger"
+                        class="ml-1"
+                        @click="showDeleteConfirmation(item)"
+                      >
+                        Delete
+                      </CButton>
+                    </CCardBody>
+                  </CCollapse>
+                </template>
+              </CDataTable>
+            </CCardBody>
+            <CCardFooter>
+              <CButton type="submit" size="sm" color="primary" @click="addNew"
+                ><CIcon name="cil-check-circle" /> Add New</CButton
+              >
+            </CCardFooter>
+          </CCard>
+          <CModal
+            title="Confirm Delete"
+            color="warning"
+            :show.sync="warningModal"
+            @update:show="onDeleteConfirmation"
+          >
+            Are you sure you want to delete this {{ itemToDelete.code }} ?
+          </CModal>
+        </CCol>
+      </CRow>
+    </div>
   </div>
 </template>
 
 <script>
+// import BillApi from "@/lib/billApi";
 import ReceiptApi from "@/lib/receiptApi";
 import moment from "moment";
-import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
+
+const items = [];
+const fields = [
+  { key: "createdOn" },
+  { key: "date" },
+  { key: "companyName" },
+  { key: "billNo" },
+  { key: "totalAmount" },
+  {
+    key: "show_image",
+    label: "Image",
+  },
+
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+];
 
 export default {
-  name: "ReceiptList",
-  components: {
-    WidgetsUploadImage,
-  },
+  name: "BillList",
   data() {
     return {
-      uploadedFiles: [],
-      billImageUrl: "",
-      documentId: null,
-      receipts: [],
-      newReceipt: {
-        documentUrl: "",
-      },
+      loading: false,
+      items: items.map((item, id) => {
+        return { ...item, id };
+      }),
+      infoList: [],
+      fields,
+      details: [],
+      collapseDuration: 0,
       api: new ReceiptApi(),
+      warningModal: false,
+      itemToDelete: {},
     };
   },
   mounted() {
@@ -86,65 +153,62 @@ export default {
     self.refreshTable();
   },
   computed: {
-    groupedReceipts() {
-      return this.receipts.reduce((acc, receipt) => {
-        const [year, month, day] = receipt.date.split("-");
-        const monthKey = `${year}-${month}`;
-        if (!acc[monthKey]) {
-          acc[monthKey] = {};
-        }
-        if (!acc[monthKey][day]) {
-          acc[monthKey][day] = [];
-        }
-        acc[monthKey][day].push(receipt);
-        return acc;
-      }, {});
+    computedItems() {
+      return this.items.map((item) => {
+        return {
+          ...item,
+          createdOn: this.getDisplayDateTime(item.createdOn),
+          date: this.getDisplayDateTime(item.date),
+        };
+      });
     },
   },
   methods: {
-    getImageUrl(item) {
+    getImage(item) {
       var url =
         apiUrl + "documents/file/" + item.documentId;
-      console.log(url);
       return url;
     },
-    uploaded(data) {
-      var self = this;
-      self.uploadedFiles = data.uploadedFiles;
-      self.api
-        .createReceiptImage(self.uploadedFiles)
-        .then((response) => {
-          self.refreshTable();
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
 
-      // var self = this;
-      // self.uploadedFiles = data.uploadedFiles;
-      // if (self.uploadedFiles.length > 0) {
-      //   this.documentId = self.uploadedFiles[0].id;
-      //   this.loadImage();
-      // }
-      // console.log(data);
+    getDisplayDateTime(dt) {
+      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
     },
-
-    addReceipt() {},
-    deleteReceipt(id) {},
-
+    toast(header, message, color) {
+      var self = this;
+      self.infoList.push({
+        header: header,
+        message: message,
+        color: color,
+      });
+    },
+    toggleDetails(item) {
+      this.$set(item, "_toggled", !item._toggled);
+      this.collapseDuration = 300;
+      this.$nextTick(() => {
+        this.collapseDuration = 0;
+      });
+    },
     refreshTable() {
       var self = this;
+      self.loading = true;
+      // self.items = floorPlanData;
       self.api
         .getList()
         .then((response) => {
-          self.receipts = response.result;
-          console.log(self.receipts);
+          self.items = response.result;
+          self.loading = false;
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
+          self.loading = false;
         });
     },
-
+    // onAddLocation(item) {
+    //   var self = this;
+    //   self.$router.push({
+    //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
+    //   });
+    // },
     onEdit(item) {
       var self = this;
       self.$router.push({
@@ -172,7 +236,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/employee/Receipt" });
+      this.$router.push({ path: "/tenants/Bill" });
     },
     toast(header, message, color) {
       var self = this;

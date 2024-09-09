@@ -1,9 +1,231 @@
 <template>
   <div>
+    <div>
+      <CToaster :autohide="3000">
+        <template v-for="info in infoList">
+          <CToast
+            :key="info.message"
+            :show="true"
+            :header="info.header"
+            :color="info.color"
+          >
+            {{ info.message }}.
+          </CToast>
+        </template>
+      </CToaster>
+      <CRow>
+        <CCol sm="8">
+          <CCard>
+            <CCardHeader> <strong> Receipt </strong> Image </CCardHeader>
+            <CCardBody>
+              <!-- Progress Bar Section -->
+              <div v-if="isLoading">
+                <CProgress :value="progressValue" class="mb-4">
+                  <CProgressBar :value="progressValue" color="primary">
+                    Extracting... {{ progressValue }}%
+                  </CProgressBar>
+                </CProgress>
+              </div>
+
+              <CForm>
+                <CRow>
+                  <CCol sm="12">
+                    <CCol sm="6">
+                      <CImg :src="billImageUrl" class="mb-2" responsive />
+                    </CCol>
+                  </CCol>
+                </CRow>
+                <CRow form class="form-group">
+                  <CCol sm="12">
+                    <WidgetsUploadImage
+                      :billImageUrl="billImageUrl"
+                      @uploaded="uploaded"
+                    />
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+            <CCardFooter>
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="extract"
+                :disabled="isLoading"
+                >Extract Info</CButton
+              >
+              <!-- <CButton  size="sm" color="primary" @click="downloadImage" >Download</CButton> -->
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                :href="billImageUrl"
+                download="download.jpg"
+                target="_blank"
+                 :disabled="isLoading"
+              >
+                Download
+              </CButton>
+            </CCardFooter>
+          </CCard>
+        </CCol>
+        <CCol sm="4">
+          <CCard>
+            <CCardHeader> <strong> Receipt </strong> Info </CCardHeader>
+            <CCardBody>
+              <CForm>
+                <!-- <CInput
+                  label="Created On"
+                  horizontal
+                  :value="getDisplayDateTime(obj.createdOn)"
+                  readonly
+                />
+                <CInput
+                  label="Document Id"
+                  horizontal
+                  :value="obj.documentId"
+                  readonly
+                />
+
+                <CSelect
+                  label="Document Type"
+                  horizontal
+                  :options="[
+                    'Receipt',
+                    'Invoice',
+                    'Cheque',
+                    'Purchase Order',
+                    'Credit Card',
+                    'Payment voucher',
+                    'Insurance policy',
+                    'Others (with amount)',
+                    'Others (no amount)',
+                  ]"
+                  :value.sync="obj.documentType"
+                /> -->
+                <!-- <CInput
+                  label="Profile"
+                  horizontal
+                  :value="getProfileEmail(obj)"
+                  readonly
+                /> -->
+                <!--  -->
+                <CInput
+                  label="Company Name"
+                  horizontal
+                  v-model="obj.companyName"
+                />
+                <!-- <CInput label="Bill No" horizontal v-model="obj.billNo" /> -->
+                <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label"> Date </CCol>
+                  <CCol sm="9">
+                    <input
+                      type="datetime-local"
+                      :value="computeBillDate"
+                      @change="setDateFilter"
+                      class="mr-2"
+                    />
+                  </CCol>
+                </CRow>
+                <CInput
+                  label="Total Amount"
+                  horizontal
+                  v-model="obj.totalAmount"
+                />
+
+                <CInput
+                  label="Chart of Account"
+                  horizontal
+                  readonly
+                  v-model="selectedChartOfAccount.name"
+                >
+                  <template #append>
+                    <CButton color="primary" @click="onSearchChartOfAccount()">
+                      Search
+                    </CButton>
+                  </template>
+                </CInput>
+
+                <!-- <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Is For ML?
+                  </CCol>
+                  <CCol sm="9">
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="obj.isUseForMLTraining"
+                      label-on="YES"
+                      label-off="NO"
+                    >
+                    </CSwitch>
+                  </CCol>
+                </CRow> -->
+              </CForm>
+            </CCardBody>
+            <CCardFooter>
+              <CButton
+                type="submit"
+                class="ml-1"
+                color="primary"
+                @click="submit"
+                >Save</CButton
+              >
+              <CButton class="ml-1" color="primary" @click="addNew"
+                >New</CButton
+              >
+              <CButton class="ml-1" color="primary" @click="previous"
+                >Prev</CButton
+              >
+              <CButton class="ml-1" color="primary" @click="next">Next</CButton>
+            </CCardFooter>
+          </CCard>
+        </CCol>
+      </CRow>
+    </div>
+
+    <div>
+      <CModal :show.sync="chartOfAccountSearchPopup" size="xl">
+        <CRow>
+          <CCol sm="12">
+            <CDataTable
+              :items="chartOfAccountList"
+              :fields="chartOfAccountFieldList"
+              column-filter
+              items-per-page-select
+              :items-per-page="10"
+              hover
+              sorter
+              pagination
+            >
+              <template #show_details="{ item, index }">
+                <td class="py-2">
+                  <CButton
+                    color="primary"
+                    variant="outline"
+                    square
+                    @click="onChartOfAccountSelected(item, index)"
+                  >
+                    Select
+                  </CButton>
+                </td>
+              </template>
+            </CDataTable>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
   </div>
 </template>
 
 <script>
+import ReceiptApi from "../../lib/receiptApi";
+import ResitAiApi from "@/lib/resitaiApi";
+import DocumentApi from "@/lib/documentApi";
+
+import ChartOfAccountApi from "../../lib/chartOfAccountApi";
+import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
+import moment from "moment";
 
 const chartOfAccountList = [];
 const chartOfAccountFieldList = [
@@ -20,12 +242,16 @@ const chartOfAccountFieldList = [
 ];
 
 export default {
-  name: "Bill",
+  name: "Receipt",
   components: {
     WidgetsUploadImage,
   },
   data: () => {
     return {
+      isLoading: false,  // Track loading state
+      progressValue: 0,  // Track progress
+      
+      documentApi: new DocumentApi(),
       chartOfAccountSearchPopup: false,
       chartOfAccountList: chartOfAccountList.map((item, id) => {
         return { ...item, id };
@@ -69,8 +295,9 @@ export default {
       submitted: false,
       drawType: "",
       drawingState: "",
-      api: new BillApi(),
-      ocrApi: new OcrApi(),
+      api: new ReceiptApi(),
+      resitAiApi: new ResitAiApi(),
+      // ocrApi: new OcrApi(),
       chartOfAccountApi: new ChartOfAccountApi(),
       loading: false,
     };
@@ -81,20 +308,6 @@ export default {
     window.addEventListener("resize", this.onResize);
     self.resetObj();
   },
-  // validations: {
-  //   obj: {
-  //     code: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //     name: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //   },
-  // },
   computed: {
     isBillImageUrl() {
       if (this.obj.documentId == null) return false;
@@ -103,9 +316,7 @@ export default {
     },
     billImageUrl() {
       var self = this;
-      return (
-        apiUrl + "documents/file/" + self.obj.documentId
-      );
+      return apiUrl + "documents/file/" + self.obj.documentId;
     },
     computeBillDate() {
       return moment(this.billDateTime).format("YYYY-MM-DDTHH:mm");
@@ -121,120 +332,113 @@ export default {
   },
 
   methods: {
-    extract() {
-      console.log(this.obj);
+    extractImageFromUrl(imageUrl) {
 
-      var companyPoints = "";
-      var datePoints = "";
-      var numberPoints = "";
-      var amountPoints = "";
-      var itemPoints = "";
+      this.isLoading = true;
+      this.progressValue = 0; // Reset progress
 
-      if (this.obj.drawCompany != null)
-        if (this.obj.drawCompany.points != null)
-          companyPoints = this.obj.drawCompany.points.join(",");
-      if (this.obj.drawDate != null) {
-        if (this.obj.drawDate.points != null) {
-          datePoints = this.obj.drawDate.points.join(",");
+      const interval = setInterval(() => {
+        if (this.progressValue < 95) {
+          this.progressValue += 5; // Simulate progress
         }
-      }
-      if (this.obj.drawBillNo != null)
-        if (this.obj.drawBillNo.points != null)
-          numberPoints = this.obj.drawBillNo.points.join(",");
-      if (this.obj.drawTotalAmount != null)
-        if (this.obj.drawTotalAmount.points != null)
-          amountPoints = this.obj.drawTotalAmount.points.join(",");
-      if (this.obj.drawBillItem != null)
-        if (this.obj.drawBillItem.points != null)
-          itemPoints = this.obj.drawBillItem.points.join(",");
+      }, 500);
 
-      var data = {
-        uri: this.billImageUrl,
-        company_box: companyPoints,
-        date_box: datePoints,
-        number_box: numberPoints,
-        amount_box: amountPoints,
-        item_box: itemPoints,
-      };
-
-      // var data = this.ocrApi.imageToText(data);
-
-      this.ocrApi
-        .imageToText(data)
+      // Fetch the image from the URL
+      fetch(imageUrl)
         .then((response) => {
-          console.log(response);
+          // Convert the response to a Blob
 
-          var tempObj = response;
-          if(tempObj.company != "")
-          {
-            this.obj.companyName = tempObj.company;
-          }
-
-          if(tempObj.date != "")
-          {
-            //2022-04-09 00:00:00
-            var dateObj = moment(tempObj.date, 'YYYY-MM-DD HH:mm:ss');
-            this.obj.date = dateObj.format();
-            this.billDateTime = this.obj.date;
-          }
-
-          if(tempObj.number != "")
-          {
-            this.obj.billNo = tempObj.number;
-          }
-          if(tempObj.amount != "")
-          {
-            this.obj.totalAmount = tempObj.amount;
-          }
-          // self.$router.push({ path: "/tenants/chartOfAccountList" });
+          return response.blob();
         })
-        .catch(({ data }) => {
-          this.toast("Error", helper.getErrorMessage(data), "danger");
+        .then((imageBlob) => {
+          // Create a FormData object to send the image Blob and OCR engine choice
+          const formData = new FormData();
+          formData.append("file", imageBlob, "image.jpg"); // Append the image as a Blob
+          formData.append("ocr_engine", "googlevision"); // Append the OCR engine
+
+          // Use your custom API wrapper to make the call
+          const resitAiApi = new ResitAiApi();
+          return resitAiApi.extract(formData); // Return the API call so we can chain the next .then()
+        })
+        .then((result) => {
+          // Handle the result of the extraction
+          this.progressValue = 100; // Complete progress
+          this.toast("Success", "Extracted info successfully", "success");
+
+          console.log(result);
+
+          // Assuming the result contains parsed data, populate the obj fields
+          this.obj.companyName = this.getMerchantName(result.parsed_data);
+          this.obj.billNo = result.parsed_data.billNo;
+          this.billDateTime = this.getDateTime(result.parsed_data);
+          this.obj.totalAmount = this.getAmount(result.parsed_data);
+          // ... map other fields as necessary
+        })
+        .catch((error) => {
+          // Handle any errors that occurred during the fetch or the API call
+          console.error("Error extracting data:", error);
+          this.toast("Error", "Failed to extract data.", "danger");
+        })
+        .finally(() => {
+          // Optionally, do something after the entire chain is complete, like hiding a loading spinner
+          console.log("Extraction process finished.");
+          clearInterval(interval);
+          this.isLoading = false; 
         });
+    },
+    getDateTime(parsedData) {
+      try {
+        // Extract the date part (YYYY-MM-DD) and time part (HH:MM)
+        const datePart = parsedData.date.split("T")[0]; // Extract just the date portion from the string
+        const timePart = parsedData.time; // The time is already in HH:MM format
+
+        // Combine the date and time into a full datetime string
+        const dateTimeString = `${datePart}T${timePart}:00`; // Add ":00" for the seconds part if necessary
+
+        // Convert to a JavaScript Date object
+        const dateTimeObject = new Date(dateTimeString);
+        console.log(dateTimeObject); // Output: 2024-09-06T09:10:00.000Z (or your local time zone)
+        return dateTimeObject;
+      } catch (error) {
+        return Date();
+      }
+    },
+    getAmount(parsedData) {
+      var amount = parsedData.amount;
+      try {
+        if (Array.isArray(amount)) {
+          // If it's an array, return the highest value
+          return Math.max(...amount);
+        } else {
+          // If it's a single value, return it directly
+          return amount;
+        }
+      } catch (error) {
+        return 0;
+      }
+    },
+
+    getMerchantName(parsedData) {
+      try {
+        return parsedData.merchant_name;
+      } catch (error) {
+        return "";
+      }
+    },
+    extract() {
+      this.extractImageFromUrl(this.billImageUrl);
+      // this.resitAiApi
+      //   .extract(data)
+      //   .then((response) => {
+      //     console.log(response);
+      //   })
+      //   .catch(({ data }) => {
+      //     this.toast("Error", helper.getErrorMessage(data), "danger");
+      //   });
     },
     getProfileEmail(item) {
       if (item.profile == null) return "N/A";
       return item.profile.email;
-    },
-    updatePolyCompany(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawCompany.points[pointFirstIndex] = x;
-      this.obj.drawCompany.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyDate(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawDate.points[pointFirstIndex] = x;
-      this.obj.drawDate.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyBillNo(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawBillNo.points[pointFirstIndex] = x;
-      this.obj.drawBillNo.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyTotalAmount(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawTotalAmount.points[pointFirstIndex] = x;
-      this.obj.drawTotalAmount.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyBillItem(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawBillItem.points[pointFirstIndex] = x;
-      this.obj.drawBillItem.points[pointFirstIndex + 1] = y;
     },
 
     onSearchChartOfAccount() {
@@ -259,250 +463,6 @@ export default {
     downloadImage() {},
     getDisplayDateTime(dt) {
       return moment(dt).format("DD/MM/YYYY HH:mm:ss");
-    },
-    onResize() {
-      return;
-      var stage = this.$refs.stage.getStage();
-      var container = document.querySelector("#stage-container");
-      var containerWidth = container.offsetWidth;
-      var sceneWidth = this.stageSize.width;
-      var sceneHeight = this.stageSize.height;
-      var scale = containerWidth / sceneWidth;
-
-      stage.width(sceneWidth * scale);
-      stage.height(sceneHeight * scale);
-      stage.scale({ x: scale, y: scale });
-    },
-    loadImage() {
-      const image = new window.Image();
-      image.src = this.billImageUrl;
-      image.crossOrigin = "anonymous";
-      image.onload = () => {
-        this.imageConfig.image = image;
-        this.stageSize.width = image.width;
-        this.stageSize.height = image.height;
-
-        this.onResize();
-      };
-    },
-    getLableInfo(item) {
-      if (item) return item.name;
-      return "";
-    },
-    getCenterOfShape(draw) {
-      if (draw == undefined) return [0, 0];
-      if (draw.points == undefined) return [0, 0];
-      if (draw.points.length < 2) return [0, 0];
-      return drawing.getCenterOfShape(draw.points);
-    },
-    getAnchors(item) {
-      var anchors = [];
-      // var room = item;
-      if (item == null) return [];
-      if (item.points == null) return [];
-      if (item.points.length == 0) return [];
-
-      for (let i = 0; i < item.points.length; i += 2) {
-        var anchorCode = item.code + "_points_" + i;
-        anchors.push({
-          // roomId: room.id,
-          // roomCode: room.code,
-          code: anchorCode,
-          pointFirstIndex: i,
-          x: item.points[i],
-          y: item.points[i + 1],
-        });
-      }
-      return anchors;
-    },
-
-    toolClick(item) {
-      switch (item) {
-        case "rotate":
-          {
-            this.imageConfig.rotation = this.imageConfig.rotation + 90;
-            this.imageConfig.x = this.imageConfig.image.height;
-
-            // this.$refs.image.rotation = 15;
-            this.$refs.stage.getStage().draw();
-          }
-          break;
-        default:
-          this.drawTypeSelect(item);
-          break;
-      }
-    },
-    drawTypeSelect(draw) {
-      if (draw == "cancel") {
-        this.handleDone();
-        this.drawType = "";
-        return;
-      }
-      this.drawType = draw;
-      this.drawingState = "";
-
-      this.analysisMethod = {
-        category: "",
-        method: "",
-      };
-
-      this.updateCursor("crosshair");
-      this.stroke = "yellow";
-    },
-    handleDone() {
-      this.drawingState = "end";
-      if (this.drawType === "companyName") {
-        this.handleDrawCompanyName();
-      } else if (this.drawType === "date") {
-        this.handleDrawDate();
-      } else if (this.drawType === "billNo") {
-        this.handleDrawBillNo();
-      } else if (this.drawType === "totalAmount") {
-        this.handleDrawTotalAmount();
-      } else if (this.drawType === "billItem") {
-        this.handleDrawBillItem();
-      }
-
-      this.updateCursor("default");
-    },
-
-    handleStageMouseClick(event) {
-      if (event.evt.button == 2) {
-        this.handleDone();
-        this.drawType = "";
-      } else {
-        console.log("handleStageMouseClick", this.drawType);
-
-        if (this.drawType === "companyName") {
-          this.handleDrawCompanyName();
-        } else if (this.drawType === "date") {
-          this.handleDrawDate();
-        } else if (this.drawType === "billNo") {
-          this.handleDrawBillNo();
-        } else if (this.drawType === "totalAmount") {
-          this.handleDrawTotalAmount();
-        } else if (this.drawType === "billItem") {
-          this.handleDrawBillItem();
-        }
-      }
-    },
-    handleDrawCompanyName() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawCompany = {
-          code: "companyName" + 1,
-          name: "Company Name" + 1,
-          points: [x, y],
-          stroke: "#FF0000",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FF0000", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawCompany.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawDate() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawDate = {
-          code: "date" + 1,
-          name: "Bill Date" + 1,
-          points: [x, y],
-          stroke: "#FFFF00",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FFFF00", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawDate.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-    handleDrawBillNo() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawBillNo = {
-          code: "bill" + 1,
-          name: "Bill No" + 1,
-          points: [x, y],
-          stroke: "#FF00FF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FF00FF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawBillNo.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawTotalAmount() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawTotalAmount = {
-          code: "total_amount" + 1,
-          name: "Total Amount" + 1,
-          points: [x, y],
-          stroke: "#0000FF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#0000FF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawTotalAmount.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawBillItem() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawBillItem = {
-          code: "bill_item",
-          name: "Bill Item",
-          points: [x, y],
-          stroke: "#0FFFFF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#0FFFFF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawBillItem.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
     },
 
     uploaded(data) {
@@ -559,7 +519,7 @@ export default {
           .create(self.obj)
           .then((response) => {
             self.obj = response.result;
-            self.$router.push({ path: `/tenants/Bill/${self.obj.id}` });
+            self.$router.push({ path: `/employee/Receipt/${self.obj.id}` });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -613,12 +573,9 @@ export default {
         drawCompany: {},
       };
     },
-    analyze() {
-
-      
-    },
+    analyze() {},
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/employee/Receipt" });
     },
     previous() {
       var self = this;
@@ -627,7 +584,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenants/Bill/${nextObj.id}`,
+            path: `/employee/Receipt/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
@@ -641,7 +598,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenants/Bill/${nextObj.id}`,
+            path: `/employee/Receipt/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
