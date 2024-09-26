@@ -18,7 +18,9 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Chart of Account </strong> List </CCardHeader>
+            <CCardHeader>
+              <strong> Chart of Account </strong> List
+            </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="items"
@@ -31,6 +33,12 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
+
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -96,8 +104,15 @@ import ChartOfAccountApi from "@/lib/chartOfAccountApi";
 
 const items = [];
 const fields = [
-  { key: "category"},
-  { key: "accountNo"},
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "accountNo" },
+  { key: "category" },
   { key: "name" },
   {
     key: "show_details",
@@ -107,8 +122,6 @@ const fields = [
     filter: false,
   },
 ];
-
-
 
 export default {
   name: "ChartOfAccountList",
@@ -141,7 +154,7 @@ export default {
       });
     },
     toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+      this.$set(item, "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -154,6 +167,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {

@@ -1,20 +1,6 @@
 <template>
   <div class="wrapper">
-    <div>
-      <CToaster :autohide="3000">
-        <template v-for="info in infoList">
-          <CToast
-            :key="info.message"
-            :show="true"
-            :header="info.header"
-            :color="info.color"
-          >
-            {{ info.message }}.
-          </CToast>
-        </template>
-      </CToaster>
-    </div>
-    <CDropdown
+    <CDropdown v-if="isTenantAdmin()"
       placement="bottom"
       :caret="false"
       in-nav
@@ -36,49 +22,12 @@
         :key="item.id"
         @click="changeBusiness(item)"
       >
-        <CIcon name="cil-basket" class="text-primary" /> {{ item.name }}
+        {{ item.name }}
       </CDropdownItem>
-
-      <!-- <CDropdownItem>
-      <CIcon name="cil-user-follow" class="text-success" /> New user registered
-    </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-user-unfollow" class="text-danger" /> User deleted
-    </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-chart-pie" class="text-info" /> Sales report is ready
-    </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-basket" class="text-primary" /> New client
-    </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-speedometer" class="text-warning" /> Server overloaded
-    </CDropdownItem>
-    <CDropdownHeader tag="div" class="text-center bg-light">
-      <strong>Server</strong>
-    </CDropdownHeader>
-    <CDropdownItem class="d-block">
-      <div class="text-uppercase mb-1">
-        <small><b>CPU Usage</b></small>
-      </div>
-      <CProgress class="progress-xs" color="info" :value="25" />
-      <small class="text-muted">348 Processes. 1/4 Cores.</small>
-    </CDropdownItem>
-    <CDropdownItem class="d-block">
-      <div class="text-uppercase mb-1">
-        <small><b>Memory Usage</b></small>
-      </div>
-      <CProgress class="progress-xs" color="warning" :value="70" />
-      <small class="text-muted">11444GB/16384MB</small>
-    </CDropdownItem>
-    <CDropdownItem class="d-block">
-      <div class="text-uppercase mb-1">
-        <small><b>SSD 1 Usage</b></small>
-      </div>
-      <CProgress class="progress-xs" color="danger" :value="90" />
-      <small class="text-muted">243GB/256GB</small>
-    </CDropdownItem> -->
     </CDropdown>
+    <div v-else>
+      {{ currentBusinessShortName }}
+    </div>
   </div>
 </template>
 <script>
@@ -108,14 +57,18 @@ export default {
     currentBusinessShortName() {
       try {
         return this.currentProfile.defaultBusiness.shortName;
-        
       } catch (error) {
-        return "???"
+        return "???";
       }
     },
   },
 
   methods: {
+    isTenantAdmin() {
+      var role = auth.getRole();
+      if (role == "TenantAdmin") return true;
+      return false;
+    },
     initalize() {
       this.fetchCurrentProfile();
       this.fetchBusinessList();
@@ -146,7 +99,7 @@ export default {
         .getCurrentProfile()
         .then((response) => {
           self.currentProfile = response.result;
-          console.log(self.currentProfile);
+          // console.log(self.currentProfile);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -158,7 +111,7 @@ export default {
         .getListByCurrentTenant()
         .then((response) => {
           self.businessList = response.result;
-          console.log(self.businessList);
+          // console.log(self.businessList);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");

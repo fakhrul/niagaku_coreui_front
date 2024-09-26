@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_image="{ item }">
                   <td class="py-2">
                     <CImg
@@ -112,10 +117,17 @@ import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "createdOn" },
+  // { key: "createdOn" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
   { key: "date" },
   { key: "companyName" },
-  { key: "billNo" },
+  // { key: "billNo" },
   { key: "totalAmount" },
   {
     key: "show_image",
@@ -159,14 +171,21 @@ export default {
           ...item,
           createdOn: this.getDisplayDateTime(item.createdOn),
           date: this.getDisplayDateTime(item.date),
+          companyName: this.getCompanyName(item),
+          totalAmount: item.totalAmount.toFixed(2)
         };
       });
     },
   },
   methods: {
+    getCompanyName(item)
+    {
+if(item.companyName)
+return item.companyName;
+return "N/A";
+    },
     getImage(item) {
-      var url =
-        apiUrl + "documents/file/" + item.documentId;
+      var url = apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 
@@ -193,7 +212,7 @@ export default {
       self.loading = true;
       // self.items = floorPlanData;
       self.api
-        .getList()
+        .getListByCurrentUser()
         .then((response) => {
           self.items = response.result;
           self.loading = false;
@@ -236,7 +255,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/employee/Receipt" });
     },
     toast(header, message, color) {
       var self = this;

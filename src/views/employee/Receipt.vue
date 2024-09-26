@@ -55,17 +55,17 @@
                 >Extract Info</CButton
               >
               <!-- <CButton  size="sm" color="primary" @click="downloadImage" >Download</CButton> -->
-              <CButton
+              <!-- <CButton
                 type="submit"
                 class="ml-1"
                 color="primary"
                 :href="billImageUrl"
                 download="download.jpg"
                 target="_blank"
-                 :disabled="isLoading"
+                :disabled="isLoading"
               >
                 Download
-              </CButton>
+              </CButton> -->
             </CCardFooter>
           </CCard>
         </CCol>
@@ -74,46 +74,11 @@
             <CCardHeader> <strong> Receipt </strong> Info </CCardHeader>
             <CCardBody>
               <CForm>
-                <!-- <CInput
-                  label="Created On"
-                  horizontal
-                  :value="getDisplayDateTime(obj.createdOn)"
-                  readonly
-                />
-                <CInput
-                  label="Document Id"
-                  horizontal
-                  :value="obj.documentId"
-                  readonly
-                />
-
-                <CSelect
-                  label="Document Type"
-                  horizontal
-                  :options="[
-                    'Receipt',
-                    'Invoice',
-                    'Cheque',
-                    'Purchase Order',
-                    'Credit Card',
-                    'Payment voucher',
-                    'Insurance policy',
-                    'Others (with amount)',
-                    'Others (no amount)',
-                  ]"
-                  :value.sync="obj.documentType"
-                /> -->
-                <!-- <CInput
-                  label="Profile"
-                  horizontal
-                  :value="getProfileEmail(obj)"
-                  readonly
-                /> -->
-                <!--  -->
                 <CInput
                   label="Company Name"
                   horizontal
                   v-model="obj.companyName"
+                  @input="onCompanyNameChange"
                 />
                 <!-- <CInput label="Bill No" horizontal v-model="obj.billNo" /> -->
                 <CRow form class="form-group">
@@ -132,35 +97,20 @@
                   horizontal
                   v-model="obj.totalAmount"
                 />
-
-                <CInput
-                  label="Chart of Account"
-                  horizontal
-                  readonly
-                  v-model="selectedChartOfAccount.name"
-                >
-                  <template #append>
-                    <CButton color="primary" @click="onSearchChartOfAccount()">
-                      Search
-                    </CButton>
-                  </template>
-                </CInput>
-
-                <!-- <CRow form class="form-group">
+                <CRow form class="form-group">
                   <CCol tag="label" sm="3" class="col-form-label">
-                    Is For ML?
+                    Chart of Account
                   </CCol>
                   <CCol sm="9">
-                    <CSwitch
-                      class="mr-1"
-                      color="primary"
-                      :checked.sync="obj.isUseForMLTraining"
-                      label-on="YES"
-                      label-off="NO"
-                    >
-                    </CSwitch>
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedChartOfAccount"
+                      :label="'name'"
+                      :options="chartOfAccountItems"
+                      placeholder="Select COA"
+                    />
                   </CCol>
-                </CRow> -->
+                </CRow>
               </CForm>
             </CCardBody>
             <CCardFooter>
@@ -183,38 +133,6 @@
         </CCol>
       </CRow>
     </div>
-
-    <div>
-      <CModal :show.sync="chartOfAccountSearchPopup" size="xl">
-        <CRow>
-          <CCol sm="12">
-            <CDataTable
-              :items="chartOfAccountList"
-              :fields="chartOfAccountFieldList"
-              column-filter
-              items-per-page-select
-              :items-per-page="10"
-              hover
-              sorter
-              pagination
-            >
-              <template #show_details="{ item, index }">
-                <td class="py-2">
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                    square
-                    @click="onChartOfAccountSelected(item, index)"
-                  >
-                    Select
-                  </CButton>
-                </td>
-              </template>
-            </CDataTable>
-          </CCol>
-        </CRow>
-      </CModal>
-    </div>
   </div>
 </template>
 
@@ -226,71 +144,26 @@ import DocumentApi from "@/lib/documentApi";
 import ChartOfAccountApi from "../../lib/chartOfAccountApi";
 import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
 import moment from "moment";
-
-const chartOfAccountList = [];
-const chartOfAccountFieldList = [
-  { key: "category" },
-  { key: "accountNo" },
-  { key: "name" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-];
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 export default {
   name: "Receipt",
   components: {
     WidgetsUploadImage,
+    vSelect,
   },
   data: () => {
     return {
-      isLoading: false,  // Track loading state
-      progressValue: 0,  // Track progress
-      
+      selectedChartOfAccount: null,
+      chartOfAccountItems: [],
+      isLoading: false, // Track loading state
+      isLoadingSearchChartOfAccount: false,
+      progressValue: 0, // Track progress
       documentApi: new DocumentApi(),
-      chartOfAccountSearchPopup: false,
-      chartOfAccountList: chartOfAccountList.map((item, id) => {
-        return { ...item, id };
-      }),
-      chartOfAccountFieldList,
-      selectedChartOfAccount: {
-        id: null,
-        name: "",
-      },
-      imageConfig: {
-        x: 0,
-        y: 0,
-        offset: {
-          x: 0,
-          y: 0,
-        },
-        image: null,
-        rotation: 0,
-      },
-      organizationTypeList: [],
       infoList: [],
       uploadedFiles: [],
-      // image: null,
-      stageSize: {
-        width: 20,
-        height: 20,
-      },
-      obj: {
-        drawCompanyId: "",
-        drawCompany: {
-          code: "",
-          name: "",
-        },
-        date: new Date(),
-        documentId: "",
-        assemblyLessConcentrated: "",
-        standingSpace: "",
-        kitchen: "",
-      },
+      obj: {},
       billDateTime: new Date(),
       submitted: false,
       drawType: "",
@@ -304,16 +177,16 @@ export default {
   },
   mounted() {
     var self = this;
-    // self.refreshOrganizationType();
-    window.addEventListener("resize", this.onResize);
+
+    self.refreshChartOfAccount();
     self.resetObj();
+
+    this.debounceSearchChartOfAccount = this.debounce(
+      this.searchChartOfAccount,
+      1000 // Adjust the delay as needed
+    );
   },
   computed: {
-    isBillImageUrl() {
-      if (this.obj.documentId == null) return false;
-      if (this.obj.documentId == "") return false;
-      return true;
-    },
     billImageUrl() {
       var self = this;
       return apiUrl + "documents/file/" + self.obj.documentId;
@@ -322,18 +195,59 @@ export default {
       return moment(this.billDateTime).format("YYYY-MM-DDTHH:mm");
     },
   },
-  watch: {
-    obj(newVal, oldVal) {
-      console.log("obj", newVal);
-    },
-    drawingMeta(newVal, oldVal) {
-      console.log("drawingMeta value changed", newVal);
-    },
-  },
 
   methods: {
-    extractImageFromUrl(imageUrl) {
+    // Wrap the search function in debounce
+    // Debounce function added here
+    debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    },
 
+    searchChartOfAccount(merchantName) {
+      console.log("searchChartOfAccount", merchantName);
+
+      var suggestDto = {
+       businessId: this.obj.businessId,
+        merchantName: merchantName,
+      };
+
+      this.isLoadingSearchChartOfAccount = true;
+      this.chartOfAccountApi
+        .suggestChartOfAccount(suggestDto)
+        .then((response) => {
+          console.log(response.result);
+          this.selectedChartOfAccount = response.result;
+        })
+        .catch((error) => {
+          console.error("Error suggesting chart of account:", error);
+        })
+        .finally(() => {
+          this.isLoadingSearchChartOfAccount = false;
+        });
+    },
+
+    debounceSearchChartOfAccount: null,
+    onCompanyNameChange() {
+      // Trigger the debounced search function whenever the company name changes
+      this.debounceSearchChartOfAccount(this.obj.companyName);
+    },
+
+    refreshChartOfAccount() {
+      var self = this;
+      self.chartOfAccountApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.chartOfAccountItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+    extractImageFromUrl(imageUrl) {
       this.isLoading = true;
       this.progressValue = 0; // Reset progress
 
@@ -372,6 +286,8 @@ export default {
           this.obj.billNo = result.parsed_data.billNo;
           this.billDateTime = this.getDateTime(result.parsed_data);
           this.obj.totalAmount = this.getAmount(result.parsed_data);
+
+          this.debounceSearchChartOfAccount(this.obj.companyName);
           // ... map other fields as necessary
         })
         .catch((error) => {
@@ -383,7 +299,7 @@ export default {
           // Optionally, do something after the entire chain is complete, like hiding a loading spinner
           console.log("Extraction process finished.");
           clearInterval(interval);
-          this.isLoading = false; 
+          this.isLoading = false;
         });
     },
     getDateTime(parsedData) {
@@ -427,39 +343,8 @@ export default {
     },
     extract() {
       this.extractImageFromUrl(this.billImageUrl);
-      // this.resitAiApi
-      //   .extract(data)
-      //   .then((response) => {
-      //     console.log(response);
-      //   })
-      //   .catch(({ data }) => {
-      //     this.toast("Error", helper.getErrorMessage(data), "danger");
-      //   });
-    },
-    getProfileEmail(item) {
-      if (item.profile == null) return "N/A";
-      return item.profile.email;
     },
 
-    onSearchChartOfAccount() {
-      var self = this;
-      self.refreshTableChartOfAccount();
-      self.chartOfAccountSearchPopup = true;
-    },
-
-    refreshTableChartOfAccount() {
-      var self = this;
-      self.loading = true;
-      self.chartOfAccountList = [];
-      self.chartOfAccountApi
-        .getList()
-        .then((response) => {
-          self.chartOfAccountList = response.result;
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
-    },
     downloadImage() {},
     getDisplayDateTime(dt) {
       return moment(dt).format("DD/MM/YYYY HH:mm:ss");
@@ -470,14 +355,14 @@ export default {
       self.uploadedFiles = data.uploadedFiles;
       if (self.uploadedFiles.length > 0) {
         self.obj.documentId = self.uploadedFiles[0].id;
-        this.loadImage();
+        // this.loadImage();
       }
       // console.log(data);
     },
-    updateCursor(cursor) {
-      let stage = this.$refs.stage.getStage();
-      stage.container().style.cursor = cursor;
-    },
+    // updateCursor(cursor) {
+    //   let stage = this.$refs.stage.getStage();
+    //   stage.container().style.cursor = cursor;
+    // },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -485,13 +370,10 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            self.obj.totalAmount = self.obj.totalAmount.toFixed(2); 
+            console.log(self.obj);
             self.billDateTime = self.obj.date;
             self.selectedChartOfAccount = self.obj.chartAccount;
-            if (self.selectedChartOfAccount == null)
-              self.selectedChartOfAccount = {
-                name: "",
-              };
-            self.loadImage();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -508,7 +390,13 @@ export default {
       var self = this;
 
       self.obj.date = moment(self.billDateTime).format();
-
+      if (self.selectedChartOfAccount) {
+        self.obj.chartAccount = self.selectedChartOfAccount;
+        self.obj.chartAccountId = self.selectedChartOfAccount.id;
+      } else {
+        self.obj.chartAccount = null;
+        self.obj.chartAccountId = null;
+      }
       // if (self.uploadedFiles.length > 0)
       //   self.obj.documentId = self.uploadedFiles[0].id;
 
@@ -615,12 +503,12 @@ export default {
       this.$router.push({ path: "/tenant/maplist" });
     },
 
-    onChartOfAccountSelected(item, index) {
-      var self = this;
-      self.selectedChartOfAccount = item;
-      self.obj.chartAccountId = item.id.toString();
-      self.chartOfAccountSearchPopup = false;
-    },
+    // onChartOfAccountSelected(item, index) {
+    //   var self = this;
+    //   self.selectedChartOfAccount = item;
+    //   self.obj.chartAccountId = item.id.toString();
+    //   self.chartOfAccountSearchPopup = false;
+    // },
   },
 };
 </script>

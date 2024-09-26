@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_image="{ item }">
                   <td class="py-2">
                     <CImg
@@ -106,15 +111,24 @@
 </template>
 
 <script>
-import BillApi from "@/lib/billApi";
+// import BillApi from "@/lib/billApi";
+import ReceiptApi from "@/lib/receiptApi";
 import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "createdOn" },
+  // { key: "createdOn" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
   { key: "date" },
+  { key: "profileName", label: "Profile" },
   { key: "companyName" },
-  { key: "billNo" },
+  // { key: "billNo" },
   { key: "totalAmount" },
   {
     key: "show_image",
@@ -142,7 +156,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new BillApi(),
+      api: new ReceiptApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -158,14 +172,27 @@ export default {
           ...item,
           createdOn: this.getDisplayDateTime(item.createdOn),
           date: this.getDisplayDateTime(item.date),
+          companyName: this.getCompanyName(item),
+          totalAmount: item.totalAmount.toFixed(2),
+          profileName: this.getProfileName(item),
         };
       });
     },
   },
   methods: {
+    getProfileName(item) {
+      try {
+        return item.profile.fullName;
+      } catch (error) {
+        return "N/A";
+      }
+    },
+    getCompanyName(item) {
+      if (item.companyName) return item.companyName;
+      return "N/A";
+    },
     getImage(item) {
-      var url =
-        apiUrl + "documents/file/" + item.documentId;
+      var url = apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 
@@ -192,7 +219,7 @@ export default {
       self.loading = true;
       // self.items = floorPlanData;
       self.api
-        .getList()
+        .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
           self.loading = false;
@@ -211,7 +238,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Bill/${item.id}`,
+        path: `/tenants/Receipt/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -235,7 +262,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/tenants/Receipt" });
     },
     toast(header, message, color) {
       var self = this;

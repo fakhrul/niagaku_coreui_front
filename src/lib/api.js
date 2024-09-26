@@ -28,6 +28,17 @@ class Api {
 
                 })
                 .catch((error) => {
+                    console.log('call', error);
+                    console.log('call2', error.request.status);
+
+                    if(error.request.status == 401)
+                    {
+                        window.localStorage.removeItem('token');
+                        window.localStorage.removeItem('user');
+                
+                        reject(error.request);
+                    }
+
                     if (error.response) {
                         error.response.data
                          // The request was made and the server responded with a status code
@@ -50,6 +61,7 @@ class Api {
                         reject(error.message);
                     }
                    
+
                     //response.data = response;
                     //console.log(response)
                     // console.log(response)

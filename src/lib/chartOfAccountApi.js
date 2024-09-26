@@ -18,6 +18,14 @@ class ChartOfAccountApi {
             });
     }
 
+    suggestChartOfAccount(data) {
+        var url = apiUrl + 'chartAccounts/suggest-account';
+        return api.call('post', url, data)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
 
     get(id) {
         var url = apiUrl + 'chartAccounts/';

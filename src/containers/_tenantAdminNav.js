@@ -2,22 +2,22 @@ export default [
   {
     _name: 'CSidebarNav',
     _children: [
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Tenant Admin'],
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Subscription',
-        to: '/tenants/subscriptionList',
-        icon: 'cilTags'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Business',
-        to: '/tenants/businessList',
-        icon: 'cilIndustry'
-      },
+      // {
+      //   _name: 'CSidebarNavTitle',
+      //   _children: ['Tenant Admin'],
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Subscription',
+      //   to: '/tenants/subscriptionList',
+      //   icon: 'cilTags'
+      // },
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: 'Business',
+      //   to: '/tenants/businessList',
+      //   icon: 'cilIndustry'
+      // },
       {
         _name: 'CSidebarNavTitle',
         _children: ['Company'],

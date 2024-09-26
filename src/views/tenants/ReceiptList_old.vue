@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Quotation </strong> List </CCardHeader>
+            <CCardHeader> <strong> Bill </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -31,14 +31,14 @@
                 pagination
                 :loading="loading"
               >
-                <template #show_status="{ item }">
-                  <td>
-                    <CBadge
-                      :color="
-                        getQuotationStatusBadgeColor(item.statusDescription)
-                      "
-                      >{{ item.statusDescription }}</CBadge
-                    >
+                <template #show_image="{ item }">
+                  <td class="py-2">
+                    <CImg
+                      thumbnail
+                      :src="getImage(item)"
+                      height="70"
+                      width="70"
+                    />
                   </td>
                 </template>
 
@@ -61,6 +61,9 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
+                      <!-- <p class="text-muted">Code: {{ item.code }}</p>
+                      <p class="text-muted">Name: {{ item.name }}</p>
+                       -->
                       <CButton
                         size="sm"
                         color="info"
@@ -103,16 +106,21 @@
 </template>
 
 <script>
-import QuotationApi from "@/lib/quotationApi";
+import BillApi from "@/lib/billApi";
+import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "quotationNumber" },
-  { key: "customerName" },
-  { key: "grandTotal" },
+  { key: "createdOn" },
+  { key: "date" },
+  { key: "companyName" },
+  { key: "billNo" },
+  { key: "totalAmount" },
+  {
+    key: "show_image",
+    label: "Image",
+  },
 
-  { key: "show_status", label: "Status" },
-  // { key: "statusDescription" },
   {
     key: "show_details",
     label: "",
@@ -123,10 +131,10 @@ const fields = [
 ];
 
 export default {
-  name: "QuotationList",
+  name: "BillList",
   data() {
     return {
-      loading: true,
+      loading: false,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
@@ -134,7 +142,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new QuotationApi(),
+      api: new BillApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -148,45 +156,21 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          customerName: this.getCustomerName(item),
-          grandTotal: this.getGrandTotal(item),
+          createdOn: this.getDisplayDateTime(item.createdOn),
+          date: this.getDisplayDateTime(item.date),
         };
       });
     },
   },
-
   methods: {
-    getCustomerName(item)
-    {
-if(item.customer)
-{
-  return item.customer.name;
-}
-return "N/A";
+    getImage(item) {
+      var url =
+        apiUrl + "documents/file/" + item.documentId;
+      return url;
     },
-    getGrandTotal(quotation) {
-      console.log('grandTotal', quotation);
-      var total = 0;
-      for (var i = 0; i < quotation.items.length; i++) {
-        var item = quotation.items[i];
-        total += item.price * item.quantity;
-      }
-      return total.toFixed(2);
-    },
-    getQuotationStatusBadgeColor(status) {
-      return status === "Draft"
-        ? "secondary"
-        : status === "Accepted"
-        ? "primary"
-        : status === "Sent"
-        ? "success"
-        : status === "Rejected"
-        ? "warning"
-        : status === "ShowRoom"
-        ? "info"
-        : status === "Cancelled"
-        ? "danger"
-        : "secondary";
+
+    getDisplayDateTime(dt) {
+      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
     },
     toast(header, message, color) {
       var self = this;
@@ -196,8 +180,8 @@ return "N/A";
         color: color,
       });
     },
-    toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+    toggleDetails(item) {
+      this.$set(item, "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -205,22 +189,29 @@ return "N/A";
     },
     refreshTable() {
       var self = this;
-      self.loading = false;
+      self.loading = true;
+      // self.items = floorPlanData;
       self.api
-        .getListByCurrentBusiness()
+        .getList()
         .then((response) => {
           self.items = response.result;
-          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
+          self.loading = false;
         });
     },
+    // onAddLocation(item) {
+    //   var self = this;
+    //   self.$router.push({
+    //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
+    //   });
+    // },
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Quotation/${item.id}`,
+        path: `/tenants/Bill/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -233,6 +224,7 @@ return "N/A";
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
           });
       }
       self.itemToDelete = {};
@@ -243,7 +235,7 @@ return "N/A";
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Quotation" });
+      this.$router.push({ path: "/tenants/Bill" });
     },
     toast(header, message, color) {
       var self = this;

@@ -35,6 +35,7 @@ import {
 
 
 import {
+  cilPen,
   cilLockUnlocked,
   cilRestaurant,
   cilCalendarCheck,
@@ -145,8 +146,9 @@ import { logo } from './logo'
 
 
 export const iconsSet = Object.assign({}, { logo }, {
+  cilPen,
   cilLockUnlocked,
-    cilRestaurant,
+  cilRestaurant,
   cilCalendarCheck,
   cilTransfer,
   cilListLowPriority,

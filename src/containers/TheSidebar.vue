@@ -34,9 +34,13 @@
 import adminNav from "./_adminNav";
 import tenantAdminNav from "./_tenantAdminNav";
 import accountantNav from "./_accountantNav";
+import nav from "./_nav";
+
+import accountantNavMyLedger from "./_accountantNavMyLedger";
+import navMyLedger from "./_navMyLedger";
+
 import { mapState } from "vuex"; // Import Vuex helpers
 
-import nav from "./_nav";
 
 export default {
   name: "TheSidebar",
@@ -48,7 +52,7 @@ export default {
     };
   },
   computed: {
-     ...mapState({
+    ...mapState({
       // logoUrl: (state) => state.logoUrl, // Access the logo from Vuex
       logoUrl: (state) => state.logoUrl || "/logo.png", // Access the logo from Vuex
       primaryColor: (state) => state.primaryColor || "#756CFB", // Access the primary color from Vuex
@@ -62,19 +66,33 @@ export default {
     navigation() {
       try {
         var role = auth.getRole();
-        console.log("role", role);
-        if (role == "SystemAdmin") {
-          return adminNav;
-        } else if (role == "TenantAdmin") {
-          return tenantAdminNav;
-        } else if (role == "Accountant") {
-          return accountantNav;
+        // console.log("role", role);
+        const fullDomain = window.location.hostname;
+
+        console.log(fullDomain);
+        if (fullDomain == "myledger.safa.com.my") {
+          if (role == "SystemAdmin") {
+            return adminNav;
+          } else if (role == "TenantAdmin") {
+            return tenantAdminNav;
+          } else if (role == "Accountant") {
+            return accountantNavMyLedger;
+          } else {
+            return navMyLedger;
+          }
         } else {
-          return nav;
+          if (role == "SystemAdmin") {
+            return adminNav;
+          } else if (role == "TenantAdmin") {
+            return tenantAdminNav;
+          } else if (role == "Accountant") {
+            return accountantNav;
+          } else {
+            return nav;
+          }
         }
       } catch (error) {}
       return nav;
-
     },
   },
 };

@@ -22,7 +22,7 @@
           <CCard class="mx-4 mb-0">
             <CCardBody class="p-4">
               <div class="text-center mb-4">
-                <img src="/img/logo.png" alt="Niaga-ku Logo" class="img-fluid mb-3" style="max-height: 80px;" />
+                <img src="/img/logo.png" alt="Logo" class="img-fluid mb-3" style="max-height: 80px;" />
                 <h1 class="text-primary" style="color: #756CFB;">Login</h1>
                 <p class="text-muted">Sign in to your account</p>
               </div>

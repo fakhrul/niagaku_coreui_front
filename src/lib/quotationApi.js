@@ -1,6 +1,14 @@
 
 class QuotationApi {
     
+    getNextNumber() {
+        var url = apiUrl + 'quotations/next-number';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     getQuotationStatus() {
         var url = apiUrl + 'quotations/states';
         return api.call('get', url)

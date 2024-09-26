@@ -37,7 +37,6 @@ export default {
         .getByDomain(fullDomain)
         .then((response) => {
           const obj = response.result;
-          console.log(obj);
           obj.logoUrl = this.getFullLogoUrl(obj.logoUrl);
           obj.faviconUrl = this.getFullLogoUrl(obj.faviconUrl);
           // Commit branding data to Vuex

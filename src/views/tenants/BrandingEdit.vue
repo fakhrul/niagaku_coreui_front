@@ -17,10 +17,11 @@
         <CCard>
           <CCardHeader> <strong>General</strong> Branding </CCardHeader>
           <CCardBody>
-            <CForm>
+            <CForm >
               <CRow form>
                 <CCol md="6">
                   <CInput
+                  
                     label="Custom Domain"
                     v-model="obj.tenant.domainName"
                   />
@@ -52,7 +53,7 @@
                 ></CCol>
                 <CCol md="6"
                   ><CFormGroup wrapperClasses="input-group pt-2">
-                    <template #label> Company Chop </template>
+                    <template #label> Favorite Icon </template>
                     <template #input>
                       <div style="width: 100%">
                         <CRow>

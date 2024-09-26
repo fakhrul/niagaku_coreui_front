@@ -49,91 +49,61 @@
           </CRow>
         </div>
 
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Item & Description</th>
-              <th class="text-center">Quantity</th>
-              <th class="text-center">
-                Price ({{ quotation.business.currency }})
-              </th>
-              <th class="text-center">
-                Total ({{ quotation.business.currency }})
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in computedQuotationItems" :key="item.name">
-              <td>{{ item.position }}</td>
-              <td>
-                <p>
-                  <strong>{{ item.product.name }}</strong>
-                </p>
-                <p>{{ item.description }}</p>
-              </td>
-              <td class="text-center">{{ item.quantity }}</td>
-              <td class="text-right">{{ item.price.toFixed(2) }}</td>
-              <td class="text-right">
-                {{ item.totalAmountPerItem.toFixed(2) }}
-              </td>
-            </tr>
+        <div class="table-wrapper">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item & Description</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-center">
+                  Price ({{ quotation.business.currency }})
+                </th>
+                <th class="text-center">
+                  Total ({{ quotation.business.currency }})
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in computedQuotationItems" :key="item.name">
+                <td>{{ item.position }}</td>
+                <td>
+                  <p>
+                    <strong>{{ item.product.name }}</strong>
+                  </p>
+                  <p>{{ item.description }}</p>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right">{{ item.price.toFixed(2) }}</td>
+                <td class="text-right">
+                  {{ item.totalAmountPerItem.toFixed(2) }}
+                </td>
+              </tr>
 
-            <!-- <tr>
-              <td><strong>Total Amount Due</strong></td>
-              <td>
-                <strong>{{ getTotalAmountDue() }}</strong>
-              </td>
-            </tr> -->
+              <!-- Grand Total Row -->
+              <tr>
+                <td colspan="4" class="text-right">
+                  <strong>Total</strong>
+                </td>
+                <td class="text-right">
+                  <strong>{{ grandTotal }}</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-            <!-- Grand Total Row -->
-            <tr>
-              <td colspan="4" class="text-right">
-                <strong>Total</strong>
-              </td>
-              <td class="text-right">
-                <strong>{{ grandTotal }}</strong>
-              </td>
-            </tr>
-            <!-- <tr>
-              <td>
-                <strong>Total Amount </strong>
-                {{ stock.sale.loan.bank.name }}
-              </td>
-              <td>
-                <strong>{{ getNetAmountDue() }}</strong>
-              </td>
-            </tr>  -->
-          </tbody>
-        </table>
         <!-- Terms and Conditions Section -->
         <div v-if="quotation.note" class="terms-and-conditions mt-4">
           <h4>Terms and Conditions</h4>
           <p v-html="formatNote(quotation.note)"></p>
         </div>
-
-        <!--
-        <div class="vehicle-details">
-          <p><strong>Chassis No:</strong> {{ getVehicleChasisNo() }}</p>
-          <p><strong>Engine No:</strong> {{ getVehicleEngineNo() }}</p>
-          <p><strong>Regn. No:</strong> {{ getPlateNo() }}</p>
-          <p><strong>Model:</strong> {{ getBrandModelNo() }}</p>
-        </div>-->
-        <!-- <div class="signature text-right">
-          <p>{{ quotation.business.name }}</p>
-        </div>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />  -->
       </CCardBody>
     </CCard>
   </div>
 </template>
 
 <script>
-// import html2pdf from "html2pdf.js";
 import moment from "moment";
 
 export default {
@@ -155,13 +125,15 @@ export default {
       });
     },
     grandTotal() {
-      // Calculate the grand total by summing up the total amount per item
       return this.computedQuotationItems
         .reduce((acc, item) => {
           return acc + item.totalAmountPerItem;
         }, 0)
         .toFixed(2);
     },
+  },
+  mounted() {
+    this.forceA4Size();
   },
   methods: {
     formatNote(note) {
@@ -174,76 +146,11 @@ export default {
         return 0;
       }
     },
-
     getQuotationIssuedDate() {
       return moment(this.quotation.issuedDate).format("DD/MM/YYYY");
     },
     getQuotationExpiryDate() {
       return moment(this.quotation.expiryDate).format("DD/MM/YYYY");
-    },
-    getNetAmountDue() {
-      var totalAmount = this.getTotalAmountDue() - this.getTotalLess();
-      return totalAmount.toFixed(2);
-    },
-    getTotalLess() {
-      var totalAmount = 0;
-      try {
-        totalAmount =
-          this.stock.sale.depositAmount + this.stock.sale.tradeInAmount;
-      } catch (error) {}
-      return totalAmount.toFixed(2);
-    },
-    getTotalAmountDue() {
-      var totalAmount = 0;
-      try {
-        totalAmount = this.stock.sale.saleAmount;
-        for (
-          var i = 0;
-          i < this.stock.adminitrativeCost.adminitrativeCostItems.length;
-          i++
-        ) {
-          totalAmount +=
-            this.stock.adminitrativeCost.adminitrativeCostItems[i].amount;
-        }
-      } catch (error) {}
-      return totalAmount.toFixed(2);
-    },
-    getSellingPrice() {
-      try {
-        return this.stock.sale.saleAmount.toFixed(2);
-      } catch (error) {
-        return null;
-      }
-    },
-    getPlateNo() {
-      try {
-        return this.stock.registration.vehicleRegistrationNumber;
-      } catch (error) {
-        return "N/A";
-      }
-    },
-    getBrandModelNo() {
-      try {
-        return (
-          this.stock.vehicle.brand.name + " - " + this.stock.vehicle.model.name
-        );
-      } catch (error) {
-        return "N/A";
-      }
-    },
-    getVehicleEngineNo() {
-      try {
-        return this.stock.vehicle.engineNo;
-      } catch (error) {
-        return "N/A";
-      }
-    },
-    getVehicleChasisNo() {
-      try {
-        return this.stock.vehicle.chasisNo;
-      } catch (error) {
-        return "N/A";
-      }
     },
     getCustomerAddress() {
       try {
@@ -259,30 +166,9 @@ export default {
         return "N/A";
       }
     },
-    getCustomerIcNumber() {
-      try {
-        return this.stock.sale.customer.icNumber;
-      } catch (error) {
-        return "N/A";
-      }
-    },
-    removeTrailingSlash(str) {
-      if (str.endsWith("/")) {
-        return str.slice(0, -1);
-      }
-      return str;
-    },
-    getImageChopUrl() {
-      var url =
-        this.removeTrailingSlash(apiUrl) +
-        this.quotation.business.companyChopUrl;
-      return url;
-    },
     getImageUrl() {
       try {
-        var url =
-          this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
-        return url;
+        return this.quotation.business.logoUrl;
       } catch (error) {
         return "";
       }
@@ -290,32 +176,75 @@ export default {
     formatAddress(address) {
       return address.replace(/\n/g, "<br />");
     },
-    saveAsPDF() {
-      const element = this.$refs.pdfContent;
-      const options = {
-        margin: [0.5, 0.5, 0.5, 0.5], // Top, right, bottom, left
-        filename: "Invoice.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-      };
-      html2pdf().from(element).set(options).save();
+    forceA4Size() {
+      const pdfContent = this.$refs.pdfContent;
+      if (pdfContent) {
+        // Ensure the size is recalculated and displayed correctly
+        pdfContent.style.width = "210mm";
+        pdfContent.style.height = "297mm";
+      }
     },
     printContent() {
-      const printContents = this.$refs.pdfContent.innerHTML;
-      const originalContents = document.body.innerHTML;
+      this.forceA4Size(); // Ensure the content is set to A4 size
+      setTimeout(() => {
+        const printContents = this.$refs.pdfContent.innerHTML;
+        const originalContents = document.body.innerHTML;
 
-      document.body.innerHTML = printContents;
-
-      window.print();
-
-      document.body.innerHTML = originalContents;
-      window.location.reload();
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+      }, 100); // Delay slightly to allow reflow
     },
   },
 };
 </script>
+
 <style scoped>
+.pdf-content {
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: white;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.table td,
+.table th {
+  white-space: normal; /* Ensure text wraps within cells */
+}
+
+@media screen and (max-width: 768px) {
+  .pdf-content {
+    width: 100%;
+    height: auto;
+  }
+  
+  .table-wrapper {
+    display: block;
+    white-space: nowrap;
+  }
+}
+
+@media print {
+  .pdf-content {
+    width: 210mm;
+    height: 297mm;
+  }
+}
+
 .text-right {
   text-align: right;
 }
@@ -325,48 +254,7 @@ export default {
   margin: 10px 0;
 }
 
-.logo-image {
-  max-width: 100%;
-}
-
-.vehicle-details p,
-.signature p {
-  margin: 0;
-}
-
-.signature {
-  margin-top: 30px;
-}
-
 .terms-and-conditions {
-  margin-top: 20px;
-}
-
-.signature-section {
-  margin-top: 40px;
-  text-align: left;
-}
-
-.signature-area {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 40px;
-}
-
-.signature-space {
-  border-bottom: 1px solid #000;
-  width: 200px;
-  height: 25px; /* Adjust height for signature space */
-  margin-right: 30px; /* Space between signature and chop */
-}
-
-.chop-image {
-  width: 100px; /* Adjust size as needed */
-  height: auto;
-}
-
-.creator-info {
   margin-top: 20px;
 }
 

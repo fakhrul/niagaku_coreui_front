@@ -26,7 +26,7 @@
                 <img
                   id="logo"
                   :src="logoUrl"
-                  alt="Niaga-ku Logo"
+                  alt="Logo"
                   class="img-fluid mb-3"
                   style="max-height: 80px"
                 />
@@ -46,6 +46,7 @@
                   aria-label="Email Address"
                   class="mb-3"
                   :style="{ borderColor: primaryColor }"
+                  data-test-id="usernameInput"
                 >
                   <template #prepend-content>
                     <CIcon name="cil-user" />
@@ -68,6 +69,7 @@
                   aria-label="Password"
                   class="mb-3"
                   :style="{ borderColor: primaryColor }"
+                  data-test-id="passwordInput"
                 >
                   <template #prepend-content>
                     <CIcon name="cil-lock-locked" />
@@ -92,7 +94,14 @@
                 >
                   <CSpinner v-if="loading" size="sm" /> Login
                 </CButton> -->
-                <CButton :color="loading ? 'secondary' : 'success'" :disabled="loading" block @click.prevent="login" style="background-color: #756CFB; border-color: #756CFB;">
+                <CButton
+                  :color="loading ? 'secondary' : 'success'"
+                  :disabled="loading"
+                  block
+                  @click.prevent="login"
+                  style="background-color: #756cfb; border-color: #756cfb"
+                  data-test-id="loginButton"
+                >
                   <CSpinner v-if="loading" size="sm" /> Login
                 </CButton>
 

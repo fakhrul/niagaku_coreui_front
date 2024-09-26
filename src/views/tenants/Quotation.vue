@@ -51,7 +51,9 @@
                   class="m-0 d-inline-block"
                 >
                   <!-- <CIcon name="cil-x-circle"/> -->
-                  <CDropdownItem @click="startTour">Onboarding Tour</CDropdownItem>
+                  <CDropdownItem @click="startTour"
+                    >Onboarding Tour</CDropdownItem
+                  >
                   <CDropdownItem disabled>Quick Info</CDropdownItem>
                   <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
                   <CDropdownItem disabled>Video Tutorial</CDropdownItem>
@@ -67,7 +69,6 @@
                     <template #label>Customer </template>
                     <template #input>
                       <v-select
-                      
                         style="width: 100%"
                         v-model="selectedCustomer"
                         :label="'name'"
@@ -77,13 +78,13 @@
                     </template>
                   </CFormGroup>
                 </CCol>
-                <CCol sm="12"  lg="2"
+                <CCol sm="12" lg="2"
                   ><CInput
                     label="Quotation No"
                     placeholder=""
                     v-model="obj.quotationNumber"
                 /></CCol>
-                <CCol sm="12"  lg="2">
+                <CCol sm="12" lg="2">
                   <CInput
                     label="Date"
                     type="date"
@@ -98,14 +99,14 @@
                   class="mr-2"
                 /> -->
                 </CCol>
-                <CCol sm="12"  lg="2">
+                <CCol sm="12" lg="2">
                   <CInput
                     label="Expiry"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
                 /></CCol>
-                <CCol sm="12"  lg="2">
+                <CCol sm="12" lg="2">
                   <CInput label="Reference" v-model="obj.reference"
                 /></CCol>
               </CRow>
@@ -638,6 +639,25 @@ export default {
           });
       } else {
         self.obj = self.getEmptyObj();
+
+        let currentDate = new Date();
+        this.issuedDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set issuedDate
+        currentDate.setDate(currentDate.getDate() + 30);
+        this.expiryDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set expiry date
+
+        this.api
+          .getNextNumber()
+          .then((response) => {
+            console.log(response.result);
+            self.obj.quotationNumber = response.result;
+            console.log(self.obj);
+          })
+          .catch(({ data }) => {});
+
       }
     },
     onSubmit() {
@@ -650,6 +670,10 @@ export default {
         item.productId = item.product.id;
       });
       console.log(self.obj.items);
+      if(self.selectedCustomer)
+      {
+        self.obj.customerId = self.selectedCustomer.id;
+      }
 
       if (!self.obj.id) {
         this.api
@@ -704,6 +728,7 @@ export default {
     },
     getEmptyObj() {
       return {
+        quotationNumber: "",
         // code: "",
         // name: "",
         // decsription: "",

@@ -15,7 +15,9 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
+          <CCardHeader>
+            <strong> Chart of Account </strong> Information
+          </CCardHeader>
           <CCardBody>
             <CForm>
               <CInput label="Category" horizontal v-model="obj.category" />
@@ -31,32 +33,212 @@
         </CCard>
       </CCol>
     </CRow>
+    <CRow v-if="obj.id">
+      <CCol>
+        <CCard>
+          <CCardHeader> <strong> Merchant </strong> Keyword </CCardHeader>
+          <CCardBody>
+            <CDataTable
+              :items="merchantItems"
+              :fields="merchantFields"
+              column-filter
+              items-per-page-select
+              :items-per-page="10"
+              hover
+              sorter
+              pagination
+              :loading="loading"
+            >
+              <template #show_details="{ item, index }">
+                <td class="py-2">
+                  <CButton
+                    size="sm"
+                    color="danger"
+                    class="ml-1"
+                    @click="showDeleteConfirmation(item)"
+                  >
+                    Delete
+                  </CButton>
+                </td>
+              </template>
+            </CDataTable>
+          </CCardBody>
+          <CCardFooter>
+            <CButton
+              type="submit"
+              size="sm"
+              color="primary"
+              @click="addNewMerchant"
+              ><CIcon name="cil-check-circle" /> Add New</CButton
+            >
+          </CCardFooter>
+        </CCard>
+        <CModal
+          :show.sync="editMerchantModal"
+          :no-close-on-backdrop="true"
+          :centered="true"
+          title="Merchant"
+          size="lg"
+          color="primary"
+        >
+          <CRow>
+            <CCol>
+              <CForm>
+                <CInput horizontal label="Name" v-model="merchant.name" />
+              </CForm>
+            </CCol>
+          </CRow>
+
+          <template #header>
+            <h6 class="modal-title">Merchant</h6>
+            <CButtonClose
+              @click="editMerchantModal = false"
+              class="text-white"
+            />
+          </template>
+          <template #footer>
+            <CButton @click="editMerchantModal = false" color="danger"
+              >Cancel</CButton
+            >
+            <CButton @click="updateMerchant" color="success">Accept</CButton>
+          </template>
+        </CModal>
+
+        <CModal
+          title="Confirm Delete"
+          color="warning"
+          :show.sync="warningModal"
+          @update:show="onDeleteConfirmation"
+        >
+          Are you sure you want to delete this {{ itemToDelete.name }} ?
+        </CModal>
+      </CCol>
+    </CRow>
   </div>
 </template>
 
 <script>
 import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import MerchantApi from "@/lib/merchantApi";
+// const items = [];
+// const fields = [
+//   { key: "category" },
+//   { key: "accountNo" },
+//   { key: "name" },
+//   {
+//     key: "show_details",
+//     label: "",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+// ];
 
 export default {
   name: "ChartOfAccount",
   data: () => {
     return {
-      organizationTypeList: [],
+      editMerchantModal: false,
+      merchant: {},
+      warningModal: false,
+      itemToDelete: {},
+      merchantItems: [],
+      merchantFields: [
+        { key: "name" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+      ],
+      // organizationTypeList: [],
+      loading: false,
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
       api: new ChartOfAccountApi(),
+      merchantApi: new MerchantApi(),
     };
   },
   mounted() {
     var self = this;
     self.resetObj();
   },
-  computed: {
-    
-  },
+  computed: {},
   methods: {
+    updateMerchant() {
+      this.merchant.businessId = this.obj.businessId;
+      this.merchant.chartAccountId = this.obj.id;
+      this.addOrUpdateSubscription(this.merchant);
+    },
+    addOrUpdateSubscription(editObj) {
+      var self = this;
+      if (!editObj.id) {
+        this.merchantApi
+          .create(editObj)
+          .then((response) => {
+            // self.$router.push({ path: "/tenants/subscriptionList" });
+            self.refreshMerchants();
+            self.editMerchantModal = false;
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      } else {
+        this.merchantApi
+          .update(editObj)
+          .then((response) => {
+            self.toast("Success", "Database had been update", "success");
+            self.refreshMerchants();
+            self.editMerchantModal = false;
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+    onDeleteConfirmation(status, evt, accept) {
+      var self = this;
+      if (accept) {
+        this.merchantApi
+          .delete(self.itemToDelete.id)
+          .then((response) => {
+            self.refreshMerchants();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      self.itemToDelete = {};
+    },
+    showDeleteConfirmation(item) {
+      var self = this;
+      self.itemToDelete = item;
+      self.warningModal = true;
+    },
+    addNewMerchant() {
+      this.merchant = {
+        name: "",
+      };
+
+      this.editMerchantModal = true;
+    },
+    refreshMerchants() {
+      var self = this;
+      self.loading = true;
+      self.merchantApi
+        .getListByChartAccountId(self.obj.id)
+        .then((response) => {
+          self.merchantItems = response.result;
+          self.loading = false;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+          self.loading = false;
+        });
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -64,6 +246,8 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            console.log(self.obj);
+            self.refreshMerchants();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -129,10 +313,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

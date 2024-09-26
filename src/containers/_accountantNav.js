@@ -2,22 +2,6 @@ export default [
   {
     _name: 'CSidebarNav',
     _children: [
-      // {
-      //   _name: 'CSidebarNavTitle',
-      //   _children: ['Tenant Admin'],
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Subscription',
-      //   to: '/tenants/subscription',
-      //   icon: 'cilBookmark'
-      // },
-      // {
-      //   _name: 'CSidebarNavItem',
-      //   name: 'Business',
-      //   to: '/tenants/businessList',
-      //   icon: 'cilBookmark'
-      // },
       {
         _name: 'CSidebarNavTitle',
         _children: ['Company'],
@@ -87,7 +71,7 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Receipt',
+            name: 'Receipts',
             to: '/tenants/receiptList',
             icon: 'cilBookmark'
           },
@@ -190,7 +174,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Receipts',
+        name: 'My Receipts',
         to: '/employee/receiptList',
         icon: 'cilBookmark'
       },

@@ -37,18 +37,18 @@
     <CDropdownItem @click="navigateTo('/general/profile')">
       <CIcon name="cil-user" /> Profile
     </CDropdownItem>
-    <CDropdownItem @click="navigateTo('/tenants/subscriptionList')">
-      <CIcon
-        name="cilTags"
-        
-      />
+    <CDropdownItem
+      v-if="isTenantAdmin()"
+      @click="navigateTo('/tenants/subscriptionList')"
+    >
+      <CIcon name="cilTags" />
       Subsriptions
     </CDropdownItem>
-    <CDropdownItem  @click="navigateTo('/tenants/businessList')">
+    <CDropdownItem v-if="isTenantAdmin()" @click="navigateTo('/tenants/businessList')">
       <CIcon name="cilIndustry" /> Business
       <!-- <CBadge color="secondary" class="mfs-auto">{{ itemsCount }}</CBadge> -->
     </CDropdownItem>
-    <CDropdownItem  @click="navigateTo('/tenants/branding')">
+    <CDropdownItem v-if="isTenantAdmin()" @click="navigateTo('/tenants/branding')">
       <CIcon name="cil-file" /> Branding
       <!-- <CBadge color="primary" class="mfs-auto">{{ itemsCount }}</CBadge> -->
     </CDropdownItem>
@@ -71,6 +71,11 @@ export default {
     };
   },
   methods: {
+    isTenantAdmin() {
+      var role = auth.getRole();
+      if (role == "TenantAdmin") return true;
+      return false;
+    },
     navigateTo(path) {
       this.$router.push({ path: path });
     },

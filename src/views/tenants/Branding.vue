@@ -18,69 +18,57 @@
           <CCardHeader> <strong>General</strong> Settings </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Name" horizontal v-model="obj.name" readonly />
-              <CInput label="RegNo" horizontal v-model="obj.regNo" readonly />
-              <CInput
-                label="Tagline"
-                horizontal
-                v-model="obj.tagLine"
-                readonly
-              />
-              <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Address
-                </CCol>
-                <CCol sm="9">
-                  <CTextarea
-                  readonly
-                    placeholder="Address..."
-                    rows="5"
-                    v-model="obj.address"
+              <CRow form>
+                <CCol md="6">
+                  <CInput
+                    label="Custom Domain"
+                    v-model="obj.tenant.domainName"
+                    readonly
                   />
                 </CCol>
+                <CCol md="6"> </CCol>
               </CRow>
 
-              <CInput label="Phone" horizontal v-model="obj.phone" readonly />
-              <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Company Logo
-                </CCol>
-                <CCol sm="9">
-                  <CImg :src="getImageUrl()" class="mb-2" thumbnail></CImg>
-                </CCol>
+              <CRow>
+                <CCol md="6"
+                  ><CFormGroup wrapperClasses="input-group pt-2">
+                    <template #label> Brand Logo </template>
+                    <template #input>
+                      <div style="width: 100%">
+                        <CRow>
+                          <CCol>
+                            <CImg
+                              :src="getLogoUrl()"
+                              class="mb-2"
+                              thumbnail
+                              responsive
+                            />
+                          </CCol>
+                         
+                        </CRow>
+                      </div>
+                    </template> </CFormGroup
+                ></CCol>
+                <CCol md="6"
+                  ><CFormGroup wrapperClasses="input-group pt-2">
+                    <template #label> Favorite Icon </template>
+                    <template #input>
+                      <div style="width: 100%">
+                        <CRow>
+                          <CCol>
+                            <CImg
+                              :src="getFavIconUrl()"
+                              class="mb-2"
+                              thumbnail
+                              responsive
+                            />
+                          </CCol>
+                          
+                        </CRow>
+                      </div>
+                    </template> </CFormGroup
+                ></CCol>
               </CRow>
-              <CInput
-                label="Bank Name"
-                horizontal
-                v-model="obj.bankName"
-                readonly
-              />
-              <CRow form class="form-group">
-                <CCol tag="label" sm="3" class="col-form-label">
-                  Bank Address
-                </CCol>
-                <CCol sm="9">
-                  <CTextarea
-                  readonly
-                placeholder="Address..."
-                rows="5"
-                v-model="obj.bankAddress"
-              />
-                </CCol>
-              </CRow>
-
-              <CInput
-                label="Bank Account Name"
-                horizontal
-                v-model="obj.bankAccountName"
-                readonly
-              />
-              <CInput
-                label="Bank Account No"
-                horizontal
-                v-model="obj.bankAccountNo"
-                readonly
-              />
             </CForm>
           </CCardBody>
           <CCardFooter>
@@ -94,12 +82,10 @@
 
 <script>
 import BrandingApi from "../../lib/brandingApi";
-import WidgetsUploadImage from "../widgets/WidgetsUploadImage"
 
 export default {
   name: "Company",
   components: {
-    WidgetsUploadImage,
   },
   data() {
     return {
@@ -111,7 +97,6 @@ export default {
         logoUrl: "",
       },
       logoUrl: "",
-
     };
   },
   mounted() {
@@ -126,7 +111,14 @@ export default {
     },
   },
   methods: {
-    removeTrailingSlash(str) {
+    getFavIconUrl() {
+      var url = this.removeTrailingSlash(apiUrl) + this.obj.faviconUrl;
+      return url;
+    },
+    getLogoUrl() {
+      var url = this.removeTrailingSlash(apiUrl) + this.obj.logoUrl;
+      return url;
+    },removeTrailingSlash(str) {
       if (str.endsWith("/")) {
         return str.slice(0, -1);
       }
@@ -149,10 +141,10 @@ export default {
     resetObj() {
       var self = this;
       this.api
-        .getList()
+        .getByCurrentUser()
         .then((response) => {
           console.log(response);
-          self.obj = response.result[0];
+          self.obj = response.result;
           console.log(self.obj);
         })
         .catch((data) => {

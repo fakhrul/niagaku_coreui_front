@@ -1,6 +1,23 @@
 
 class ReceiptApi {
 
+    
+    getListByCurrentBusiness() {
+        var url = apiUrl + 'receipts/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    getListByCurrentUser() {
+        var url = apiUrl + 'receipts/currentUser/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     createReceiptImage(data) {
         var url = apiUrl + 'receipts/newReceiptImages/';
         return api.call('put',url, data)
