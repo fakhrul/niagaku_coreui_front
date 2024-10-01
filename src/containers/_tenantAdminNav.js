@@ -161,7 +161,7 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Banks',
-            to: '/tenants/expenseList',
+            to: '/tenants/bankList',
             icon: 'cilBank',
             badge: {
               color: 'danger',

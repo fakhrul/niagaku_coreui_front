@@ -256,6 +256,9 @@
                 class="tour-submit-button"
                 ><CIcon name="cil-check-circle" /> Submit</CButton
               >
+              <CButton class="ml-1" color="secondary" @click="cancel">
+                Cancel
+              </CButton>
             </CCardFooter>
           </CCard>
         </CCol>
@@ -414,6 +417,10 @@ export default {
     },
   },
   methods: {
+    cancel() {
+      this.$router.push({ path: "/tenants/QuotationList" });
+    },
+
     startTour() {
       const tour = new Shepherd.Tour({
         useModalOverlay: true,
@@ -574,8 +581,9 @@ export default {
       );
     },
     addNewItem() {
-      const newPosition = this.computedQuotationItems.length + 1;
-      this.computedQuotationItems.push({
+      console.log(this.quotationItems);
+      const newPosition = this.quotationItems.length + 1;
+      this.quotationItems.push({
         id: this.generateGUID(),
         product: this.productItems[0],
         price: 0,
@@ -583,6 +591,7 @@ export default {
         description: "",
         position: newPosition,
       });
+      console.log(this.quotationItems);
     },
     getTotalItemPrice(item) {
       try {
@@ -657,7 +666,6 @@ export default {
             console.log(self.obj);
           })
           .catch(({ data }) => {});
-
       }
     },
     onSubmit() {
@@ -670,8 +678,7 @@ export default {
         item.productId = item.product.id;
       });
       console.log(self.obj.items);
-      if(self.selectedCustomer)
-      {
+      if (self.selectedCustomer) {
         self.obj.customerId = self.selectedCustomer.id;
       }
 

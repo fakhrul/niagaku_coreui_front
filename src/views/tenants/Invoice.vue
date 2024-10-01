@@ -38,9 +38,7 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
-            
                 </CDropdown>
-         
               </div>
             </CCardHeader>
             <CCardBody>
@@ -232,6 +230,9 @@
               <CButton type="submit" size="sm" color="primary" @click="submit"
                 ><CIcon name="cil-check-circle" /> Submit</CButton
               >
+              <CButton class="ml-1" color="secondary" @click="cancel">
+                Cancel
+              </CButton>
             </CCardFooter>
           </CCard>
         </CCol>
@@ -318,7 +319,14 @@ export default {
   },
   data: () => {
     return {
-      previewObj: null,
+      previewObj: {
+        business: {
+          name: "",
+          address: "",
+        },
+        items: [],
+        note: "",
+      },
       invoicePreviewPopup: false,
       invoiceStatuses: [],
       issuedDate: Date(),
@@ -335,7 +343,9 @@ export default {
       selectedCustomer: null,
       organizationTypeList: [],
       infoList: [],
-      obj: {},
+      obj: {
+        invoiceNumber: "",
+      },
       submitted: false,
       api: new InvoiceApi(),
       customerApi: new CustomerApi(),
@@ -378,6 +388,9 @@ export default {
     },
   },
   methods: {
+    cancel() {
+      this.$router.push({ path: "/tenants/InvoiceList" });
+    },
     changeState(item) {
       var self = this;
       self.obj.status = item.id;
@@ -563,6 +576,23 @@ export default {
           });
       } else {
         self.obj = self.getEmptyObj();
+
+        let currentDate = new Date();
+        this.issuedDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set issuedDate
+        currentDate.setDate(currentDate.getDate() + 30);
+        this.expiryDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set expiry date
+
+        this.api
+          .getNextNumber()
+          .then((response) => {
+            self.obj.invoiceNumber = response.result;
+            console.log(self.obj.invoiceNumber);
+          })
+          .catch(({ data }) => {});
       }
     },
     onSubmit() {
@@ -629,6 +659,7 @@ export default {
     },
     getEmptyObj() {
       return {
+        invoiceNumber: "",
         // code: "",
         // name: "",
         // decsription: "",

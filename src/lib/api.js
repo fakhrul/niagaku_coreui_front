@@ -28,8 +28,8 @@ class Api {
 
                 })
                 .catch((error) => {
-                    console.log('call', error);
-                    console.log('call2', error.request.status);
+                    // console.log('call', error);
+                    // console.log('call2', error.request.status);
 
                     if(error.request.status == 401)
                     {

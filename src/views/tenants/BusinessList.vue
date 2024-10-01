@@ -15,18 +15,13 @@
       </CToaster>
     </div>
     <div>
-      <CAlert
-            color="info"
-            closeButton
-            :show.sync="showQuickInfo"
-          >
-          <p><strong>Quick Info</strong> This page show all of your business</p>
-          <ul>
-            <li>You can select your default business to manage.</li>
-            <li>To manage your specific buisness, click Show and Edit.</li>
-          </ul>
-   
-          </CAlert>
+      <CAlert color="info" closeButton :show.sync="showQuickInfo">
+        <p><strong>Quick Info</strong> This page show all of your business</p>
+        <ul>
+          <li>You can select your default business to manage.</li>
+          <li>To manage your specific buisness, click Show and Edit.</li>
+        </ul>
+      </CAlert>
     </div>
     <div>
       <CRow>
@@ -49,7 +44,9 @@
                   <CDropdownItem disabled @click="startTour"
                     >Onboarding Tour</CDropdownItem
                   >
-                  <CDropdownItem @click="showQuickInfo = true">Quick Info</CDropdownItem>
+                  <CDropdownItem @click="showQuickInfo = true"
+                    >Quick Info</CDropdownItem
+                  >
                   <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
                   <CDropdownItem disabled>Video Tutorial</CDropdownItem>
                   <CDropdownItem disabled>Live Chat</CDropdownItem>
@@ -72,16 +69,31 @@
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
-                      color="primary"
-                      variant="outline"
-                      square
                       size="sm"
+                      color="primary"
+                      class="ml-1"
                       @click="setDefault(item)"
                       :disabled="item.isDefault"
                     >
-                      Set Default
+                      Default
                     </CButton>
-
+                    <CButton
+                      size="sm"
+                      color="info"
+                      class="ml-1"
+                      @click="onEdit(item)"
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      size="sm"
+                      color="danger"
+                      class="ml-1"
+                      @click="showDeleteConfirmation(item)"
+                    >
+                      Delete
+                    </CButton>
+                    <!--                       
                     <CButton
                       color="primary"
                       variant="outline"
@@ -90,10 +102,10 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
+                    </CButton> -->
                   </td>
                 </template>
-                <template #details="{ item }">
+                <!-- <template #details="{ item }">
                   <CCollapse
                     :show="Boolean(item._toggled)"
                     :duration="collapseDuration"
@@ -117,7 +129,7 @@
                       </CButton>
                     </CCardBody>
                   </CCollapse>
-                </template>
+                </template> -->
               </CDataTable>
             </CCardBody>
             <CCardFooter>
@@ -212,7 +224,7 @@ const fields = [
   {
     key: "show_details",
     label: "",
-    _style: "width:150px",
+    _style: "width:200px",
     sorter: false,
     filter: false,
   },
@@ -275,10 +287,7 @@ export default {
   },
 
   methods: {
-    startTour()
-    {
-
-    },
+    startTour() {},
     /// For Profile List
     onEditProfile(item) {
       var self = this;

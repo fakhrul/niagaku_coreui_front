@@ -44,6 +44,11 @@ const Subscription = () => import('@/views/tenants/Subscription')
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
 
+const BankList = () => import('@/views/tenants/BankList')
+const Bank = () => import('@/views/tenants/Bank')
+const BankStatement = () => import('@/views/tenants/BankStatement')
+
+
 const CustomerList = () => import('@/views/tenants/CustomerList')
 const Customer = () => import('@/views/tenants/Customer')
 
@@ -93,6 +98,8 @@ const BrandingEdit = () => import('@/views/tenants/BrandingEdit')
 
 const VerifyEmail = () => import('@/views/pages/VerifyEmail')
 const RegisterCompleted = () => import('@/views/pages/RegisterCompleted')
+
+const Profile = () => import('@/views/pages/Profile')
 
 
 
@@ -336,6 +343,13 @@ function configRoutes() {
               name: 'Business',
               component: Business
             },
+            //
+            {
+              path: '/pages/profile',
+              name: 'Profile',
+              component: Profile,
+            },
+
             //
             {
               path: '/tenants/subscriptionList',
@@ -610,6 +624,27 @@ function configRoutes() {
             },
 
 
+            {
+              path: '/tenants/Bank',
+              name: 'Bank',
+              component: Bank
+            },
+            {
+              path: '/tenants/Bank/:id',
+              name: 'BankById',
+              component: Bank
+            },
+            {
+              path: '/tenants/BankList',
+              name: 'BankList',
+              component: BankList
+            },
+            {
+              path: '/tenants/BankStatement/:id',
+              name: 'BankStatementById',
+              component: BankStatement
+            },
+
           ]
         },
         {
@@ -632,7 +667,7 @@ function configRoutes() {
       ]
     },
 
-    
+
     {
       path: '/pages',
       redirect: '/pages/404',
@@ -682,6 +717,8 @@ function configRoutes() {
           component: RegisterCompleted,
         },
 
+
+
         // {
         //   path: 'workArea/:id',
         //   name: 'WorkArea',
@@ -695,6 +732,6 @@ function configRoutes() {
 
       ]
     },
-    
+
   ]
 }

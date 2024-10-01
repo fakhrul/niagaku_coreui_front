@@ -18,7 +18,6 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            
             <CCardHeader> <strong> Tenant </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
@@ -32,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_image="{ item }">
                   <td class="py-2">
                     <CImg
@@ -112,7 +116,14 @@ import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "name" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "tenantName" },
   // { key: "domainName" },
   { key: "tenantEmail" },
   { key: "totalBusiness" },
@@ -156,6 +167,7 @@ export default {
         return {
           ...item,
           totalUser: this.getTotalProfile(item),
+          tenantName: this.getTenantName(item),
           tenantEmail: this.getTenantEmail(item),
           totalBusiness: this.getTotalBusiness(item),
           createdOn: this.getDisplayDateTime(item.createdOn),
@@ -176,6 +188,13 @@ export default {
         return item.businesses.length;
       } catch (error) {
         return 0;
+      }
+    },
+    getTenantName(item) {
+      try {
+        return item.tenantAdmin.fullName;
+      } catch (error) {
+        return "N/A";
       }
     },
     getTenantEmail(item) {
@@ -242,8 +261,8 @@ export default {
         auth
           .deleteByTenant(self.itemToDelete.id)
           .then((response) => {
-            console.log('authdelete', response);
-            console.log('authdelete', tenantId);
+            console.log("authdelete", response);
+            console.log("authdelete", tenantId);
             this.api
               .delete(tenantId)
               .then((response) => {
@@ -270,7 +289,6 @@ export default {
         //
         self.itemToDelete = {};
       }
-      
     },
     showDeleteConfirmation(item) {
       var self = this;

@@ -15,7 +15,9 @@
     <CRow>
       <CCol sm="12">
         <CCard>
-          <CCardHeader> <strong> Chart of Account </strong> Information </CCardHeader>
+          <CCardHeader>
+            <strong> Chart of Account </strong> Information
+          </CCardHeader>
           <CCardBody>
             <CForm>
               <CInput label="Category" horizontal v-model="obj.category" />
@@ -27,6 +29,9 @@
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -43,8 +48,7 @@ export default {
     return {
       organizationTypeList: [],
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
       api: new ChartOfAccountApi(),
     };
@@ -53,9 +57,7 @@ export default {
     var self = this;
     self.resetObj();
   },
-  computed: {
-    
-  },
+  computed: {},
   methods: {
     resetObj() {
       var self = this;
@@ -129,10 +131,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

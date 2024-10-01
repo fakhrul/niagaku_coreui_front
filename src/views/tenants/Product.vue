@@ -53,6 +53,9 @@
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -91,6 +94,9 @@ export default {
   },
   computed: {},
   methods: {
+    cancel() {
+      this.$router.push({ path: "/tenants/ProductList" });
+    },
     refreshChartOfAccount() {
       var self = this;
       self.coaApi
@@ -121,9 +127,10 @@ export default {
     },
     onSubmit() {
       var self = this;
-      self.obj.chartAccount = self.selectedChartOfAccount;
-      self.obj.chartAccountId = self.selectedChartOfAccount.id;
-
+      if (self.selectedChartOfAccount) {
+        self.obj.chartAccount = self.selectedChartOfAccount;
+        self.obj.chartAccountId = self.selectedChartOfAccount.id;
+      }
       if (!self.obj.id) {
         this.api
           .create(self.obj)

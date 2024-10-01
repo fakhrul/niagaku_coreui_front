@@ -1,35 +1,29 @@
-
-class InvoiceApi {
-
-       
-    getNextNumber() {
-        var url = apiUrl + 'invoices/next-number';
-        return api.call('get', url)
+class BankApi {
+    removeBankStatementDocuments(bankStatementId, documentId) {
+        var url = apiUrl + 'banks/removeDocument/' + bankStatementId + '/' + documentId;
+        return api.call('put', url)
             .then(({ data }) => {
                 return data
             });
     }
 
-    getInvoiceStatus() {
-        var url = apiUrl + 'invoices/states';
-        return api.call('get', url)
+    updateBankStatementDocuments(id, data) {
+        var url = apiUrl + 'banks/addDocuments/';
+        return api.call('put', url + id, data)
             .then(({ data }) => {
                 return data
             });
     }
-
-    getListByCurrentBusiness()
-    {
-        var url = apiUrl + 'invoices/currentBusiness/';
+    getListByCurrentBusiness(){
+        var url = apiUrl + 'banks/currentBusiness/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
-
     }
 
     getListByCurrentTenant(){
-        var url = apiUrl + 'invoices/currentUser/';
+        var url = apiUrl + 'banks/currentUser/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -37,7 +31,7 @@ class InvoiceApi {
     }
 
     getList() {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'banks';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -46,14 +40,14 @@ class InvoiceApi {
 
 
     get(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'banks/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
     create(data) {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'banks';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -61,14 +55,14 @@ class InvoiceApi {
 
     }
     update(data) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'banks/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
     delete(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'banks/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -77,4 +71,4 @@ class InvoiceApi {
 
 }
 
-export default InvoiceApi;
+export default BankApi;

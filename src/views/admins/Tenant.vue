@@ -111,7 +111,7 @@
                   </CCardHeader> -->
                   <CCardBody>
                     <CDataTable
-                      :items="obj.subscriptions"
+                      :items="computedSubscriptionHistory"
                       :fields="subsriptionFields"
                       column-filter
                       items-per-page-select
@@ -741,11 +741,16 @@ import PackageApi from "@/lib/packageApi";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 const subsriptionFields = [
-  { key: "name" },
+  { key: "startDate", label: "Start Date" },
+  { key: "endDate", label: "End Date" },
+  { key: "packageName", label: "Plan" },
+  { key: "isActiveYesNo", label: "Active" },
+  { key: "statusDescription", label: "State" },
+  { key: "amount", label: "Amount" },
   {
     key: "show_details",
     label: "",
-    _style: "width:150px",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
@@ -826,6 +831,21 @@ export default {
   },
 
   computed: {
+    activeSubscription() {
+      return this.computedSubscriptionHistory.find(
+        (sub) => sub.isActive === true
+      );
+    },
+    computedSubscriptionHistory() {
+      return this.obj.subscriptions.map((item) => {
+        return {
+          ...item,
+          isActiveYesNo: item.isActive ? "YES" : "NO",
+          packageName: item.package.name,
+        };
+      });
+    },
+
     computeSubscriptionStartDate() {
       return moment(this.subscriptionStartDate).format("YYYY-MM-DD");
     },
@@ -1003,16 +1023,20 @@ export default {
             // this.$router.push({ path: "/pages/registerCompleted" });
           })
           .catch((error) => {
-            this.loading = false;
-            let errorMessage = "An unknown error occurred.";
-            if (
-              error.data &&
-              error.data.responseException &&
-              error.data.responseException.exceptionMessage
-            ) {
-              errorMessage =
-                error.data.responseException.exceptionMessage.title;
-            }
+            console.log(error);
+            var errorMessage = helper.getErrorMessage2(error);
+            // console.log("details",details);
+
+            // this.loading = false;
+            // let errorMessage = "An unknown error occurred.";
+            // if (
+            //   error.data &&
+            //   error.data.responseException &&
+            //   error.data.responseException.exceptionMessage
+            // ) {
+            //   errorMessage =
+            //     error.data.responseException.exceptionMessage.title;
+            // }
             this.toast("Error", errorMessage, "danger");
           });
 

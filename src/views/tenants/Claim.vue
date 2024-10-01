@@ -40,6 +40,9 @@
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -58,8 +61,6 @@
               <template #show_item="{ item }">
                 <td>
                   <CInput v-model="item.name" min="1"></CInput>
-
-                 
                 </td>
               </template>
               <template #show_description="{ item }">

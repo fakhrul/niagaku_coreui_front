@@ -20,15 +20,15 @@
             <CForm>
               <CInput label="Name" horizontal v-model="obj.name" />
               <CRow form class="form-group">
-              <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
-              <CCol sm="9">
-                <CTextarea
-                  placeholder="Address..."
-                  rows="5"
-                  v-model="obj.address"
-                />
-              </CCol>
-            </CRow>
+                <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
+                <CCol sm="9">
+                  <CTextarea
+                    placeholder="Address..."
+                    rows="5"
+                    v-model="obj.address"
+                  />
+                </CCol>
+              </CRow>
 
               <CInput label="City" horizontal v-model="obj.city" />
               <CInput label="Country" horizontal v-model="obj.country" />
@@ -37,15 +37,30 @@
               <CInput label="Phone" horizontal v-model="obj.phone" />
               <CInput label="Website" horizontal v-model="obj.website" />
 
-              <CInput label="Contact Name" horizontal v-model="obj.contactName" />
-              <CInput label="Contact Phone" horizontal v-model="obj.contactPhone" />
-              <CInput label="Contact Email" horizontal v-model="obj.contactEmail" />
+              <CInput
+                label="Contact Name"
+                horizontal
+                v-model="obj.contactName"
+              />
+              <CInput
+                label="Contact Phone"
+                horizontal
+                v-model="obj.contactPhone"
+              />
+              <CInput
+                label="Contact Email"
+                horizontal
+                v-model="obj.contactEmail"
+              />
             </CForm>
           </CCardBody>
           <CCardFooter>
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -62,8 +77,7 @@ export default {
     return {
       organizationTypeList: [],
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
       api: new VendorApi(),
     };
@@ -72,9 +86,7 @@ export default {
     var self = this;
     self.resetObj();
   },
-  computed: {
-    
-  },
+  computed: {},
   methods: {
     resetObj() {
       var self = this;
@@ -148,10 +160,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

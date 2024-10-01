@@ -18,10 +18,10 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Sales Order </strong> List </CCardHeader>
+            <CCardHeader> <strong> Bank </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="computedItems"
+                :items="items"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -31,9 +31,31 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
+                      size="sm"
+                      color="info"
+                      class="ml-1"
+                      @click="onEdit(item)"
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      size="sm"
+                      color="danger"
+                      class="ml-1"
+                      @click="showDeleteConfirmation(item)"
+                    >
+                      Delete
+                    </CButton>
+
+                    <!-- <CButton
                       color="primary"
                       variant="outline"
                       square
@@ -41,14 +63,7 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
-                  </td>
-                </template>
-                <template #document_link="{ item }">
-                  <td>
-                    <CLink target="_blank" :href="item.documentUrl">{{
-                      item.documentName
-                    }}</CLink>
+                    </CButton> -->
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -99,30 +114,31 @@
 </template>
 
 <script>
-import SalesOrderApi from "@/lib/salesOrderApi";
-import moment from "moment";
+import BankApi from "@/lib/bankApi";
 
 const items = [];
 const fields = [
-  { key: "displayDate", label: "Date" },
-  { key: "orderNo" },
+  // { key: "accountNo"},
   {
-    key: "document_link",
-    label: "Document",
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
     sorter: false,
     filter: false,
   },
+  { key: "name" },
+  // { key: "contactName" },
   {
     key: "show_details",
     label: "",
-    _style: "width:1%",
+    _style: "width:2%; min-width:150px",
     sorter: false,
     filter: false,
   },
 ];
 
 export default {
-  name: "SalesOrderList",
+  name: "BankList",
   data() {
     return {
       loading: true,
@@ -133,7 +149,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new SalesOrderApi(),
+      api: new BankApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -142,32 +158,8 @@ export default {
     var self = this;
     self.refreshTable();
   },
-  computed: {
-    computedItems() {
-      return this.items.map((item) => {
-        return {
-          ...item,
-          displayDate: this.getDisplayDate(item.date),
-          documentName: this.getDocumentName(item),
-          documentUrl: this.getDocumentUrl(item),
-        };
-      });
-    },
-  },
-
   methods: {
-    getDocumentName(item) {
-      if (item.document == null) return "Unknown";
-      if (item.document.fileName == null) return "Unknown";
-
-      return item.document.fileName;
-    },
-    getDocumentUrl(item) {
-      return apiUrl + "documents/file/" + item.documentId;
-    },
-    getDisplayDate(dt) {
-      return moment(dt).format("DD/MM/YYYY");
-    },
+    setDefault(item) {},
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -190,7 +182,6 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
-          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -200,7 +191,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/SalesOrder/${item.id}`,
+        path: `/tenants/Bank/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -223,7 +214,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/SalesOrder" });
+      this.$router.push({ path: "/tenants/Bank" });
     },
     toast(header, message, color) {
       var self = this;

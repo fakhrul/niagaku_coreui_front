@@ -34,7 +34,7 @@
     <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>Settings</strong>
     </CDropdownHeader>
-    <CDropdownItem @click="navigateTo('/general/profile')">
+    <CDropdownItem @click="navigateTo('/pages/profile')">
       <CIcon name="cil-user" /> Profile
     </CDropdownItem>
     <CDropdownItem

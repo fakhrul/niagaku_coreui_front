@@ -1,35 +1,33 @@
 
-class InvoiceApi {
+class BankStatementApi {
 
-       
-    getNextNumber() {
-        var url = apiUrl + 'invoices/next-number';
+    
+    getListByCurrentBusiness() {
+        var url = apiUrl + 'bankstatements/currentBusiness/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
     }
 
-    getInvoiceStatus() {
-        var url = apiUrl + 'invoices/states';
+    getListByCurrentUser() {
+        var url = apiUrl + 'bankstatements/currentUser/';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
     }
 
-    getListByCurrentBusiness()
-    {
-        var url = apiUrl + 'invoices/currentBusiness/';
-        return api.call('get', url)
+    createBankStatementImage(data) {
+        var url = apiUrl + 'bankstatements/newBankStatementImages/';
+        return api.call('put',url, data)
             .then(({ data }) => {
                 return data
             });
-
     }
 
-    getListByCurrentTenant(){
-        var url = apiUrl + 'invoices/currentUser/';
+    getBankStatementDataSet() {
+        var url = apiUrl + 'bankstatements/xmlList';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -37,7 +35,7 @@ class InvoiceApi {
     }
 
     getList() {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'bankstatements';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
@@ -46,14 +44,32 @@ class InvoiceApi {
 
 
     get(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'bankstatements/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
+    getNext(id) {
+        var url = apiUrl + 'bankstatements/nextTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+    
+    getPrev(id) {
+        var url = apiUrl + 'bankstatements/prevTo/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
     create(data) {
-        var url = apiUrl + 'invoices';
+        var url = apiUrl + 'bankstatements';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -61,14 +77,14 @@ class InvoiceApi {
 
     }
     update(data) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'bankstatements/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
     delete(id) {
-        var url = apiUrl + 'invoices/';
+        var url = apiUrl + 'bankstatements/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -77,4 +93,4 @@ class InvoiceApi {
 
 }
 
-export default InvoiceApi;
+export default BankStatementApi;

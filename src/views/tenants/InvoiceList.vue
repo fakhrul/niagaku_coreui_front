@@ -148,7 +148,7 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          customerName: item.customer.name,
+          customerName: this.getCustomerName(item),
           grandTotal: this.getGrandTotal(item),
         };
       });
@@ -156,6 +156,12 @@ export default {
   },
 
   methods: {
+    getCustomerName(item) {
+      if (item.customer) {
+        return item.customer.name;
+      }
+      return "N/A";
+    },
     getGrandTotal(invoice) {
       console.log('grandTotal', invoice);
       var total = 0;

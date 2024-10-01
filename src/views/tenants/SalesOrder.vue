@@ -30,12 +30,15 @@
               />
               <CRow form class="form-group">
                 <CCol tag="label" sm="3" class="col-form-label">
-                  BOL Documents
+                  Document
                 </CCol>
                 <CCol sm="9">
-                  <CLink target="_blank" :href="getDocumentUrl()">{{
-                    getDocumentName()
-                  }}</CLink>
+                  <CLink
+                    target="_blank"
+                    :href="getDocumentUrl()"
+                    v-if="obj.documentId"
+                    >{{ getDocumentName() }}</CLink
+                  >
                 </CCol>
               </CRow>
 
@@ -51,6 +54,9 @@
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -84,41 +90,47 @@ export default {
   },
   mounted() {
     var self = this;
+    this.initializeDefaultDate();
     self.resetObj();
   },
   computed: {
     computeDate() {
       return moment(this.orderDate).format("YYYY-MM-DD");
     },
+    documentUrl() {
+      return apiUrl + "documents/file/" + this.obj.documentId;
+    },
   },
   methods: {
-    getDocumentUrl()
-    {
+    cancel() {
+      this.$router.push({ path: "/tenants/SalesOrderList" });
+    },
+    initializeDefaultDate() {
+      const today = new Date();
+      this.orderDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0
+      );
+    },
+    getDocumentUrl() {
       var self = this;
       return apiUrl + "documents/file/" + this.obj.documentId;
-
     },
-    getDocumentName()
-    {
+    getDocumentName() {
       if (this.obj.document == null) return "Unknown";
       if (this.obj.document.fileName == null) return "Unknown";
-
       return this.obj.document.fileName;
-
     },
     uploaded(data) {
       var self = this;
       self.uploadedFiles = data.uploadedFiles;
       console.log(self.uploadedFiles);
       self.obj.documentId = self.uploadedFiles[0].id;
-      // self.api
-      //   .createReceiptImage(self.uploadedFiles)
-      //   .then((response) => {
-      //     self.resetObj();
-      //   })
-      //   .catch(({ data }) => {
-      //     self.toast("Error", helper.getErrorMessage(data), "danger");
-      //   });
+      self.obj.document.fileName = self.uploadedFiles[0].fileName;
     },
     setDate(e) {
       this.orderDate = new Date(e + "T00:00:00"); // ISO format assumes local time

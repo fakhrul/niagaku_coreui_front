@@ -15,7 +15,13 @@ class Helper {
         }
     }
 
-
+    getErrorMessage2(data){
+        try {
+            return data.data;
+        } catch (error) {
+            return "Unkown Error" + error;
+        }
+    }
     getErrorMessage(data) {
         var errorMessage = "";
         // console.log(data); //'23505: duplicate key

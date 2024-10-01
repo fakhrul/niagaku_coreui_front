@@ -17,35 +17,87 @@
         <CCard>
           <CCardHeader> <strong> Customer </strong> Information </CCardHeader>
           <CCardBody>
-            <CForm>
-              <CInput label="Name" horizontal v-model="obj.name" />
-              <CRow form class="form-group">
-              <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
-              <CCol sm="9">
+            <CRow form>
+              <CCol md="6">
+                <CInput
+                  label="Name"
+                  v-model="obj.name"
+                  placeholder="Customer Sdn Bhd"
+                  required
+                  was-validated
+                />
+                <CInput label="Contact Name" v-model="obj.contactName" />
+                <CInput label="Contact Email" v-model="obj.contactEmail" />
+                <CInput label="Contact Phone" v-model="obj.contactPhone" />
+              </CCol>
+              <CCol md="6">
                 <CTextarea
-                  placeholder="Address..."
+                  label="Address"
+                  placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
                   rows="5"
                   v-model="obj.address"
+                  required
+                  was-validated
                 />
+                <CInput label="City" v-model="obj.city" />
+                <CInput label="Country" v-model="obj.country" />
+                <CInput label="State" v-model="obj.state" />
+                <!-- <CSelect
+                  :value.sync="obj.country"
+                  :options="aseanCountries"
+                  label="Country"
+                /> -->
+                <!-- State Selection -->
+                <!-- <CSelect
+                  :value.sync="obj.state"
+                  :options="stateOptions"
+                  label="State"
+                /> -->
+                <CInput label="Postcode" v-model="obj.postcode" />
+                <CInput label="Phone" v-model="obj.phone" />
+                <CInput label="Website" v-model="obj.website" />
               </CCol>
             </CRow>
 
-              <CInput label="City" horizontal v-model="obj.city" />
-              <CInput label="Country" horizontal v-model="obj.country" />
-              <CInput label="State" horizontal v-model="obj.state" />
-              <CInput label="Postcode" horizontal v-model="obj.postcode" />
-              <CInput label="Phone" horizontal v-model="obj.phone" />
-              <CInput label="Website" horizontal v-model="obj.website" />
+            <!-- <CForm>
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label"> Address </CCol>
+                <CCol sm="9">
+                  <CTextarea
+                    placeholder="Address..."
+                    rows="5"
+                    v-model="obj.address"
+                  />
+                </CCol>
+              </CRow>
 
-              <CInput label="Contact Name" horizontal v-model="obj.contactName" />
-              <CInput label="Contact Phone" horizontal v-model="obj.contactPhone" />
-              <CInput label="Contact Email" horizontal v-model="obj.contactEmail" />
-            </CForm>
+              <CInput
+                label="Contact Name"
+                horizontal
+                v-model="obj.contactName"
+              />
+              <CInput
+                label="Contact Phone"
+                horizontal
+                v-model="obj.contactPhone"
+              />
+              <CInput
+                label="Contact Email"
+                horizontal
+                v-model="obj.contactEmail"
+              />
+            </CForm> -->
           </CCardBody>
           <CCardFooter>
             <CButton type="submit" size="sm" color="primary" @click="submit"
               ><CIcon name="cil-check-circle" /> Submit</CButton
             >
+            <CButton class="ml-1" color="secondary" @click="cancel">
+              Cancel
+            </CButton>
           </CCardFooter>
         </CCard>
       </CCol>
@@ -60,10 +112,40 @@ export default {
   name: "Customer",
   data: () => {
     return {
+      selectedCountry: "Malaysia",
+      selectedState: "",
+      aseanCountries: [
+        "Brunei",
+        "Cambodia",
+        "Indonesia",
+        "Laos",
+        "Malaysia",
+        "Myanmar",
+        "Philippines",
+        "Singapore",
+        "Thailand",
+        "Vietnam",
+      ],
+      stateOptions: [
+        "Johor",
+        "Kedah",
+        "Kelantan",
+        "Malacca",
+        "Pahang",
+        "Penang",
+        "Perak",
+        "Perlis",
+        "Sabah",
+        "Sarawak",
+        "Selangor",
+        "Terengganu",
+        "Kuala Lumpur",
+        "Labuan",
+        "Putrajaya",
+      ],
       organizationTypeList: [],
       infoList: [],
-      obj: {
-      },
+      obj: {},
       submitted: false,
       api: new CustomerApi(),
     };
@@ -72,10 +154,11 @@ export default {
     var self = this;
     self.resetObj();
   },
-  computed: {
-    
-  },
+  computed: {},
   methods: {
+    cancel() {
+      this.$router.push({ path: "/tenants/CustomerList" });
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -148,10 +231,9 @@ export default {
       };
     },
     submit() {
-        this.onSubmit();
-        this.submitted = true;
+      this.onSubmit();
+      this.submitted = true;
     },
-    
   },
 };
 </script>

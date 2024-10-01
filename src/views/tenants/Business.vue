@@ -205,6 +205,9 @@ Malaysia"
                       >
                         <CIcon name="cil-check-circle" /> Submit
                       </CButton>
+                      <CButton class="ml-1" color="secondary" @click="cancel">
+                        Cancel
+                      </CButton>
                     </CCardFooter>
                   </CForm>
                 </CCard>
@@ -789,6 +792,10 @@ export default {
     getImageUrl() {
       return this.removeTrailingSlash(apiUrl) + this.obj.logoUrl;
     },
+    cancel() {
+      this.$router.push({ path: "/tenants/BusinessList" });
+    },
+
     submit() {
       this.onSubmit();
       this.submitted = true;
@@ -797,8 +804,11 @@ export default {
       if (!this.obj.id) {
         this.api
           .createByCurrentTenant(this.obj)
-          .then(() => {
+          .then((response) => {
+            this.obj = response.result;
             this.toast("Success", "Business created successfully", "success");
+            this.$router.push({ path: `/tenants/Business/${this.obj.id}` });
+            //route
           })
           .catch(({ data }) => {
             this.toast("Error", helper.getErrorMessage(data), "danger");

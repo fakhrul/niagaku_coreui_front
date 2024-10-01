@@ -38,9 +38,7 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
-            
                 </CDropdown>
-         
               </div>
             </CCardHeader>
             <CCardBody>
@@ -232,6 +230,9 @@
               <CButton type="submit" size="sm" color="primary" @click="submit"
                 ><CIcon name="cil-check-circle" /> Submit</CButton
               >
+              <CButton class="ml-1" color="secondary" @click="cancel">
+                Cancel
+              </CButton>
             </CCardFooter>
           </CCard>
         </CCol>
