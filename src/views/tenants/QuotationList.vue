@@ -18,7 +18,22 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Quotation </strong> List </CCardHeader>
+            <CCardHeader> <strong> Quotation </strong> List 
+              <div class="card-header-actions">
+                <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                 
+                  <CDropdownItem @click="showQuickInfo = true"
+                    >Quick Info</CDropdownItem
+                  >
+                 
+                </CDropdown>
+              </div>
+            </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -31,6 +46,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_status="{ item }">
                   <td>
                     <CBadge
@@ -104,12 +124,21 @@
 
 <script>
 import QuotationApi from "@/lib/quotationApi";
+import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "quotationNumber" },
-  { key: "customerName" },
-  { key: "grandTotal" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "quotationNumber", label: "Quotation No" },
+  { key: "customerName", label: "Customer" },
+  { key: "displayIssuedDate", label: "Issued" },
+  { key: "grandTotal", label: "Amount" },
 
   { key: "show_status", label: "Status" },
   // { key: "statusDescription" },
@@ -126,6 +155,7 @@ export default {
   name: "QuotationList",
   data() {
     return {
+      showQuickInfo: false,
       loading: true,
       items: items.map((item, id) => {
         return { ...item, id };
@@ -148,6 +178,8 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
+          displayIssuedDate: this.getDisplayDate(item.issuedDate),
+
           customerName: this.getCustomerName(item),
           grandTotal: this.getGrandTotal(item),
         };
@@ -156,16 +188,16 @@ export default {
   },
 
   methods: {
-    getCustomerName(item)
-    {
-if(item.customer)
-{
-  return item.customer.name;
-}
-return "N/A";
+    getDisplayDate(dt) {
+      return moment(dt).format("DD/MM/YYYY");
+    },
+    getCustomerName(item) {
+      if (item.customer) {
+        return item.customer.name;
+      }
+      return "N/A";
     },
     getGrandTotal(quotation) {
-      console.log('grandTotal', quotation);
       var total = 0;
       for (var i = 0; i < quotation.items.length; i++) {
         var item = quotation.items[i];

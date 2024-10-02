@@ -36,11 +36,6 @@
                   color="link"
                   class="m-0 d-inline-block"
                 >
-                  <!-- <template #toggler>
-                    <CButton color="link">
-                      <i class="material-icons">help_outline</i>
-                    </CButton>
-                  </template> -->
                   <CDropdownItem disabled @click="startTour"
                     >Onboarding Tour</CDropdownItem
                   >

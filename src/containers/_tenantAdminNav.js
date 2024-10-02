@@ -30,7 +30,7 @@ export default [
         _children: [
           {
             _name: 'CSidebarNavItem',
-            name: 'Quotation',
+            name: 'Quotations',
             to: '/tenants/quotationList',
             icon: 'cilFile'
           },

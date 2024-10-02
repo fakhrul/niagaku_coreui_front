@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -104,8 +109,16 @@ import moment from "moment";
 
 const items = [];
 const fields = [
-  { key: "displayDate", label: "Date" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
   { key: "orderNo" },
+  { key: "displayDate", label: "Date" },
+
   {
     key: "document_link",
     label: "Document",

@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -42,8 +47,6 @@
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
                     </CButton>
-
-                    
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -99,6 +102,13 @@ import CustomerApi from "@/lib/customerApi";
 const items = [];
 const fields = [
   // { key: "accountNo"},
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
   { key: "name" },
   { key: "contactName" },
   {
@@ -109,8 +119,6 @@ const fields = [
     filter: false,
   },
 ];
-
-
 
 export default {
   name: "CustomerList",
@@ -134,9 +142,7 @@ export default {
     self.refreshTable();
   },
   methods: {
-    setDefault(item){
-
-    },
+    setDefault(item) {},
     toast(header, message, color) {
       var self = this;
       self.infoList.push({

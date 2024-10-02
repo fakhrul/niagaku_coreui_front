@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_status="{ item }">
                   <td>
                     <CBadge
@@ -107,7 +112,14 @@ import InvoiceApi from "@/lib/invoiceApi";
 
 const items = [];
 const fields = [
-  { key: "invoiceNumber" },
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "invoiceNumber", lable: "Invoice No" },
   { key: "customerName" },
   { key: "grandTotal" },
 
@@ -163,7 +175,7 @@ export default {
       return "N/A";
     },
     getGrandTotal(invoice) {
-      console.log('grandTotal', invoice);
+      console.log("grandTotal", invoice);
       var total = 0;
       for (var i = 0; i < invoice.items.length; i++) {
         var item = invoice.items[i];
