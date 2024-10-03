@@ -41,7 +41,11 @@
                     >
                   </td>
                 </template>
-
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -107,7 +111,13 @@ import PurchaseOrderApi from "@/lib/purchaseOrderApi";
 
 const items = [];
 const fields = [
-  { key: "orderNumber" },
+{
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },  { key: "orderNumber" },
   { key: "vendorName" },
   { key: "grandTotal" },
 

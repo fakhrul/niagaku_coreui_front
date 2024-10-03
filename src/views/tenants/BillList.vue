@@ -31,6 +31,11 @@
                 pagination
                 :loading="loading"
               >
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
                 <template #show_image="{ item }">
                   <td class="py-2">
                     <CImg
@@ -111,6 +116,13 @@ import moment from "moment";
 
 const items = [];
 const fields = [
+{
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
   { key: "createdOn" },
   { key: "date" },
   { key: "companyName" },
