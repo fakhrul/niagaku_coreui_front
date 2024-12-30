@@ -20,7 +20,7 @@
           <CCol>
             <h1>{{ quotation.business.name }}</h1>
             <p>{{ "(" + quotation.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(quotation.business.address)"></p>
+            <p v-html="formatAddress(quotation.business.address)"></p> <!--item.description is rendered from handlekeydown event and rerun format-->
             <p>Tel: {{ quotation.business.phone }}</p>
           </CCol>
         </CRow>
@@ -71,7 +71,7 @@
                   <p>
                     <strong>{{ item.product.name }}</strong>
                   </p>
-                  <p>{{ item.description }}</p>
+                  <p v-html="formatDescription(item.description)"></p>
                 </td>
                 <td class="text-center quantity-column">{{ item.quantity }}</td>
                 <td class="text-right price-column">
@@ -141,6 +141,21 @@ export default {
     formatNote(note) {
       return note.replace(/\n/g, "<br />");
     },
+
+
+    formatDescription(description) {
+      // split item.description \n
+      return description
+        .split('\n') //split into an array
+        .map(line => {
+          // check for indentation (e.g., spaces or tabs at the start)
+          const indentLevel = (line.match(/^(\s+)/) || [''])[0].length / 4; 
+          return `<p style="padding-left: ${indentLevel * 20}px;">${line.trim()}</p>`;
+          //wraps in one line and padding for neatness
+        })
+        .join(''); //join into single html string and pass to <p>
+    },
+
     getTotalItemPrice(item) {
       try {
         return item.quantity * item.price;

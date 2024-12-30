@@ -118,6 +118,7 @@
                     v-model="obj.title"
                     placeholder=""
                     rows="2"
+                    @keydown="handleKeyDown($event, item)"
                   />
                 </CCol>
               </CRow>
@@ -161,7 +162,8 @@
                         <CTextarea
                           placeholder=""
                           v-model="item.description"
-                          rows="1"
+                          rows="3"
+                          @keydown="handleKeyDown($event, item)"
                         />
                       </td>
                     </template>
@@ -421,6 +423,36 @@ export default {
   methods: {
     cancel() {
       this.$router.push({ path: "/tenants/QuotationList" });
+    },
+
+    handleKeyDown(event, item) {
+      const start = event.target.selectionStart;
+      const end = event.target.selectionEnd;
+
+      if (event.key === 'Tab') {  //check if user click tab or enter
+        event.preventDefault();
+        item.description =
+          item.description.substring(0, start) +
+          '    ' + // 4 spaces
+          item.description.substring(end);
+
+        //start and end = current position of cursor, if tab, add 4 spaces
+        this.$nextTick(() => {
+          event.target.selectionStart = event.target.selectionEnd = start + 4; //tam
+        });
+      }
+
+      if (event.key === 'Enter') { //if user clicks enter, gets the cursor position & insert new line (\n)
+        item.description =
+          item.description.substring(0, start) +
+          '\n' +
+          item.description.substring(end);
+
+        // Move cursor
+        this.$nextTick(() => {
+          event.target.selectionStart = event.target.selectionEnd = start + 1;
+        });
+      }
     },
 
     startTour() {
