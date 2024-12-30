@@ -74,7 +74,9 @@
                   <p>{{ item.description }}</p>
                 </td>
                 <td class="text-center quantity-column">{{ item.quantity }}</td>
-                <td class="text-right price-column">{{ item.price.toFixed(2) }}</td>
+                <td class="text-right price-column">
+                  {{ item.price.toFixed(2) }}
+                </td>
                 <td class="text-right total-column">
                   {{ item.totalAmountPerItem.toFixed(2) }}
                 </td>
@@ -172,8 +174,9 @@ export default {
 
     getImageUrl() {
       try {
-        return this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
-
+        return (
+          this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl
+        );
       } catch (error) {
         return "";
       }
@@ -192,12 +195,27 @@ export default {
     printContent() {
       this.forceA4Size(); // Ensure the content is set to A4 size
       setTimeout(() => {
+        const originalTitle = document.title; // Save the current title
+        document.title = "Print_" + this.quotation.business.shortName + "_" + this.quotation.quotationNumber; // Set the desired filename
+
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;
 
         document.body.innerHTML = printContents;
         window.print();
         document.body.innerHTML = originalContents;
+        document.title = originalTitle; // Restore the original title
+
+        // Reattach Vue.js event listeners (important!)
+        this.$nextTick(() => {
+          this.$forceUpdate();
+          //window.location.reload(); // Refresh the page to reinitialize Vue bindings
+
+          // console.log(originalDate)
+          // console.log(originalSelectedDevice)
+          // this.queryDate = originalDate;
+          // this.selectedDeviceID = originalSelectedDevice.devicecID;
+        });
       }, 100); // Delay slightly to allow reflow
     },
   },
@@ -205,7 +223,6 @@ export default {
 </script>
 
 <style scoped>
-
 .pdf-content > .CRow:first-child {
   margin-bottom: 0; /* Reduce space between header and content */
 }
@@ -216,14 +233,13 @@ export default {
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto; 
+  overflow-y: auto;
   background-color: white;
 }
 
 .table-wrapper {
   overflow-x: auto;
   max-width: 100%;
-  
 }
 
 .table {
@@ -239,29 +255,27 @@ export default {
 }
 
 .quantity-column {
-  width: 85px; 
+  width: 85px;
   text-align: center;
 }
 
 .price-column {
-  width: 150px; 
+  width: 150px;
   text-align: center;
 }
 
 .total-column {
-  width: 150px; 
+  width: 150px;
   text-align: center;
 }
 
 .item-column {
-  width: 250px; 
-  
+  width: 250px;
 }
 
 .index-column {
-  width: 50px; 
-  text-align: center; 
-   
+  width: 50px;
+  text-align: center;
 }
 
 .table td,
@@ -274,7 +288,7 @@ export default {
     width: 100%;
     height: auto;
   }
-  
+
   .table-wrapper {
     display: block;
     white-space: nowrap;
@@ -282,7 +296,6 @@ export default {
 }
 
 @media print {
-
   .pdf-content {
     width: 100%;
     height: auto;
@@ -293,11 +306,11 @@ export default {
   .table-wrapper {
     page-break-before: auto;
     /*page-break-inside: avoid;*/
-    margin-top: 10px; 
+    margin-top: 10px;
   }
 
   .invoice-details {
-    margin-bottom: 20px;  /* Add some bottom margin to the header section */
+    margin-bottom: 20px; /* Add some bottom margin to the header section */
   }
 
   .table tr {
@@ -307,12 +320,12 @@ export default {
 
   .table {
     width: 100%;
-    /*page-break-inside: auto;  -- Remove this line */ 
-    border-collapse: collapse; 
+    /*page-break-inside: auto;  -- Remove this line */
+    border-collapse: collapse;
   }
 
   .no-print {
-    display: none !important; 
+    display: none !important;
   }
 }
 
