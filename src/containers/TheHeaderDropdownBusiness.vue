@@ -1,6 +1,7 @@
 <template>
   <div class="wrapper">
-    <CDropdown v-if="isTenantAdmin()"
+    <CDropdown
+      v-if="isTenantAdmin()"
       placement="bottom"
       :caret="false"
       in-nav
@@ -88,6 +89,10 @@ export default {
         .updateDefaultBusiness(item)
         .then((response) => {
           this.initalize();
+          this.$router.push({ path: "/" }).then(() => {
+            // Force reload the page to clear all cached data
+            window.location.reload();
+          });
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");

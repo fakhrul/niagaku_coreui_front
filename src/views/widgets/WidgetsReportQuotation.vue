@@ -166,9 +166,14 @@ export default {
         return "N/A";
       }
     },
+    removeTrailingSlash(str) {
+      return str.endsWith("/") ? str.slice(0, -1) : str;
+    },
+
     getImageUrl() {
       try {
-        return this.quotation.business.logoUrl;
+        return this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl;
+
       } catch (error) {
         return "";
       }
