@@ -42,7 +42,7 @@
               <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>
             </CCol>
           </CRow>
-          <CRow>
+          <CRow v-if="quotation.title">
             <CCol>
               <p><strong>Title: </strong> {{ quotation.title }}</p>
             </CCol>
@@ -53,29 +53,29 @@
           <table class="table table-bordered">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Item & Description</th>
-                <th class="text-center">Quantity</th>
-                <th class="text-center">
+                <th class="index-column">#</th>
+                <th class="item-column">Item & Description</th>
+                <th class="text-center quantity-column">Quantity</th>
+                <th class="text-center price-column">
                   Price ({{ quotation.business.currency }})
                 </th>
-                <th class="text-center">
+                <th class="text-center total-column">
                   Total ({{ quotation.business.currency }})
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in computedQuotationItems" :key="item.name">
-                <td>{{ item.position }}</td>
-                <td>
+                <td class="index-column">{{ item.position }}</td>
+                <td class="item-column">
                   <p>
                     <strong>{{ item.product.name }}</strong>
                   </p>
                   <p>{{ item.description }}</p>
                 </td>
-                <td class="text-center">{{ item.quantity }}</td>
-                <td class="text-right">{{ item.price.toFixed(2) }}</td>
-                <td class="text-right">
+                <td class="text-center quantity-column">{{ item.quantity }}</td>
+                <td class="text-right price-column">{{ item.price.toFixed(2) }}</td>
+                <td class="text-right total-column">
                   {{ item.totalAmountPerItem.toFixed(2) }}
                 </td>
               </tr>
@@ -205,25 +205,63 @@ export default {
 </script>
 
 <style scoped>
+
+.pdf-content > .CRow:first-child {
+  margin-bottom: 0; /* Reduce space between header and content */
+}
 .pdf-content {
   width: 210mm;
   height: 297mm;
+  max-height: 297mm;
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-y: auto; 
   background-color: white;
 }
 
 .table-wrapper {
   overflow-x: auto;
   max-width: 100%;
+  
 }
 
 .table {
   width: 100%;
   table-layout: fixed;
   word-wrap: break-word;
+  page-break-inside: auto;
+}
+
+.table tr {
+  page-break-inside: auto; /* Prevent page breaks inside table rows */
+  page-break-after: auto; /* Allow page breaks after rows */
+}
+
+.quantity-column {
+  width: 85px; 
+  text-align: center;
+}
+
+.price-column {
+  width: 150px; 
+  text-align: center;
+}
+
+.total-column {
+  width: 150px; 
+  text-align: center;
+}
+
+.item-column {
+  width: 250px; 
+  
+}
+
+.index-column {
+  width: 50px; 
+  text-align: center; 
+   
 }
 
 .table td,
@@ -244,9 +282,37 @@ export default {
 }
 
 @media print {
+
   .pdf-content {
-    width: 210mm;
-    height: 297mm;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    page-break-inside: avoid;
+  }
+
+  .table-wrapper {
+    page-break-before: auto;
+    /*page-break-inside: avoid;*/
+    margin-top: 10px; 
+  }
+
+  .invoice-details {
+    margin-bottom: 20px;  /* Add some bottom margin to the header section */
+  }
+
+  .table tr {
+    /*page-break-inside: avoid; -- Remove this line */
+    page-break-after: auto;
+  }
+
+  .table {
+    width: 100%;
+    /*page-break-inside: auto;  -- Remove this line */ 
+    border-collapse: collapse; 
+  }
+
+  .no-print {
+    display: none !important; 
   }
 }
 

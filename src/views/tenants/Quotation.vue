@@ -243,6 +243,7 @@
                     v-model="obj.note"
                     placeholder=""
                     rows="2"
+                    class="small-text"
                   />
                 </CCol>
               </CRow>
@@ -354,6 +355,7 @@ export default {
         business: {
           name: "",
           address: "",
+          phone: ""
         },
         items: [],
         note: "",
@@ -509,8 +511,12 @@ export default {
     },
 
     preview() {
-      this.previewObj = this.obj;
-      this.previewObj.items = this.computedQuotationItems;
+      this.previewObj = {
+        ...this.obj,
+        items: this.computedQuotationItems,
+        expiryDate: this.expiryDate, // Add this line to include the expiry date
+      };
+      
       this.quotationPreviewPopup = true;
     },
     getBadgeClass() {
@@ -753,5 +759,9 @@ export default {
 .table {
   width: 100%;
   margin-top: 20px;
+}
+
+.small-text {
+  font-size: 0.5em !important;
 }
 </style>
