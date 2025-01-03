@@ -26,7 +26,7 @@
         </CRow>
         <hr class="thick-hr" />
         <div class="invoice-details">
-          <h3 class="text-center">QUOTATION</h3>
+          <h3 class="text-center">RECEIPT</h3>
           <CRow>
             <CCol md="6">
               <p>
@@ -36,7 +36,7 @@
             </CCol>
             <CCol md="6" class="text-right">
               <p>
-                <strong>Quotation No:</strong> {{ quotation.quotationNumber }}
+                <strong>Receipt No:</strong> {{ quotation.quNumber }}
               </p>
               <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
               <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>

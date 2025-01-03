@@ -36,6 +36,12 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
+            name: 'Receipt',
+            to: '/tenants/incomeReceiptList',
+            icon: 'cilImageBroken'
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'Sale Order',
             to: '/tenants/salesOrderList',
             icon: 'cilCart'

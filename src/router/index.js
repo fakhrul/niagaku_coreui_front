@@ -43,6 +43,8 @@ const Subscription = () => import('@/views/tenants/Subscription')
 
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
+const IncomeReceipt = () => import('@/views/tenants/IncomeReceipt')
+const IncomeReceiptList = () => import('@/views/tenants/IncomeReceiptList')
 
 const BankList = () => import('@/views/tenants/BankList')
 const Bank = () => import('@/views/tenants/Bank')
@@ -178,21 +180,21 @@ function configRoutes() {
             render(c) { return c('router-view') }
           },
           children: [
-            {
-              path: '/employee/receiptList',
-              name: 'ReceiptList',
-              component: ReceiptList
-            },
-            {
-              path: '/employee/receipt/:id',
-              name: 'ReceiptById',
-              component: Receipt
-            },
-            {
-              path: '/employee/receipt',
-              name: 'Receipt',
-              component: Receipt
-            },
+            // {
+            //   path: '/employee/receiptList',
+            //   name: 'ReceiptList',
+            //   component: ReceiptList
+            // },
+            // {
+            //   path: '/employee/receipt/:id',
+            //   name: 'ReceiptById',
+            //   component: Receipt
+            // },
+            // {
+            //   path: '/employee/receipt',
+            //   name: 'Receipt',
+            //   component: Receipt
+            // },
 
 
             {
@@ -372,6 +374,23 @@ function configRoutes() {
               name: 'Quotation',
               component: Quotation
             },
+
+
+            { //new
+              path: '/tenants/incomeReceipt',
+              name: 'IncomeReceipt',
+              component: IncomeReceipt
+            },
+            { //new
+              path: '/tenants/incomeReceipt/:id',
+              name: 'IncomeReceiptById',
+              component: IncomeReceipt
+            },
+            { //new
+              path: '/tenants/incomeReceiptList',
+              name: 'IncomeReceiptList',
+              component: IncomeReceiptList
+            },
             {
               path: '/tenants/quotation/:id',
               name: 'QuotationById',
@@ -545,7 +564,7 @@ function configRoutes() {
               component: ChartOfAccount
             },
 
-            //
+            
             {
               path: '/tenants/receiptList',
               name: 'TenantReceiptList',
