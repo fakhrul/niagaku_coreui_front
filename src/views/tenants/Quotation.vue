@@ -224,7 +224,7 @@
                           >Add</CButton
                         >
                       </td>
-                      <td colspan="5" class="text-right">
+                      <td colspan="4" class="text-right">
                         <strong>Grand Total:</strong>
                       </td>
                       <td>{{ grandTotal.toFixed(2) }}</td>
@@ -243,7 +243,6 @@
                     v-model="obj.note"
                     placeholder=""
                     rows="2"
-                    class="small-text"
                   />
                 </CCol>
               </CRow>
@@ -314,6 +313,7 @@ const quotationFields = [
   {
     key: "show_item",
     label: "Item",
+    _style: "width:100px",
   },
   {
     key: "show_description",
@@ -355,7 +355,7 @@ export default {
         business: {
           name: "",
           address: "",
-          phone: ""
+          phone: "",
         },
         items: [],
         note: "",
@@ -516,7 +516,7 @@ export default {
         items: this.computedQuotationItems,
         expiryDate: this.expiryDate, // Add this line to include the expiry date
       };
-      
+
       this.quotationPreviewPopup = true;
     },
     getBadgeClass() {
@@ -693,6 +693,12 @@ export default {
           .create(self.obj)
           .then((response) => {
             self.toast("Success", "Updated", "success");
+            console.log(response.result);
+            var newObj = response.result;
+            self.$router.push({
+              path: `/tenants/Quotation/${newObj.id}`,
+            });
+
             self.resetObj();
             // self.$router.push({ path: "/tenants/quotationList" });
           })
