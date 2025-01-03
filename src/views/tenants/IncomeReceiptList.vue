@@ -207,11 +207,8 @@ export default {
       return "N/A";
     },
     getReceiptNo(item) {
-      return item.incomeReceiptNo;
-      // if (item.customer) {
-      //   return item.customer.name;
-      // }
-      return "N/A";
+      return item.incomeReceiptNumber;
+ 
     },
     getGrandTotal(incomeReceipt) {
       var total = 0;

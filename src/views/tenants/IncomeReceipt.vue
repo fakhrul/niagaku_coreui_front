@@ -18,7 +18,7 @@
           <CCard>
             <CCardHeader>
               <strong>Receipt</strong>
-              <small>{{ obj.receiptNumber }}</small>
+              <small>{{ obj.incomeReceiptNumber }}</small>
               <a href="" target="_blank" :class="getBadgeClass()">
                 {{ obj.statusDescription }}
               </a>
@@ -82,7 +82,7 @@
                   ><CInput
                     label="Receipt No"
                     placeholder=""
-                    v-model="obj.receiptNumber"
+                    v-model="obj.incomeReceiptNumber"
                 /></CCol>
                 <CCol sm="12" lg="2">
                   <CInput
@@ -302,8 +302,58 @@ import "vue-select/dist/vue-select.css";
 import moment from "moment";
 import WidgetsReportIncomeReceipt from "../widgets/WidgetsReportIncomeReceipt";
 
-const incomeReceiptItems = [];
-const incomeReceiptFields = [
+// const incomeReceiptItems = [];
+// const incomeReceiptFields = [
+//   {
+//     key: "show_index",
+//     label: "#",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+//   // { key: "position", label: "Position" },
+//   // { key: "productName", label: "Item" },
+//   {
+//     key: "show_item",
+//     label: "Item",
+//   },
+//   {
+//     key: "show_description",
+//     label: "Description",
+//   },
+//   {
+//     key: "show_quantity",
+//     label: "Quantity",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_price",
+//     label: "Price",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_total",
+//     label: "Total",
+//   },
+//   {
+//     key: "show_move",
+//     _style: "width:1%",
+//   },
+//   {
+//     key: "show_remove",
+//     _style: "width:1%",
+//   },
+// ];
+
+export default {
+  name: "IncomeReceipt",
+  components: {
+    vSelect,
+    WidgetsReportIncomeReceipt,
+  },
+  data: () => {
+    return {
+      incomeReceiptFields : [
   {
     key: "show_index",
     label: "#",
@@ -343,16 +393,7 @@ const incomeReceiptFields = [
     key: "show_remove",
     _style: "width:1%",
   },
-];
-
-export default {
-  name: "Income Receipt",
-  components: {
-    vSelect,
-    WidgetsReportIncomeReceipt,
-  },
-  data: () => {
-    return {
+],
       previewObj: {
         business: {
           name: "",
@@ -367,11 +408,11 @@ export default {
       issuedDate: Date(),
       expiryDate: Date(),
       // Quotation Itm
-      incomeReceiptItems: incomeReceiptItems.map((item, id) => {
-        return { ...item, id };
-      }),
+      // incomeReceiptItems: incomeReceiptItems.map((item, id) => {
+      //   return { ...item, id };
+      // }),
 
-      incomeReceiptItems,
+      incomeReceiptItems: [],
 
       selectedItem: null,
 
@@ -402,7 +443,7 @@ export default {
       return moment(this.issuedDate).format("YYYY-MM-DD");
     },
 
-    computedIncomeReceiptItems() {
+    computedincomeReceiptItems() {
       return this.incomeReceiptItems.map((item) => {
         return {
           ...item,
@@ -644,6 +685,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.productItems = response.result;
+          console.log('self.productItems',self.productItems);
         })
         .catch(({ data }) => {});
     },
@@ -655,6 +697,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.customerItems = response.result;
+          console.log('self.customerItems',self.customerItems);
         })
         .catch(({ data }) => {});
     },
@@ -665,8 +708,10 @@ export default {
         self.api
           .get(self.$route.params.id)
           .then((response) => {
+            console.log(response);
             self.obj = response.result;
-            console.log(self.obj);
+          console.log('self.obj',self.obj);
+
             this.issuedDate = self.obj.issuedDate;
             this.expiryDate = self.obj.dueDate;
             self.selectedCustomer = self.obj.customer;
@@ -700,7 +745,7 @@ export default {
           .getNextNumber()
           .then((response) => {
             console.log(response.result);
-            self.obj.receiptNumber = response.result;
+            self.obj.incomeReceiptNumber = response.result;
             console.log(self.obj);
           })
           .catch(({ data }) => {});
@@ -773,7 +818,7 @@ export default {
     },
     getEmptyObj() {
       return {
-        receiptNumber: "",
+        incomeReceiptNumber: "",
         // code: "",
         // name: "",
         // decsription: "",

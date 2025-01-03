@@ -18,10 +18,10 @@
             />
           </CCol>
           <CCol>
-            <h1>{{ quotation.business.name }}</h1>
-            <p>{{ "(" + quotation.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(quotation.business.address)"></p> <!--item.description is rendered from handlekeydown event and rerun format-->
-            <p>Tel: {{ quotation.business.phone }}</p>
+            <h1>{{ receipt.business.name }}</h1>
+            <p>{{ "(" + receipt.business.regNo + ")" }}</p>
+            <p v-html="formatAddress(receipt.business.address)"></p> <!--item.description is rendered from handlekeydown event and rerun format-->
+            <p>Tel: {{ receipt.business.phone }}</p>
           </CCol>
         </CRow>
         <hr class="thick-hr" />
@@ -36,15 +36,15 @@
             </CCol>
             <CCol md="6" class="text-right">
               <p>
-                <strong>Receipt No:</strong> {{ quotation.quNumber }}
+                <strong>Receipt No:</strong> {{ receipt.incomeReceiptNumber }}
               </p>
-              <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
-              <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>
+              <p><strong>Date:</strong> {{ getQuotationIssuedDate() }}</p>
+              <!-- <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p> -->
             </CCol>
           </CRow>
-          <CRow v-if="quotation.title">
+          <CRow v-if="receipt.title">
             <CCol>
-              <p><strong>Title: </strong> {{ quotation.title }}</p>
+              <p><strong>Title: </strong> {{ receipt.title }}</p>
             </CCol>
           </CRow>
         </div>
@@ -57,10 +57,10 @@
                 <th class="item-column">Item & Description</th>
                 <th class="text-center quantity-column">Quantity</th>
                 <th class="text-center price-column">
-                  Price ({{ quotation.business.currency }})
+                  Price ({{ receipt.business.currency }})
                 </th>
                 <th class="text-center total-column">
-                  Total ({{ quotation.business.currency }})
+                  Total ({{ receipt.business.currency }})
                 </th>
               </tr>
             </thead>
@@ -96,9 +96,9 @@
         </div>
 
         <!-- Terms and Conditions Section -->
-        <div v-if="quotation.note" class="terms-and-conditions mt-4">
+        <div v-if="receipt.note" class="terms-and-conditions mt-4">
           <h4>Terms and Conditions</h4>
-          <p v-html="formatNote(quotation.note)"></p>
+          <p v-html="formatNote(receipt.note)"></p>
         </div>
       </CCardBody>
     </CCard>
@@ -111,14 +111,14 @@ import moment from "moment";
 export default {
   name: "WidgetsReportInvoice",
   props: {
-    quotation: {
+    receipt: {
       type: Object,
       required: true,
     },
   },
   computed: {
     computedQuotationItems() {
-      return this.quotation.items.map((item) => {
+      return this.receipt.items.map((item) => {
         return {
           ...item,
           productName: item.product.name,
@@ -164,21 +164,21 @@ export default {
       }
     },
     getQuotationIssuedDate() {
-      return moment(this.quotation.issuedDate).format("DD/MM/YYYY");
+      return moment(this.receipt.issuedDate).format("DD/MM/YYYY");
     },
     getQuotationExpiryDate() {
-      return moment(this.quotation.expiryDate).format("DD/MM/YYYY");
+      return moment(this.receipt.expiryDate).format("DD/MM/YYYY");
     },
     getCustomerAddress() {
       try {
-        return this.quotation.customer.address;
+        return this.receipt.customer.address;
       } catch (error) {
         return "N/A";
       }
     },
     getCustomerName() {
       try {
-        return this.quotation.customer.name;
+        return this.receipt.customer.name;
       } catch (error) {
         return "N/A";
       }
@@ -190,7 +190,7 @@ export default {
     getImageUrl() {
       try {
         return (
-          this.removeTrailingSlash(apiUrl) + this.quotation.business.logoUrl
+          this.removeTrailingSlash(apiUrl) + this.receipt.business.logoUrl
         );
       } catch (error) {
         return "";
@@ -211,7 +211,7 @@ export default {
       this.forceA4Size(); // Ensure the content is set to A4 size
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
-        document.title = "Print_" + this.quotation.business.shortName + "_" + this.quotation.quotationNumber; // Set the desired filename
+        document.title = "Print_" + this.receipt.business.shortName + "_" + this.receipt.quotationNumber; // Set the desired filename
 
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;
