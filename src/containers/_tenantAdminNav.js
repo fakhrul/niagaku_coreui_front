@@ -37,7 +37,7 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Receipt',
-            to: '/tenants/incomeReceipt',
+            to: '/tenants/incomeReceiptList',
             icon: 'cilImageBroken'
           },
           {

@@ -33,11 +33,11 @@
                   class="m-2 d-inline-block tour-cdropdown"
                   size="sm"
                 >
-                  <template v-for="status in quotationStatuses">
+                  <!-- <template v-for="status in quotationStatuses">
                     <CDropdownItem @click="changeState(status)">{{
                       status.name
                     }}</CDropdownItem>
-                  </template>
+                  </template> -->
                 </CDropdown>
                 <!-- Start Tour Button -->
                 <!-- <CButton size="sm" color="info" @click="startTour">
@@ -128,8 +128,8 @@
                   <!-- Wrap CDataTable with draggable -->
 
                   <CDataTable
-                    :items="computedQuotationItems"
-                    :fields="quotationFields"
+                    :items="computedincomeReceiptItems"
+                    :fields="incomeReceiptFields"
                   >
                     <!-- <template #show_drag="{ item, index }">
                       <td>
@@ -200,7 +200,7 @@
                           color="primary"
                           size="sm"
                           @click="moveItem(index, 'down')"
-                          :disabled="index === quotationItems.length - 1"
+                          :disabled="index === incomeReceiptItems.length - 1"
                         >
                           ↓
                         </CButton>
@@ -294,7 +294,7 @@
 import Shepherd from "shepherd.js";
 import "shepherd.js/dist/css/shepherd.css"; // Import Shepherd.js default style
 
-import QuotationApi from "@/lib/quotationApi";
+import IncomeReceiptApi from "@/lib/incomeReceiptApi";
 import CustomerApi from "@/lib/customerApi";
 import ProductApi from "@/lib/productApi";
 import vSelect from "vue-select";
@@ -302,8 +302,8 @@ import "vue-select/dist/vue-select.css";
 import moment from "moment";
 import WidgetsReportIncomeReceipt from "../widgets/WidgetsReportIncomeReceipt";
 
-const quotationItems = [];
-const quotationFields = [
+const incomeReceiptItems = [];
+const incomeReceiptFields = [
   {
     key: "show_index",
     label: "#",
@@ -363,15 +363,15 @@ export default {
         note: "",
       },
       receiptPreviewPopup: false,
-      quotationStatuses: [],
+      // quotationStatuses: [],
       issuedDate: Date(),
       expiryDate: Date(),
       // Quotation Itm
-      quotationItems: quotationItems.map((item, id) => {
+      incomeReceiptItems: incomeReceiptItems.map((item, id) => {
         return { ...item, id };
       }),
 
-      quotationFields,
+      incomeReceiptItems,
 
       selectedItem: null,
 
@@ -380,7 +380,7 @@ export default {
       infoList: [],
       obj: {},
       submitted: false,
-      api: new QuotationApi(),
+      api: new IncomeReceiptApi(),
       customerApi: new CustomerApi(),
       productApi: new ProductApi(),
       customerItems: [],
@@ -389,7 +389,7 @@ export default {
   },
   mounted() {
     var self = this;
-    this.fetchQuotationStatuses();
+    // this.fetchQuotationStatuses();
     self.refreshCustomer();
     self.refreshProduct();
     self.resetObj();
@@ -402,8 +402,8 @@ export default {
       return moment(this.issuedDate).format("YYYY-MM-DD");
     },
 
-    computedQuotationItems() {
-      return this.quotationItems.map((item) => {
+    computedIncomeReceiptItems() {
+      return this.incomeReceiptItems.map((item) => {
         return {
           ...item,
           productName: item.product.name,
@@ -413,8 +413,8 @@ export default {
     },
     grandTotal() {
       var total = 0;
-      for (var i = 0; i < this.quotationItems.length; i++) {
-        var item = this.quotationItems[i];
+      for (var i = 0; i < this.incomeReceiptItems.length; i++) {
+        var item = this.incomeReceiptItems[i];
         total += item.price * item.quantity;
       }
       return total;
@@ -515,37 +515,37 @@ export default {
       // Start the tour
       tour.start();
     },
-    changeState(item) {
-      var self = this;
-      self.obj.status = item.id;
-      if (self.obj.id) {
-        this.api
-          .updateState(self.obj)
-          .then((response) => {
-            self.resetObj();
-          })
-          .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
-          });
-      }
-    },
-    fetchQuotationStatuses() {
-      var self = this;
-      self.api
-        .getQuotationStatus()
-        .then((response) => {
-          this.quotationStatuses = response.result;
-          console.log(this.quotationStatuses);
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
-    },
+    // changeState(item) {
+    //   var self = this;
+    //   self.obj.status = item.id;
+    //   if (self.obj.id) {
+    //     this.api
+    //       .updateState(self.obj)
+    //       .then((response) => {
+    //         self.resetObj();
+    //       })
+    //       .catch(({ data }) => {
+    //         self.toast("Error", helper.getErrorMessage(data), "danger");
+    //       });
+    //   }
+    // },
+    // fetchQuotationStatuses() {
+    //   var self = this;
+    //   self.api
+    //     .getQuotationStatus()
+    //     .then((response) => {
+    //       this.quotationStatuses = response.result;
+    //       console.log(this.quotationStatuses);
+    //     })
+    //     .catch(({ data }) => {
+    //       self.toast("Error", helper.getErrorMessage(data), "danger");
+    //     });
+    // },
 
     preview() {
       this.previewObj = {
         ...this.obj,
-        items: this.computedQuotationItems,
+        items: this.computedincomeReceiptItems,
         expiryDate: this.expiryDate, // Add this line to include the expiry date
       };
       
@@ -573,34 +573,34 @@ export default {
       this.issuedDate = new Date(e + "T00:00:00"); // ISO format assumes local time
     },
     updatePositions() {
-      this.computedQuotationItems.forEach((item, index) => {
+      this.computedincomeReceiptItems.forEach((item, index) => {
         item.position = index + 1;
       });
     },
 
     moveItem(index, direction) {
       const newIndex = direction === "up" ? index - 1 : index + 1;
-      if (newIndex >= 0 && newIndex < this.computedQuotationItems.length) {
-        const temp = this.computedQuotationItems[index];
+      if (newIndex >= 0 && newIndex < this.computedincomeReceiptItems.length) {
+        const temp = this.computedincomeReceiptItems[index];
         this.$set(
-          this.computedQuotationItems,
+          this.computedincomeReceiptItems,
           index,
-          this.computedQuotationItems[newIndex]
+          this.computedincomeReceiptItems[newIndex]
         );
-        this.$set(this.computedQuotationItems, newIndex, temp);
+        this.$set(this.computedincomeReceiptItems, newIndex, temp);
 
         // Update positions after swapping
-        this.computedQuotationItems[index].position = index + 1;
-        this.computedQuotationItems[newIndex].position = newIndex + 1;
+        this.computedincomeReceiptItems[index].position = index + 1;
+        this.computedincomeReceiptItems[newIndex].position = newIndex + 1;
       }
     },
 
     onRemoveClaimItem(item) {
       var self = this;
-      if (self.computedQuotationItems != null) {
-        for (var i = 0; i < self.computedQuotationItems.length; i++) {
-          if (self.computedQuotationItems[i].id === item.id) {
-            self.computedQuotationItems.splice(i, 1);
+      if (self.computedincomeReceiptItems != null) {
+        for (var i = 0; i < self.computedincomeReceiptItems.length; i++) {
+          if (self.computedincomeReceiptItems[i].id === item.id) {
+            self.computedincomeReceiptItems.splice(i, 1);
           }
         }
       }
@@ -619,9 +619,9 @@ export default {
       );
     },
     addNewItem() {
-      console.log(this.quotationItems);
-      const newPosition = this.quotationItems.length + 1;
-      this.quotationItems.push({
+      console.log(this.incomeReceiptItems);
+      const newPosition = this.incomeReceiptItems.length + 1;
+      this.incomeReceiptItems.push({
         id: this.generateGUID(),
         product: this.productItems[0],
         price: 0,
@@ -629,7 +629,7 @@ export default {
         description: "",
         position: newPosition,
       });
-      console.log(this.quotationItems);
+      console.log(this.incomeReceiptItems);
     },
     getTotalItemPrice(item) {
       try {
@@ -679,7 +679,7 @@ export default {
               }
             }
 
-            self.quotationItems = self.obj.items;
+            self.incomeReceiptItems = self.obj.items;
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -700,7 +700,7 @@ export default {
           .getNextNumber()
           .then((response) => {
             console.log(response.result);
-            self.obj.quotationNumber = response.result;
+            self.obj.receiptNumber = response.result;
             console.log(self.obj);
           })
           .catch(({ data }) => {});
@@ -708,7 +708,7 @@ export default {
     },
     onSubmit() {
       var self = this;
-      self.obj.items = self.computedQuotationItems;
+      self.obj.items = self.computedincomeReceiptItems;
       self.obj.issuedDate = self.issuedDate;
       self.obj.dueDate = self.expiryDate;
 

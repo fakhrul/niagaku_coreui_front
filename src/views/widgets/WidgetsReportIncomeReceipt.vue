@@ -36,7 +36,7 @@
             </CCol>
             <CCol md="6" class="text-right">
               <p>
-                <strong>Receipt No:</strong> {{ quotation.quotationNumber }}
+                <strong>Receipt No:</strong> {{ quotation.quNumber }}
               </p>
               <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
               <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>

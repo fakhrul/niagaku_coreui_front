@@ -44,6 +44,7 @@ const Subscription = () => import('@/views/tenants/Subscription')
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
 const IncomeReceipt = () => import('@/views/tenants/IncomeReceipt')
+const IncomeReceiptList = () => import('@/views/tenants/IncomeReceiptList')
 
 const BankList = () => import('@/views/tenants/BankList')
 const Bank = () => import('@/views/tenants/Bank')
@@ -379,6 +380,16 @@ function configRoutes() {
               path: '/tenants/incomeReceipt',
               name: 'IncomeReceipt',
               component: IncomeReceipt
+            },
+            { //new
+              path: '/tenants/incomeReceipt/:id',
+              name: 'IncomeReceiptById',
+              component: IncomeReceipt
+            },
+            { //new
+              path: '/tenants/incomeReceiptList',
+              name: 'IncomeReceiptList',
+              component: IncomeReceiptList
             },
             {
               path: '/tenants/quotation/:id',
