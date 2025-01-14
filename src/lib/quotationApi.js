@@ -43,6 +43,13 @@ class QuotationApi {
             });
     }
 
+    getItem(id) {
+        var url = apiUrl + 'quotations/item/';
+        return api.call('get', url + id)
+            .then(({ data }) => {
+                return data
+            });
+    }
 
     get(id) {
         var url = apiUrl + 'quotations/';
@@ -51,6 +58,7 @@ class QuotationApi {
                 return data
             });
     }
+    
     create(data) {
         var url = apiUrl + 'quotations';
         return api.call('post', url, data)

@@ -63,7 +63,23 @@
 
                 <template #show_details="{ item, index }">
                   <td class="py-2">
-                    <CButton
+                    <CDropdown toggler-text="Action" class="m-2" color="light">
+                      <CDropdownItem @click="onEdit(item)"
+                        >View/Edit</CDropdownItem
+                      >
+                      <CDropdownItem @click="onDuplicate(item)"
+                        >Duplicate</CDropdownItem
+                      >
+                      <CDropdownDivider />
+                      <CDropdownItem>Print</CDropdownItem>
+                      <CDropdownItem>Export to PDF</CDropdownItem>
+                      <CDropdownDivider />
+                      <CDropdownItem @click="showDeleteConfirmation(item)"
+                        >Delete</CDropdownItem
+                      >
+                    </CDropdown>
+
+                    <!-- <CButton
                       color="primary"
                       variant="outline"
                       square
@@ -71,7 +87,7 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
+                    </CButton> -->
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -256,6 +272,12 @@ export default {
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
         });
+    },
+    onDuplicate(item) {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Quotation/${item.id}/duplicate`,
+      });
     },
     onEdit(item) {
       var self = this;

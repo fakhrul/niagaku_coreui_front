@@ -28,11 +28,16 @@
                 >
                 <CDropdown
                   placement="bottom-end"
-                  toggler-text="Change Status"
-                  color="primary"
+                  toggler-text="Action"
+                  color="light"
                   class="m-2 d-inline-block tour-cdropdown"
                   size="sm"
                 >
+                  <CDropdownItem @click="onConvertToInvoice(obj)"
+                    >Convert To Invoice</CDropdownItem
+                  >
+                  <CDropdownDivider />
+                  <CDropdownHeader>Change Status To:</CDropdownHeader>
                   <template v-for="status in quotationStatuses">
                     <CDropdownItem @click="changeState(status)">{{
                       status.name
@@ -64,32 +69,36 @@
             </CCardHeader>
             <CCardBody>
               <CRow>
-                <CCol sm="12" lg="4"
-                  ><CFormGroup wrapperClasses="input-group pt-2 mb-2">
-                    <template #label>Customer </template>
-                    <template #input>
-                      <v-select
-                        style="width: 100%"
-                        v-model="selectedCustomer"
-                        :label="'name'"
-                        :options="customerItems"
-                        placeholder="Select customer"
-                      />
-                    </template>
-                  </CFormGroup>
+                <CCol sm="12" md="12" lg="6">
+                  <v-select
+                    class="form-control-lg"
+                    style="width: 100%"
+                    v-model="selectedCustomer"
+                    :label="'name'"
+                    :options="customerItemsWithAddNew"
+                    placeholder="Select customer"
+                    @input="handleCustomerSelect"
+                  />
                 </CCol>
-                <CCol sm="12" lg="2"
+                <CCol sm="12" md="12" lg="6"
                   ><CInput
-                    label="Quotation No"
-                    placeholder=""
+                    size="lg"
+                    placeholder="Quot No"
                     v-model="obj.quotationNumber"
-                /></CCol>
-                <CCol sm="12" lg="2">
+                    description="Quotation No"
+                  >
+                    <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
+                  </CInput></CCol
+                >
+              </CRow>
+              <CRow>
+                <CCol sm="12" md="8" lg="4">
                   <CInput
-                    label="Date"
                     type="date"
+                    size="lg"
                     :value="computeIssuedDate"
                     @change="setIssuedDate"
+                    description="Issue Date"
                   />
 
                   <!-- <input
@@ -99,18 +108,21 @@
                   class="mr-2"
                 /> -->
                 </CCol>
-                <CCol sm="12" lg="2">
+                <CCol sm="12" md="8" lg="4">
                   <CInput
-                    label="Expiry"
+                    size="lg"
+                    description="Expriry Date"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
                 /></CCol>
-                <CCol sm="12" lg="2">
-                  <CInput label="Reference" v-model="obj.reference"
+                <CCol sm="12" md="8" lg="4">
+                  <CInput
+                    size="lg"
+                    description="Reference"
+                    v-model="obj.reference"
                 /></CCol>
               </CRow>
-
               <CRow>
                 <CCol>
                   <CTextarea
@@ -150,8 +162,9 @@
                               style="width: 100%"
                               v-model="item.product"
                               :label="'name'"
-                              :options="productItems"
+                              :options="computeProductItemsWithAddNew"
                               placeholder="Select product"
+                              @input="handleProductSelect"
                             />
                           </template>
                         </CFormGroup>
@@ -208,25 +221,32 @@
                     </template>
                     <template #show_remove="{ item }">
                       <td class="py-2">
+                        <CDropdown
+                          color="secondary"
+                          split
+                          toggler-text="Remove"
+                          class="m-2"
+                          @click="onRemoveClaimItem(item)"
+                        >
+                          <CDropdownItem @click="createInvoiceByItem(item)">Create Invoice</CDropdownItem>
+                        </CDropdown>
+                        <!--               
                         <CButton
-                          color="primary"
-                          variant="outline"
-                          square
-                          size="sm"
+                          color="light"
                           @click="onRemoveClaimItem(item)"
                         >
                           Remove
-                        </CButton>
+                        </CButton> -->
                       </td>
                     </template>
 
                     <template #footer>
-                      <td>
-                        <CButton @click="addNewItem()" color="primary"
-                          >Add</CButton
+                      <td colspan="2">
+                        <CButton color="light" @click="addNewItem()"
+                          >Add Item</CButton
                         >
                       </td>
-                      <td colspan="4" class="text-right">
+                      <td colspan="3" class="text-right">
                         <strong>Grand Total:</strong>
                       </td>
                       <td>{{ grandTotal.toFixed(2) }}</td>
@@ -265,6 +285,19 @@
           </CCard>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader>Preview</CCardHeader>
+            <CCardBody>
+              <WidgetsReportQuotation
+                :quotation="computedPreviewItem"
+              ></WidgetsReportQuotation>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <!-- <CRow>
         <CCol>
           <WidgetsReportQuotation :quotation="obj"></WidgetsReportQuotation>
@@ -282,6 +315,68 @@
             <WidgetsReportQuotation
               :quotation="previewObj"
             ></WidgetsReportQuotation>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
+    <div>
+      <CModal
+        title="Add New Customer"
+        size="xl"
+        :show.sync="addCustomerFormPopup"
+        @update:show="onCustomerPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="6">
+            <CInput
+              label="Name"
+              v-model="itemAddNewCustomer.name"
+              placeholder="Customer Sdn Bhd"
+              required
+              was-validated
+            />
+            <CInput
+              label="Contact Name"
+              v-model="itemAddNewCustomer.contactName"
+            />
+            <CInput
+              label="Contact Email"
+              v-model="itemAddNewCustomer.contactEmail"
+            />
+            <CInput
+              label="Contact Phone"
+              v-model="itemAddNewCustomer.contactPhone"
+            />
+          </CCol>
+          <CCol md="6">
+            <CTextarea
+              label="Address"
+              placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
+              rows="5"
+              v-model="itemAddNewCustomer.address"
+              required
+              was-validated
+            />
+            <CInput label="City" v-model="itemAddNewCustomer.city" />
+            <CInput label="Country" v-model="itemAddNewCustomer.country" />
+            <CInput label="State" v-model="itemAddNewCustomer.state" />
+            <!-- <CSelect
+                  :value.sync="obj.country"
+                  :options="aseanCountries"
+                  label="Country"
+                /> -->
+            <!-- State Selection -->
+            <!-- <CSelect
+                  :value.sync="obj.state"
+                  :options="stateOptions"
+                  label="State"
+                /> -->
+            <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" />
+            <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
+            <CInput label="Website" v-model="itemAddNewCustomer.website" />
           </CCol>
         </CRow>
       </CModal>
@@ -353,6 +448,9 @@ export default {
   },
   data: () => {
     return {
+      itemAddNewCustomer: {},
+      addCustomerFormPopup: false,
+
       previewObj: {
         business: {
           name: "",
@@ -395,6 +493,27 @@ export default {
     self.resetObj();
   },
   computed: {
+    computedPreviewItem() {
+      return {
+        ...this.obj,
+        items: this.computedQuotationItems,
+        expiryDate: this.expiryDate, // Add this line to include the expiry date
+      };
+    },
+    computeProductItemsWithAddNew()
+    {
+      return [
+        ...this.productItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+
+    },
+    customerItemsWithAddNew() {
+      return [
+        ...this.customerItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -421,6 +540,61 @@ export default {
     },
   },
   methods: {
+    createInvoiceByItem(item)
+    {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Invoice/${item.id}/convertFromItem`,
+      });
+
+    },
+    onConvertToInvoice(item) {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Invoice/${item.id}/convertFromQuot`,
+      });
+    },
+    onCustomerPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.customerApi
+          .create(this.itemAddNewCustomer)
+          .then((response) => {
+            console.log("onCustomerPopupConfirmation", response);
+
+            var addedCustomer = response.result;
+            this.refreshCustomer();
+            this.selectedCustomer = addedCustomer;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewCustomer = {};
+    },
+    handleProductSelect(selected) {
+      if (selected.id === "add_new") {
+        alert('add new')
+        // // Trigger action to add a new customer
+        // this.addNewProduct();
+        // this.selectedCustomer = null; // Reset selection
+      }
+    },
+    handleCustomerSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewCustomer();
+        this.selectedCustomer = null; // Reset selection
+      }
+    },
+    addNewCustomer() {
+      this.itemAddNewCustomer = {};
+      this.addCustomerFormPopup = true;
+      // Logic to handle adding a new customer
+      // alert("Add New Customer clicked!");
+    },
+
     cancel() {
       this.$router.push({ path: "/tenants/QuotationList" });
     },
@@ -429,11 +603,12 @@ export default {
       const start = event.target.selectionStart;
       const end = event.target.selectionEnd;
 
-      if (event.key === 'Tab') {  //check if user click tab or enter
+      if (event.key === "Tab") {
+        //check if user click tab or enter
         event.preventDefault();
         item.description =
           item.description.substring(0, start) +
-          '    ' + // 4 spaces
+          "    " + // 4 spaces
           item.description.substring(end);
 
         //start and end = current position of cursor, if tab, add 4 spaces
@@ -442,10 +617,11 @@ export default {
         });
       }
 
-      if (event.key === 'Enter') { //if user clicks enter, gets the cursor position & insert new line (\n)
+      if (event.key === "Enter") {
+        //if user clicks enter, gets the cursor position & insert new line (\n)
         item.description =
           item.description.substring(0, start) +
-          '\n' +
+          "\n" +
           item.description.substring(end);
 
         // Move cursor
@@ -597,10 +773,10 @@ export default {
 
     onRemoveClaimItem(item) {
       var self = this;
-      if (self.computedQuotationItems != null) {
-        for (var i = 0; i < self.computedQuotationItems.length; i++) {
-          if (self.computedQuotationItems[i].id === item.id) {
-            self.computedQuotationItems.splice(i, 1);
+      if (self.quotationItems != null) {
+        for (var i = 0; i < self.quotationItems.length; i++) {
+          if (self.quotationItems[i].id === item.id) {
+            self.quotationItems.splice(i, 1);
           }
         }
       }
@@ -619,8 +795,7 @@ export default {
       );
     },
     addNewItem() {
-      console.log(this.quotationItems);
-      const newPosition = this.quotationItems.length + 1;
+       const newPosition = this.quotationItems.length + 1;
       this.quotationItems.push({
         id: this.generateGUID(),
         product: this.productItems[0],
@@ -680,6 +855,38 @@ export default {
             }
 
             self.quotationItems = self.obj.items;
+
+            // Handle duplication logic
+            if (self.$route.name === "QuotationDuplicate") {
+              delete self.obj.id; // Remove `id` for duplication
+              let currentDate = new Date();
+              this.issuedDate = new Date(
+                currentDate.toISOString().split("T")[0] + "T00:00:00"
+              ); // Set issuedDate
+              currentDate.setDate(currentDate.getDate() + 30);
+              this.expiryDate = new Date(
+                currentDate.toISOString().split("T")[0] + "T00:00:00"
+              ); // Set expiry date
+
+              this.api
+                .getNextNumber()
+                .then((response) => {
+                  console.log(response.result);
+                  self.obj.quotationNumber = response.result;
+                  console.log(self.obj);
+                })
+                .catch(({ data }) => {});
+
+              self.obj.createdAt = null; // Clear timestamps
+              self.obj.updatedAt = null;
+
+              for (var i = 0; i < self.obj.items.length; i++) {
+                delete self.obj.items[i].id;
+              }
+
+              // Optionally modify any other fields if required
+              this.toast("Info", "You are duplicating a quotation.", "info");
+            }
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -720,6 +927,7 @@ export default {
         self.obj.customerId = self.selectedCustomer.id;
       }
 
+      console.log("self.obj", self.obj);
       if (!self.obj.id) {
         this.api
           .create(self.obj)

@@ -18,7 +18,7 @@
               filesChange($event.target.name, $event.target.files);
               fileCount = $event.target.files.length;
             "
-            accept="image/*"
+            accept="image/*,.pdf"
             class="input-file"
           />
           <p v-if="isInitial">
@@ -31,15 +31,6 @@
       <!--SUCCESS-->
       <div v-if="isSuccess">
 
-        <!-- <ul class="list-unstyled">
-          <li v-for="item in uploadedFiles">
-            <img
-              :src="item.url"
-              class="img-responsive img-thumbnail"
-              :alt="item.originalName"
-            />
-          </li>
-        </ul> -->
         <p>
           <a href="javascript:void(0)" @click="reset()"
             >Click to upload again</a

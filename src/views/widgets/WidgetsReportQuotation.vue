@@ -10,17 +10,19 @@
       </CCardHeader>
       <CCardBody>
         <CRow class="justify-content-between align-items-center">
-          <CCol xs="4" sm="3" md="2">
+          <CCol >
             <img
               :src="getImageUrl()"
               alt="Logo Syarikat"
               class="img-fluid logo-image"
             />
           </CCol>
-          <CCol>
-            <h1>{{ quotation.business.name }}</h1>
+          <CCol class="text-right">
+            <h1>QUOTATION</h1>
+            <h4>{{ quotation.business.name }}</h4>
             <p>{{ "(" + quotation.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(quotation.business.address)"></p> <!--item.description is rendered from handlekeydown event and rerun format-->
+            <p v-html="formatAddress(quotation.business.address)"></p>
+            <!--item.description is rendered from handlekeydown event and rerun format-->
             <p>Tel: {{ quotation.business.phone }}</p>
           </CCol>
         </CRow>
@@ -142,18 +144,19 @@ export default {
       return note.replace(/\n/g, "<br />");
     },
 
-
     formatDescription(description) {
       // split item.description \n
       return description
-        .split('\n') //split into an array
-        .map(line => {
+        .split("\n") //split into an array
+        .map((line) => {
           // check for indentation (e.g., spaces or tabs at the start)
-          const indentLevel = (line.match(/^(\s+)/) || [''])[0].length / 4; 
-          return `<p style="padding-left: ${indentLevel * 20}px;">${line.trim()}</p>`;
+          const indentLevel = (line.match(/^(\s+)/) || [""])[0].length / 4;
+          return `<p style="padding-left: ${
+            indentLevel * 20
+          }px;">${line.trim()}</p>`;
           //wraps in one line and padding for neatness
         })
-        .join(''); //join into single html string and pass to <p>
+        .join(""); //join into single html string and pass to <p>
     },
 
     getTotalItemPrice(item) {
@@ -211,7 +214,11 @@ export default {
       this.forceA4Size(); // Ensure the content is set to A4 size
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
-        document.title = "Print_" + this.quotation.business.shortName + "_" + this.quotation.quotationNumber; // Set the desired filename
+        document.title =
+          "Print_" +
+          this.quotation.business.shortName +
+          "_" +
+          this.quotation.quotationNumber; // Set the desired filename
 
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;
@@ -311,6 +318,9 @@ export default {
 }
 
 @media print {
+  .text-right {
+    text-align: right;
+  }
   .pdf-content {
     width: 100%;
     height: auto;

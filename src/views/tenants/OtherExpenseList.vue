@@ -21,7 +21,7 @@
             <CCardHeader> <strong> Other Expenses </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
-                :items="items"
+                :items="computedItems"
                 :fields="fields"
                 column-filter
                 items-per-page-select
@@ -31,15 +31,35 @@
                 pagination
                 :loading="loading"
               >
-
                 <template #show_index="{ index }">
                   <td class="py-2">
                     {{ index + 1 }}
                   </td>
                 </template>
+                <template #show_image="{ item }">
+                  <td class="py-2">
+                    <CImg
+                      thumbnail
+                      :src="getImage(item)"
+                      height="70"
+                      width="70"
+                    />
+                  </td>
+                </template>
+
                 <template #show_details="{ item, index }">
                   <td class="py-2">
-                    <CButton
+                    <CDropdown toggler-text="Action" class="m-2" color="light">
+                      <CDropdownItem @click="onEdit(item)"
+                        >View/Edit</CDropdownItem
+                      >
+                      <CDropdownDivider />
+                      <CDropdownItem @click="showDeleteConfirmation(item)"
+                        >Delete</CDropdownItem
+                      >
+                    </CDropdown>
+
+                    <!-- <CButton
                       color="primary"
                       variant="outline"
                       square
@@ -47,7 +67,7 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
+                    </CButton> -->
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -56,6 +76,9 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
+                      <!-- <p class="text-muted">Code: {{ item.code }}</p>
+                      <p class="text-muted">Name: {{ item.name }}</p>
+                       -->
                       <CButton
                         size="sm"
                         color="info"
@@ -98,20 +121,31 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+// import BillApi from "@/lib/billApi";
+import ExpenseApi from "@/lib/expenseApi";
+import moment from "moment";
 
 const items = [];
 const fields = [
-{
+  // { key: "createdOn" },
+  {
     key: "show_index",
     label: "#",
     _style: "width:1%",
     sorter: false,
     filter: false,
   },
-  { key: "category"},
-  { key: "accountNo"},
-  { key: "name" },
+  { key: "date" },
+  // { key: "profileName", label: "Profile" },
+  { key: "vendorName", label: "Company" },
+  // { key: "billNo" },
+  { key: "totalAmount" },
+  { key: "description" },
+  // {
+  //   key: "show_image",
+  //   label: "Image",
+  // },
+
   {
     key: "show_details",
     label: "",
@@ -121,13 +155,11 @@ const fields = [
   },
 ];
 
-
-
 export default {
-  name: "ChartOfAccountList",
+  name: "BillList",
   data() {
     return {
-      loading: true,
+      loading: false,
       items: items.map((item, id) => {
         return { ...item, id };
       }),
@@ -135,7 +167,7 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new ChartOfAccountApi(),
+      api: new ExpenseApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -144,7 +176,40 @@ export default {
     var self = this;
     self.refreshTable();
   },
+  computed: {
+    computedItems() {
+      return this.items.map((item) => {
+        return {
+          ...item,
+          createdOn: this.getDisplayDateTime(item.createdOn),
+          date: this.getDisplayDateTime(item.date),
+          vendorName: this.getVendorName(item),
+          totalAmount: item.totalAmount.toFixed(2),
+          // profileName: this.getProfileName(item),
+        };
+      });
+    },
+  },
   methods: {
+    // getProfileName(item) {
+    //   try {
+    //     return item.profile.fullName;
+    //   } catch (error) {
+    //     return "N/A";
+    //   }
+    // },
+    getVendorName(item) {
+      if (item.vendor.name) return item.vendor.name;
+      return "N/A";
+    },
+    getImage(item) {
+      var url = apiUrl + "documents/file/" + item.documentId;
+      return url;
+    },
+
+    getDisplayDateTime(dt) {
+      return moment(dt).format("DD/MM/YYYY");
+    },
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -153,8 +218,8 @@ export default {
         color: color,
       });
     },
-    toggleDetails(item, index) {
-      this.$set(this.items[index], "_toggled", !item._toggled);
+    toggleDetails(item) {
+      this.$set(item, "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -162,21 +227,30 @@ export default {
     },
     refreshTable() {
       var self = this;
-      self.loading = false;
+      self.loading = true;
+      // self.items = floorPlanData;
       self.api
-        .getList()
+        .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
+          self.loading = false;
         });
     },
+    // onAddLocation(item) {
+    //   var self = this;
+    //   self.$router.push({
+    //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
+    //   });
+    // },
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/ChartOfAccount/${item.id}`,
+        path: `/tenants/OtherExpense/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -189,6 +263,7 @@ export default {
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
           });
       }
       self.itemToDelete = {};
@@ -199,7 +274,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/ChartOfAccount" });
+      this.$router.push({ path: "/tenants/otherExpense" });
     },
     toast(header, message, color) {
       var self = this;

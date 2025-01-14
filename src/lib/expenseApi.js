@@ -1,5 +1,38 @@
 class ExpensesApi {
 
+    removeInvoiceDocument(id, documentId) {
+        var url = apiUrl + 'expenses/RemoveInvoiceDocument/' + id + '/' + documentId;
+        return api.call('delete', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    removePaymentDocument(id, documentId) {
+        var url = apiUrl + 'expenses/RemovePaymentDocument/' + id + '/' + documentId;
+        return api.call('delete', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    removeReceiptDocument(id, documentId) {
+        var url = apiUrl + 'expenses/RemoveReceiptDocument/' + id + '/' + documentId;
+        return api.call('delete', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+
+    getListByCurrentBusiness() {
+        var url = apiUrl + 'expenses/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     getList() {
         var url = apiUrl + 'expenses';
         return api.call('get', url)

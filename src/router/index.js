@@ -180,21 +180,21 @@ function configRoutes() {
             render(c) { return c('router-view') }
           },
           children: [
-            // {
-            //   path: '/employee/receiptList',
-            //   name: 'ReceiptList',
-            //   component: ReceiptList
-            // },
-            // {
-            //   path: '/employee/receipt/:id',
-            //   name: 'ReceiptById',
-            //   component: Receipt
-            // },
-            // {
-            //   path: '/employee/receipt',
-            //   name: 'Receipt',
-            //   component: Receipt
-            // },
+            {
+              path: '/employee/receiptList',
+              name: 'ReceiptList',
+              component: ReceiptList
+            },
+            {
+              path: '/employee/receipt/:id',
+              name: 'ReceiptById',
+              component: Receipt
+            },
+            {
+              path: '/employee/receipt',
+              name: 'Receipt',
+              component: Receipt
+            },
 
 
             {
@@ -374,7 +374,21 @@ function configRoutes() {
               name: 'Quotation',
               component: Quotation
             },
-
+            {
+              path: '/tenants/quotation/:id',
+              name: 'QuotationById',
+              component: Quotation
+            },
+            {
+              path: '/tenants/quotation/:id/duplicate', // New route
+              name: 'QuotationDuplicate',
+              component: Quotation // Use the same component or create a new one if needed
+            },
+            {
+              path: '/tenants/quotationList',
+              name: 'QuotationList',
+              component: QuotationList
+            },
 
             { //new
               path: '/tenants/incomeReceipt',
@@ -391,16 +405,7 @@ function configRoutes() {
               name: 'IncomeReceiptList',
               component: IncomeReceiptList
             },
-            {
-              path: '/tenants/quotation/:id',
-              name: 'QuotationById',
-              component: Quotation
-            },
-            {
-              path: '/tenants/quotationList',
-              name: 'QuotationList',
-              component: QuotationList
-            },
+  
 
             {
               path: '/tenants/Customer',
@@ -525,6 +530,23 @@ function configRoutes() {
               name: 'InvoiceById',
               component: Invoice
             },
+            {
+              path: '/tenants/invoice/:id/duplicate', // New route
+              name: 'InvoiceDuplicate',
+              component: Invoice // Use the same component or create a new one if needed
+            },
+            
+            {
+              path: '/tenants/invoice/:id/convertFromItem', // New route
+              name: 'InvoiceConvertFromItem',
+              component: Invoice // Use the same component or create a new one if needed
+            },
+            {
+              path: '/tenants/invoice/:id/convertFromQuot', // New route
+              name: 'InvoiceConvertFromQuot',
+              component: Invoice // Use the same component or create a new one if needed
+            },
+
             {
               path: '/tenants/InvoiceList',
               name: 'InvoiceList',

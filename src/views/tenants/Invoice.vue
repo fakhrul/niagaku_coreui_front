@@ -267,6 +267,7 @@ import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import moment from "moment";
 import WidgetsReportInvoice from "../widgets/WidgetsReportInvoice";
+import QuotationApi from "@/lib/quotationApi";
 
 const invoiceItems = [];
 const invoiceFields = [
@@ -319,6 +320,7 @@ export default {
   },
   data: () => {
     return {
+      quotationApi: new QuotationApi(),
       previewObj: {
         business: {
           name: "",
@@ -359,7 +361,13 @@ export default {
     this.fetchInvoiceStatuses();
     self.refreshCustomer();
     self.refreshProduct();
-    self.resetObj();
+    if (self.$route.name === "InvoiceConvertFromQuot") {
+      this.processInvoiceConvertFromQuot();
+    } else if (self.$route.name === "InvoiceConvertFromItem") {
+      this.processInvoiceConvertFromItem();
+    } else {
+      self.resetObj();
+    }
   },
   computed: {
     computeExpiryDate() {
@@ -482,10 +490,10 @@ export default {
     // },
     onRemoveClaimItem(item) {
       var self = this;
-      if (self.computedInvoiceItems != null) {
-        for (var i = 0; i < self.computedInvoiceItems.length; i++) {
-          if (self.computedInvoiceItems[i].id === item.id) {
-            self.computedInvoiceItems.splice(i, 1);
+      if (self.invoiceItems != null) {
+        for (var i = 0; i < self.invoiceItems.length; i++) {
+          if (self.invoiceItems[i].id === item.id) {
+            self.invoiceItems.splice(i, 1);
           }
         }
       }
@@ -504,8 +512,8 @@ export default {
       );
     },
     addNewItem() {
-      const newPosition = this.computedInvoiceItems.length + 1;
-      this.computedInvoiceItems.push({
+      const newPosition = this.invoiceItems.length + 1;
+      this.invoiceItems.push({
         id: this.generateGUID(),
         product: this.productItems[0],
         price: 0,
@@ -548,7 +556,114 @@ export default {
         })
         .catch(({ data }) => {});
     },
+    processInvoiceConvertFromItem() {
+      var self = this;
+      self.quotationApi
+        .getItem(self.$route.params.id)
+        .then((response) => {
+          self.obj = self.getEmptyObj();
+          var item = response.result;
+          console.log("item", item);
+          let currentDate = new Date();
+          this.issuedDate = new Date(
+            currentDate.toISOString().split("T")[0] + "T00:00:00"
+          ); // Set issuedDate
+          currentDate.setDate(currentDate.getDate() + 30);
+          this.expiryDate = new Date(
+            currentDate.toISOString().split("T")[0] + "T00:00:00"
+          ); // Set expiry date
 
+          self.selectedCustomer = item.quotation.customer;
+
+          // if (quotation.items.length > 0) {
+          //   if (quotation.items[0].position == 0) {
+          //     for (var i = 0; i < quotation.items.length; i++) {
+          //       quotation.items[i].position = i + 1;
+          //     }
+          //   }
+          // }
+          this.obj.items.push({
+            id: this.generateGUID(),
+            product: item.product,
+            price: item.price,
+            quantity: item.quantity,
+            description: item.description,
+            position: 1,
+          });
+
+          this.invoiceItems = this.obj.items;
+          console.log(this.invoiceItems);
+
+          this.api
+            .getNextNumber()
+            .then((response) => {
+              self.obj.invoiceNumber = response.result;
+            })
+            .catch(({ data }) => {});
+
+          // for (var i = 0; i < self.obj.items.length; i++) {
+          //   delete self.obj.items[i].id;
+          // }
+
+          // Optionally modify any other fields if required
+          this.toast(
+            "Info",
+            "You are convert quotation item to invoice.",
+            "info"
+          );
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+    processInvoiceConvertFromQuot() {
+      var self = this;
+      self.quotationApi
+        .get(self.$route.params.id)
+        .then((response) => {
+          self.obj = self.getEmptyObj();
+          var quotation = response.result;
+          let currentDate = new Date();
+          this.issuedDate = new Date(
+            currentDate.toISOString().split("T")[0] + "T00:00:00"
+          ); // Set issuedDate
+          currentDate.setDate(currentDate.getDate() + 30);
+          this.expiryDate = new Date(
+            currentDate.toISOString().split("T")[0] + "T00:00:00"
+          ); // Set expiry date
+
+          self.selectedCustomer = quotation.customer;
+
+          if (quotation.items.length > 0) {
+            if (quotation.items[0].position == 0) {
+              for (var i = 0; i < quotation.items.length; i++) {
+                quotation.items[i].position = i + 1;
+              }
+            }
+          }
+
+          self.invoiceItems = self.obj.items = quotation.items;
+
+          this.api
+            .getNextNumber()
+            .then((response) => {
+              console.log(response.result);
+              self.obj.invoiceNumber = response.result;
+              console.log(self.obj);
+            })
+            .catch(({ data }) => {});
+
+          for (var i = 0; i < self.obj.items.length; i++) {
+            delete self.obj.items[i].id;
+          }
+
+          // Optionally modify any other fields if required
+          this.toast("Info", "You are convert quotation to invoice.", "info");
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -605,12 +720,20 @@ export default {
         item.productId = item.product.id;
       });
       console.log(self.obj.items);
+      if (self.selectedCustomer) {
+        self.obj.customerId = self.selectedCustomer.id;
+      }
 
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
             self.toast("Success", "Updated", "success");
+            var newObj = response.result;
+            self.$router.push({
+              path: `/tenants/Invoice/${newObj.id}`,
+            });
+
             self.resetObj();
             // self.$router.push({ path: "/tenants/invoiceList" });
           })
@@ -660,6 +783,7 @@ export default {
     getEmptyObj() {
       return {
         invoiceNumber: "",
+        items: [],
         // code: "",
         // name: "",
         // decsription: "",

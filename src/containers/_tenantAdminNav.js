@@ -34,25 +34,25 @@ export default [
             to: '/tenants/quotationList',
             icon: 'cilFile'
           },
+
           {
             _name: 'CSidebarNavItem',
-            name: 'Receipt',
-            to: '/tenants/incomeReceiptList',
-            icon: 'cilImageBroken'
-          },
-          {
-            _name: 'CSidebarNavItem',
-            name: 'Sale Order',
+            name: 'Sales Order',
             to: '/tenants/salesOrderList',
             icon: 'cilCart'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Sale Invoice',
+            name: 'Sales Invoice',
             to: '/tenants/invoiceList',
             icon: 'cilMoney'
           },
           {
+            _name: 'CSidebarNavItem',
+            name: 'Sales Receipt',
+            to: '/tenants/incomeReceiptList',
+            icon: 'cilImageBroken'
+          }, {
             _name: 'CSidebarNavItem',
             name: 'Customer',
             to: '/tenants/customerList',
@@ -73,7 +73,7 @@ export default [
         route: '/parameters',
         icon: 'cilChartLine',
         moduleName: 'MasterData', // This will be used for filtering
-       
+
         _children: [
           {
             _name: 'CSidebarNavItem',

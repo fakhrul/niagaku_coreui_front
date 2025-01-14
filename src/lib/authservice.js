@@ -116,9 +116,14 @@ class AuthService {
     }
 
     getRole() {
-        if (this.user.userData.role == 'super')
+        try {
+            if (this.user.userData.role == 'super')
             return "admin";
         return this.user.userData.role;
+            
+        } catch (error) {
+            return "";
+        }
     }
 
     logout() {
