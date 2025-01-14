@@ -10,7 +10,7 @@
       </CCardHeader>
       <CCardBody>
         <CRow class="justify-content-between align-items-center">
-          <CCol >
+          <CCol>
             <img
               :src="getImageUrl()"
               alt="Logo Syarikat"
@@ -19,7 +19,7 @@
           </CCol>
           <CCol class="text-right">
             <h1>QUOTATION</h1>
-            <h4>{{ quotation.business.name }}</h4>
+            <h5>{{ quotation.business.name }}</h5>
             <p>{{ "(" + quotation.business.regNo + ")" }}</p>
             <p v-html="formatAddress(quotation.business.address)"></p>
             <!--item.description is rendered from handlekeydown event and rerun format-->
@@ -27,8 +27,8 @@
           </CCol>
         </CRow>
         <hr class="thick-hr" />
+        <br />
         <div class="invoice-details">
-          <h3 class="text-center">QUOTATION</h3>
           <CRow>
             <CCol md="6">
               <p>
@@ -37,11 +37,20 @@
               <p v-html="formatAddress(getCustomerAddress())"></p>
             </CCol>
             <CCol md="6" class="text-right">
-              <p>
+              <dl class="row">
+                <dt class="col-sm-6">Quotation No:</dt>
+                <dd class="col-sm-6">{{ quotation.quotationNumber }}</dd>
+                <dt class="col-sm-6">Issue Date:</dt>
+                <dd class="col-sm-6">{{ getQuotationIssuedDate() }}</dd>
+                <dt class="col-sm-6">Expiry Date:</dt>
+                <dd class="col-sm-6">{{ getQuotationExpiryDate() }}</dd>
+              </dl>
+
+              <!-- <p>
                 <strong>Quotation No:</strong> {{ quotation.quotationNumber }}
               </p>
               <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
-              <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p>
+              <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p> -->
             </CCol>
           </CRow>
           <CRow v-if="quotation.title">
@@ -52,16 +61,16 @@
         </div>
 
         <div class="table-wrapper">
-          <table class="table table-bordered">
+          <table class="table table-striped">
             <thead>
               <tr>
                 <th class="index-column">#</th>
                 <th class="item-column">Item & Description</th>
                 <th class="text-center quantity-column">Quantity</th>
-                <th class="text-center price-column">
+                <th class="text-right price-column">
                   Price ({{ quotation.business.currency }})
                 </th>
-                <th class="text-center total-column">
+                <th class="text-right total-column">
                   Total ({{ quotation.business.currency }})
                 </th>
               </tr>
@@ -99,8 +108,25 @@
 
         <!-- Terms and Conditions Section -->
         <div v-if="quotation.note" class="terms-and-conditions mt-4">
-          <h4>Terms and Conditions</h4>
+          <p><strong>Terms and Conditions</strong></p>
           <p v-html="formatNote(quotation.note)"></p>
+        </div>
+
+        <div class="report-footer">
+          <p>
+            {{ quotation.business.name }} | {{ quotation.business.website }} |
+            {{ quotation.business.phone }}
+          </p>
+          <p>
+            Powered By 
+            <img
+            
+              src="/logo.png"
+              alt="Niaga-ku Logo"
+              class="footer-logo"
+            />  Niaga-Ku.com
+          </p>
+        
         </div>
       </CCardBody>
     </CCard>
@@ -245,6 +271,30 @@ export default {
 </script>
 
 <style scoped>
+
+.report-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.report-footer p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.footer-logo {
+  max-width: 20px;
+  height: auto;
+  filter: grayscale(100%);
+}
+
+
+.logo-image {
+  max-width: 200px;
+}
 .pdf-content > .CRow:first-child {
   margin-bottom: 0; /* Reduce space between header and content */
 }
@@ -335,6 +385,8 @@ export default {
   }
 
   .invoice-details {
+    margin-right: 20px; /* Add some bottom margin to the header section */
+    margin-left: 20px; /* Add some bottom margin to the header section */
     margin-bottom: 20px; /* Add some bottom margin to the header section */
   }
 

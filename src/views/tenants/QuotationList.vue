@@ -15,6 +15,15 @@
       </CToaster>
     </div>
     <div>
+      <CAlert color="info" closeButton :show.sync="showQuickInfo">
+        <p><strong>Quick Info</strong> This page show all of your quotation</p>
+        <!-- <ul>
+          <li>You can select your default business to manage.</li>
+          <li>To manage your specific buisness, click Show and Edit.</li>
+        </ul> -->
+      </CAlert>
+    </div>
+    <div>
       <CRow>
         <CCol sm="12">
           <CCard>
@@ -134,15 +143,7 @@
         </CCol>
       </CRow>
     </div>
-    <div>
-      <CAlert color="info" closeButton :show.sync="showQuickInfo">
-        <p><strong>Quick Info</strong> This page show all of your quotation</p>
-        <!-- <ul>
-          <li>You can select your default business to manage.</li>
-          <li>To manage your specific buisness, click Show and Edit.</li>
-        </ul> -->
-      </CAlert>
-    </div>
+    
   </div>
 </template>
 
