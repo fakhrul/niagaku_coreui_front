@@ -52,6 +52,21 @@
                 horizontal
                 v-model="obj.contactEmail"
               />
+              <CInput
+                label="Bank Name"
+                horizontal
+                v-model="obj.bankName"
+              />
+              <CInput
+                label="Bank Account Name"
+                horizontal
+                v-model="obj.bankAccountName"
+              />
+              <CInput
+                label="Bank Account No"
+                horizontal
+                v-model="obj.bankAccountNo"
+              />
             </CForm>
           </CCardBody>
           <CCardFooter>

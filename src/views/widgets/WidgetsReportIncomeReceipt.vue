@@ -17,12 +17,21 @@
               class="img-fluid logo-image"
             />
           </CCol>
-          <CCol>
+          <!-- <CCol>
             <h1>{{ receipt.business.name }}</h1>
             <p>{{ "(" + receipt.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(receipt.business.address)"></p> <!--item.description is rendered from handlekeydown event and rerun format-->
+            <p v-html="formatAddress(receipt.business.address)"></p> 
+            <p>Tel: {{ receipt.business.phone }}</p>
+          </CCol> -->
+          <CCol class="text-right">
+            <h1>OFFICIAL RECEIPT</h1>
+            <h5>{{ receipt.business.name }}</h5>
+            <p>{{ "(" + receipt.business.regNo + ")" }}</p>
+            <p v-html="formatAddress(receipt.business.address)"></p>
+            <!--item.description is rendered from handlekeydown event and rerun format-->
             <p>Tel: {{ receipt.business.phone }}</p>
           </CCol>
+        
         </CRow>
         <hr class="thick-hr" />
         <div class="invoice-details">
@@ -238,6 +247,30 @@ export default {
 </script>
 
 <style scoped>
+
+.report-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.report-footer p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.footer-logo {
+  max-width: 20px;
+  height: auto;
+  filter: grayscale(100%);
+}
+
+
+.logo-image {
+  max-width: 200px;
+}
 .pdf-content > .CRow:first-child {
   margin-bottom: 0; /* Reduce space between header and content */
 }

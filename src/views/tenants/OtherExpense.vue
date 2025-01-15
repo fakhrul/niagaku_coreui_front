@@ -14,7 +14,154 @@
         </template>
       </CToaster>
       <CRow>
-        <CCol sm="3">
+        <CCol>
+          <CCard>
+            <CCardHeader>
+              <strong>Other Expenses</strong>
+              <a href="" target="_blank" :class="getBadgeClass()">
+                {{ obj.expenseStateDescription }}
+              </a>
+              <div class="card-header-actions">
+                <CDropdown
+                  placement="bottom-end"
+                  toggler-text="Action"
+                  color="light"
+                  class="m-2 d-inline-block tour-cdropdown"
+                  size="sm"
+                >
+                  <CDropdownItem @click="onConvertToInvoice(obj)"
+                    >Duplicate</CDropdownItem
+                  >
+                  <CDropdownDivider />
+                  <CDropdownHeader>Change Status To:</CDropdownHeader>
+                  <template v-for="status in expenseStatuses">
+                    <CDropdownItem @click="changeState(status)">{{
+                      status.name
+                    }}</CDropdownItem>
+                  </template>
+                </CDropdown>
+                <!-- Start Tour Button -->
+                <!-- <CButton size="sm" color="info" @click="startTour">
+                  Guide
+                </CButton> -->
+
+                <!-- <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                  <CDropdownItem @click="startTour"
+                    >Onboarding Tour</CDropdownItem
+                  >
+                  <CDropdownItem disabled>Quick Info</CDropdownItem>
+                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+                  <CDropdownItem disabled>Live Chat</CDropdownItem>
+                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
+                </CDropdown> -->
+              </div>
+            </CCardHeader>
+            <CCardBody>
+              <CForm>
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Vendor (Supplier) </template>
+                  <template #input>
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedVendor"
+                      :label="'name'"
+                      :options="vendorItemsWithAddNew"
+                      placeholder="Select vendor"
+                      @input="handleVendorSelect"
+                    >
+                    </v-select>
+                  </template>
+                </CFormGroup>
+                <CLink href="javascript:void(0);" @click="viewVendorDetails">
+                  View
+                </CLink>
+                <CInput
+                  label="Date"
+                  type="date"
+                  :value="computeIssuedDate"
+                  @change="setIssuedDate"
+                />
+
+                <!-- <CInput
+                  label="Company Name"
+                  horizontal
+                  v-model="obj.companyName"
+                  @input="onCompanyNameChange"
+                /> -->
+                <!-- <CInput label="Bill No" horizontal v-model="obj.billNo" /> -->
+                <!-- <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label"> Date </CCol>
+                  <CCol sm="9">
+                    <input
+                      type="datetime-local"
+                      :value="computeBillDate"
+                      @change="setDateFilter"
+                      class="mr-2"
+                    />
+                  </CCol>
+                </CRow> -->
+                <CInput label="Total Amount" v-model="obj.totalAmount" />
+                <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Is Paid?
+                  </CCol>
+                  <CCol sm="9">
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="obj.isPaid"
+                      label-on="YES"
+                      label-off="NO"
+                    >
+                    </CSwitch>
+                  </CCol>
+                </CRow>
+                <CInput
+                  label="Date"
+                  type="date"
+                  :value="computePaymentDate"
+                  @change="setPaymentDate"
+                  v-if="obj.isPaid"
+                />
+                <CTextarea
+                  label="Description"
+                  v-model="obj.description"
+                  placeholder=""
+                  rows="4"
+                />
+
+                <!-- <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Chart of Account
+                  </CCol>
+                  <CCol sm="9">
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedChartOfAccount"
+                      :label="'name'"
+                      :options="chartOfAccountItems"
+                      placeholder="Select COA"
+                    />
+                  </CCol>
+                </CRow> -->
+              </CForm>
+            </CCardBody>
+            <CCardFooter>
+              <CButton type="submit" color="light" @click="submit">
+                Save</CButton
+              >
+            </CCardFooter>
+          </CCard>
+        </CCol>
+      </CRow>
+      <CRow>
+        <CCol sm="4">
           <CCard>
             <CCardHeader> <strong> Invoice/Bill </strong></CCardHeader>
             <CCardBody>
@@ -68,12 +215,12 @@
             </CCardBody>
           </CCard>
         </CCol>
-        <CCol sm="3">
+        <CCol sm="4">
           <CCard>
             <CCardHeader> <strong> Proof Payment </strong> </CCardHeader>
             <CCardBody>
               <CForm>
-                <CRow  v-if="obj.documentPayment">
+                <CRow v-if="obj.documentPayment">
                   <CCol sm="12">
                     <div v-if="isPdf(obj.documentPayment)">
                       <!-- Render PDF -->
@@ -120,12 +267,12 @@
             </CCardBody>
           </CCard>
         </CCol>
-        <CCol sm="3">
+        <CCol sm="4">
           <CCard>
             <CCardHeader> <strong> Receipt </strong> </CCardHeader>
             <CCardBody>
               <CForm>
-                <CRow  v-if="obj.documentReceipt">
+                <CRow v-if="obj.documentReceipt">
                   <CCol sm="12">
                     <div v-if="isPdf(obj.documentReceipt)">
                       <!-- Render PDF -->
@@ -172,91 +319,6 @@
             </CCardBody>
           </CCard>
         </CCol>
-        <CCol sm="3">
-          <CCard>
-            <CCardHeader> <strong> Expense </strong> Info </CCardHeader>
-            <CCardBody>
-              <CForm>
-                <CFormGroup wrapperClasses="input-group pt-2">
-                  <template #label>Vendor (Supplier) </template>
-                  <template #input>
-                    <v-select
-                      style="width: 100%"
-                      v-model="selectedVendor"
-                      :label="'name'"
-                      :options="vendorItemsWithAddNew"
-                      placeholder="Select vendor"
-                      @input="handleVendorSelect"
-                    />
-                  </template>
-                </CFormGroup>
-                <CInput
-                  label="Date"
-                  type="date"
-                  :value="computeIssuedDate"
-                  @change="setIssuedDate"
-                />
-
-                <!-- <CInput
-                  label="Company Name"
-                  horizontal
-                  v-model="obj.companyName"
-                  @input="onCompanyNameChange"
-                /> -->
-                <!-- <CInput label="Bill No" horizontal v-model="obj.billNo" /> -->
-                <!-- <CRow form class="form-group">
-                  <CCol tag="label" sm="3" class="col-form-label"> Date </CCol>
-                  <CCol sm="9">
-                    <input
-                      type="datetime-local"
-                      :value="computeBillDate"
-                      @change="setDateFilter"
-                      class="mr-2"
-                    />
-                  </CCol>
-                </CRow> -->
-                <CInput label="Total Amount" v-model="obj.totalAmount" />
-                <CTextarea
-                    label="Description"
-                    v-model="obj.description"
-                    placeholder=""
-                    rows="4"
-                  />
-
-                <!-- <CRow form class="form-group">
-                  <CCol tag="label" sm="3" class="col-form-label">
-                    Chart of Account
-                  </CCol>
-                  <CCol sm="9">
-                    <v-select
-                      style="width: 100%"
-                      v-model="selectedChartOfAccount"
-                      :label="'name'"
-                      :options="chartOfAccountItems"
-                      placeholder="Select COA"
-                    />
-                  </CCol>
-                </CRow> -->
-              </CForm>
-            </CCardBody>
-            <CCardFooter>
-              <CButton
-                type="submit"
-                class="ml-1"
-                color="primary"
-                @click="submit"
-                >Save</CButton
-              >
-              <!-- <CButton class="ml-1" color="primary" @click="addNew"
-                >New</CButton
-              >
-              <CButton class="ml-1" color="primary" @click="previous"
-                >Prev</CButton
-              >
-              <CButton class="ml-1" color="primary" @click="next">Next</CButton> -->
-            </CCardFooter>
-          </CCard>
-        </CCol>
       </CRow>
     </div>
     <div>
@@ -296,6 +358,7 @@
       <CModal
         title="Add New Vendor"
         size="xl"
+        :close-on-backdrop="false"
         :show.sync="addVendorFormPopup"
         @update:show="onVendorPopupConfirmation"
       >
@@ -344,7 +407,6 @@ Malaysia"
         </CRow>
       </CModal>
     </div>
-
   </div>
 </template>
 
@@ -368,6 +430,7 @@ export default {
   },
   data: () => {
     return {
+      expenseStatuses: [],
       itemAddNewVendor: {},
       addVendorFormPopup: false,
 
@@ -388,6 +451,7 @@ export default {
       // uploadedFiles: [],
       obj: {},
       issuedDate: Date(),
+      paymentDate: Date(),
       submitted: false,
       drawType: "",
       drawingState: "",
@@ -401,7 +465,8 @@ export default {
   mounted() {
     var self = this;
     this.setIssuedDate(new Date().toISOString().split("T")[0]);
-
+    this.setPaymentDate(new Date().toISOString().split("T")[0]);
+    this.fetchStatuses();
     self.refreshChartOfAccount();
     self.refreshVendor();
     self.resetObj();
@@ -433,9 +498,61 @@ export default {
     computeIssuedDate() {
       return moment(this.issuedDate).format("YYYY-MM-DD");
     },
+    computePaymentDate() {
+      return moment(this.paymentDate).format("YYYY-MM-DD");
+    },
   },
 
   methods: {
+    viewVendorDetails() {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Vendor/${this.selectedVendor.id}`,
+      });
+    },
+    changeState(item) {
+      var self = this;
+      self.obj.expenseState = item.id;
+      if (self.obj.id) {
+        this.api
+          .updateState(self.obj)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+    fetchStatuses() {
+      var self = this;
+      self.api
+        .getStatusTypes()
+        .then((response) => {
+          this.expenseStatuses = response.result;
+          console.log(this.expenseStatuses);
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+    getBadgeClass() {
+      if (this.obj.expenseStateDescription == "Draft") {
+        return "badge badge-secondary ml-1";
+      } else if (this.obj.expenseStateDescription == "Accepted") {
+        return "badge badge-primary ml-1";
+      } else if (this.obj.expenseStateDescription == "Approve") {
+        return "badge badge-primary ml-1";
+      } else if (this.obj.expenseStateDescription == "Sent") {
+        return "badge badge-success ml-1";
+      } else if (this.obj.expenseStateDescription == "Rejected") {
+        return "badge badge-warning ml-1";
+      } else if (this.obj.expenseStateDescription == "Cancelled") {
+        return "badge badge-danger ml-1";
+      } else {
+        return "badge badge-secondary ml-1";
+      }
+    },
     onVendorPopupConfirmation(status, evt, accept) {
       if (accept) {
         this.vendorApi
@@ -454,18 +571,14 @@ export default {
       this.itemAddNewVendor = {};
     },
 
-    removePaymenttDocumentConfirmation()
-    {
+    removePaymenttDocumentConfirmation() {
       this.removePaymenttDocumentWarningModal = true;
     },
     onRemovePaymentDocumentConfirmation(status, evt, accept) {
       if (accept) {
         var self = this;
         self.api
-          .removePaymenttDocument(
-            self.obj.id,
-            self.obj.documentPaymenttId
-          )
+          .removePaymenttDocument(self.obj.id, self.obj.documentPaymenttId)
           .then((response) => {
             self.resetObj();
           })
@@ -475,19 +588,14 @@ export default {
       }
     },
 
-
-    removeReceiptDocumentConfirmation()
-    {
+    removeReceiptDocumentConfirmation() {
       this.removeReceiptDocumentWarningModal = true;
     },
     onRemoveReceiptDocumentConfirmation(status, evt, accept) {
       if (accept) {
         var self = this;
         self.api
-          .removeReceiptDocument(
-            self.obj.id,
-            self.obj.documentReceiptId
-          )
+          .removeReceiptDocument(self.obj.id, self.obj.documentReceiptId)
           .then((response) => {
             self.resetObj();
           })
@@ -497,20 +605,14 @@ export default {
       }
     },
 
-
-
-    removeInvoiceDocumentConfirmation()
-    {
+    removeInvoiceDocumentConfirmation() {
       this.removeInvoiceDocumentWarningModal = true;
     },
     onRemoveInvoiceDocumentConfirmation(status, evt, accept) {
       if (accept) {
         var self = this;
         self.api
-          .removeInvoiceDocument(
-            self.obj.id,
-            self.obj.documentInvoiceId
-          )
+          .removeInvoiceDocument(self.obj.id, self.obj.documentInvoiceId)
           .then((response) => {
             self.resetObj();
           })
@@ -523,7 +625,6 @@ export default {
     removeDocument(type) {
       switch (type) {
         case "invoice":
-          
           this.obj.documentInvoice = null; // Remove invoice document
           this.obj.documentInvoiceId = null; // Remove invoice ID if applicable
           break;
@@ -800,6 +901,7 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
+            console.log(self.obj);
             self.obj.totalAmount = self.obj.totalAmount.toFixed(2);
             self.issuedDate = self.obj.date;
             self.selectedVendor = self.obj.vendor;
@@ -819,6 +921,9 @@ export default {
     // },
     setIssuedDate(e) {
       this.issuedDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+    setPaymentDate(e) {
+      this.paymentDate = new Date(e + "T00:00:00"); // ISO format assumes local time
     },
     onSubmit() {
       var self = this;

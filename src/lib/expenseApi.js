@@ -1,5 +1,20 @@
 class ExpensesApi {
 
+    updateState(data) {
+        var url = apiUrl + 'expenses/state/';
+        return api.call('put', url + data.id, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+    getStatusTypes() {
+        var url = apiUrl + 'expenses/states';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     removeInvoiceDocument(id, documentId) {
         var url = apiUrl + 'expenses/RemoveInvoiceDocument/' + id + '/' + documentId;
         return api.call('delete', url)

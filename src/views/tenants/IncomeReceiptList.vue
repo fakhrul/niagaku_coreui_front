@@ -63,6 +63,16 @@
 
                 <template #show_details="{ item, index }">
                   <td class="py-2">
+                    <CDropdown toggler-text="Action" class="m-2" color="light">
+                      <CDropdownItem @click="onEdit(item)"
+                        >View/Edit</CDropdownItem
+                      >
+                      <CDropdownDivider />
+                      <CDropdownItem @click="showDeleteConfirmation(item)"
+                        >Delete</CDropdownItem
+                      >
+                    </CDropdown>
+<!--                     
                     <CButton
                       color="primary"
                       variant="outline"
@@ -71,7 +81,7 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
+                    </CButton> -->
                   </td>
                 </template>
                 <template #details="{ item }">

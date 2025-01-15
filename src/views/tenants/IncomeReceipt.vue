@@ -99,16 +99,16 @@
                   class="mr-2"
                 /> -->
                 </CCol>
-                <CCol sm="12" lg="2">
+                <!-- <CCol sm="12" lg="2">
                   <CInput
                     label="Expiry"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
-                /></CCol>
-                <CCol sm="12" lg="2">
+                /></CCol> -->
+                <!-- <CCol sm="12" lg="2">
                   <CInput label="Reference" v-model="obj.reference"
-                /></CCol>
+                /></CCol> -->
               </CRow>
 
               <CRow>
@@ -245,7 +245,6 @@
                     v-model="obj.note"
                     placeholder=""
                     rows="2"
-                    class="small-text"
                   />
                 </CCol>
               </CRow>
@@ -263,6 +262,18 @@
                 Cancel
               </CButton>
             </CCardFooter>
+          </CCard>
+        </CCol>
+      </CRow>
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader>Preview</CCardHeader>
+            <CCardBody>
+              <WidgetsReportIncomeReceipt
+                :receipt="computedPreviewItem"
+              ></WidgetsReportIncomeReceipt>
+            </CCardBody>
           </CCard>
         </CCol>
       </CRow>
@@ -353,52 +364,52 @@ export default {
   },
   data: () => {
     return {
-      incomeReceiptFields : [
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  // { key: "position", label: "Position" },
-  // { key: "productName", label: "Item" },
-  {
-    key: "show_item",
-    label: "Item",
-  },
-  {
-    key: "show_description",
-    label: "Description",
-  },
-  {
-    key: "show_quantity",
-    label: "Quantity",
-    _style: "width:100px",
-  },
-  {
-    key: "show_price",
-    label: "Price",
-    _style: "width:100px",
-  },
-  {
-    key: "show_total",
-    label: "Total",
-  },
-  {
-    key: "show_move",
-    _style: "width:1%",
-  },
-  {
-    key: "show_remove",
-    _style: "width:1%",
-  },
-],
+      incomeReceiptFields: [
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        // { key: "position", label: "Position" },
+        // { key: "productName", label: "Item" },
+        {
+          key: "show_item",
+          label: "Item",
+        },
+        {
+          key: "show_description",
+          label: "Description",
+        },
+        {
+          key: "show_quantity",
+          label: "Quantity",
+          _style: "width:100px",
+        },
+        {
+          key: "show_price",
+          label: "Price",
+          _style: "width:100px",
+        },
+        {
+          key: "show_total",
+          label: "Total",
+        },
+        {
+          key: "show_move",
+          _style: "width:1%",
+        },
+        {
+          key: "show_remove",
+          _style: "width:1%",
+        },
+      ],
       previewObj: {
         business: {
           name: "",
           address: "",
-          phone: ""
+          phone: "",
         },
         items: [],
         note: "",
@@ -436,6 +447,14 @@ export default {
     self.resetObj();
   },
   computed: {
+    computedPreviewItem() {
+      return {
+        ...this.obj,
+        items: this.computedincomeReceiptItems,
+        expiryDate: this.expiryDate, // Add this line to include the expiry date
+      };
+    },
+    
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -470,11 +489,12 @@ export default {
       const start = event.target.selectionStart;
       const end = event.target.selectionEnd;
 
-      if (event.key === 'Tab') {  //check if user click tab or enter
+      if (event.key === "Tab") {
+        //check if user click tab or enter
         event.preventDefault();
         item.description =
           item.description.substring(0, start) +
-          '    ' + // 4 spaces
+          "    " + // 4 spaces
           item.description.substring(end);
 
         //start and end = current position of cursor, if tab, add 4 spaces
@@ -483,10 +503,11 @@ export default {
         });
       }
 
-      if (event.key === 'Enter') { //if user clicks enter, gets the cursor position & insert new line (\n)
+      if (event.key === "Enter") {
+        //if user clicks enter, gets the cursor position & insert new line (\n)
         item.description =
           item.description.substring(0, start) +
-          '\n' +
+          "\n" +
           item.description.substring(end);
 
         // Move cursor
@@ -589,7 +610,7 @@ export default {
         items: this.computedincomeReceiptItems,
         expiryDate: this.expiryDate, // Add this line to include the expiry date
       };
-      
+
       this.receiptPreviewPopup = true;
     },
     getBadgeClass() {
@@ -685,7 +706,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.productItems = response.result;
-          console.log('self.productItems',self.productItems);
+          console.log("self.productItems", self.productItems);
         })
         .catch(({ data }) => {});
     },
@@ -697,7 +718,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.customerItems = response.result;
-          console.log('self.customerItems',self.customerItems);
+          console.log("self.customerItems", self.customerItems);
         })
         .catch(({ data }) => {});
     },
@@ -710,7 +731,7 @@ export default {
           .then((response) => {
             console.log(response);
             self.obj = response.result;
-          console.log('self.obj',self.obj);
+            console.log("self.obj", self.obj);
 
             this.issuedDate = self.obj.issuedDate;
             this.expiryDate = self.obj.dueDate;

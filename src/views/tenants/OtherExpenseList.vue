@@ -46,7 +46,20 @@
                     />
                   </td>
                 </template>
-
+                <template #expenseStateDescription="{ item }">
+                  <td>
+                    <CBadge :color="getBadge(item.expenseStateDescription)">
+                      {{ item.expenseStateDescription }}</CBadge
+                    >
+                  </td>
+                </template>
+                <template #paidStatus="{ item }">
+                  <td>
+                    <CBadge :color="getPaidStatus(item.isPaid)">
+                      {{ item.isPaid }}</CBadge
+                    >
+                  </td>
+                </template>
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CDropdown toggler-text="Action" class="m-2" color="light">
@@ -140,6 +153,20 @@ const fields = [
   { key: "vendorName", label: "Company" },
   // { key: "billNo" },
   { key: "totalAmount" },
+  {
+    key: "expenseStateDescription",
+    label: "Status",
+    sorter: false,
+  },
+
+  // { key: "isPaid" },
+
+  {
+    key: "paidStatus",
+    label: "Is Paid",
+    sorter: false,
+  },
+
   { key: "description" },
   // {
   //   key: "show_image",
@@ -185,6 +212,7 @@ export default {
           date: this.getDisplayDateTime(item.date),
           vendorName: this.getVendorName(item),
           totalAmount: item.totalAmount.toFixed(2),
+          isPaid: item.isPaid ? "Yes" : "No",
           // profileName: this.getProfileName(item),
         };
       });
@@ -198,6 +226,22 @@ export default {
     //     return "N/A";
     //   }
     // },
+    getBadge(status) {
+      if (status == "Draft") {
+        return "light";
+      } else if (status == "Approve") {
+        return "primary";
+      } else if (status == "NotApprove") {
+        return "light";
+      } else {
+        return "light";
+      }
+    },
+
+    getPaidStatus(status) {
+      return status === "Yes" ? "success" : "danger";
+    },
+
     getVendorName(item) {
       if (item.vendor.name) return item.vendor.name;
       return "N/A";
