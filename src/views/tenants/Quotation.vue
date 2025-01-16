@@ -213,7 +213,7 @@
                           color="primary"
                           size="sm"
                           @click="moveItem(index, 'down')"
-                          :disabled="index === quotationItems.length - 1"
+                          :disabled="index === computedQuotationItems.length - 1"
                         >
                           ↓
                         </CButton>
@@ -773,10 +773,10 @@ export default {
 
     onRemoveClaimItem(item) {
       var self = this;
-      if (self.quotationItems != null) {
-        for (var i = 0; i < self.quotationItems.length; i++) {
-          if (self.quotationItems[i].id === item.id) {
-            self.quotationItems.splice(i, 1);
+      if (self.computedQuotationItems != null) {
+        for (var i = 0; i < self.computedQuotationItems.length; i++) {
+          if (self.computedQuotationItems[i].id === item.id) {
+            self.computedQuotationItems.splice(i, 1);
           }
         }
       }
@@ -795,8 +795,8 @@ export default {
       );
     },
     addNewItem() {
-       const newPosition = this.quotationItems.length + 1;
-      this.quotationItems.push({
+       const newPosition = this.computedQuotationItems.length + 1;
+      this.computedQuotationItems.push({
         id: this.generateGUID(),
         product: this.productItems[0],
         price: 0,
@@ -804,7 +804,7 @@ export default {
         description: "",
         position: newPosition,
       });
-      console.log(this.quotationItems);
+      console.log(this.computedQuotationItems);
     },
     getTotalItemPrice(item) {
       try {
