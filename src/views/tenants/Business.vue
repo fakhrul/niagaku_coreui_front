@@ -195,6 +195,39 @@ Malaysia"
                             </template> </CFormGroup
                         ></CCol>
                       </CRow>
+                      <CRow>
+                        <CCol sm="12">
+                          <CTextarea
+                            label="Quotation Default Footer"
+                            placeholder=""
+                            rows="5"
+                            v-model="obj.quotationDefaultFooter"
+                          />
+
+                        </CCol>
+                      </CRow>
+                      <CRow>
+                        <CCol sm="12">
+                          <CTextarea
+                            label="Invoice Default Footer"
+                            placeholder=""
+                            rows="5"
+                            v-model="obj.invoiceDefaultFooter"
+                          />
+
+                        </CCol>
+                      </CRow>
+                      <CRow>
+                        <CCol sm="12">
+                          <CTextarea
+                            label="Receipt Default Footer"
+                            placeholder=""
+                            rows="5"
+                            v-model="obj.receiptDefaultFooter"
+                          />
+
+                        </CCol>
+                      </CRow>
                     </CCardBody>
                     <CCardFooter>
                       <CButton

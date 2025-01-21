@@ -19,7 +19,6 @@
           <CCardBody>
             <CForm>
               <CInput label="Name" horizontal v-model="obj.name" />
-              <!-- <CInput label="Description" horizontal v-model="obj.description" /> -->
               <CRow form class="form-group">
                 <CCol tag="label" sm="3" class="col-form-label">
                   Description

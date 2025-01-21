@@ -109,11 +109,11 @@
                     :items="computedInvoiceItems"
                     :fields="invoiceFields"
                   >
-                    <template #show_drag="{ item, index }">
+                    <!-- <template #show_drag="{ item, index }">
                       <td>
                         <i class="cil-cursor-move">Move</i>
                       </td>
-                    </template>
+                    </template> -->
 
                     <template #show_index="{ index }">
                       <td class="py-2">
@@ -140,7 +140,7 @@
                         <CTextarea
                           placeholder=""
                           v-model="item.description"
-                          rows="1"
+                          rows="3"
                         />
                       </td>
                     </template>
@@ -185,7 +185,17 @@
                     </template>
                     <template #show_remove="{ item }">
                       <td class="py-2">
-                        <CButton
+                        <CDropdown
+                          color="secondary"
+                          split
+                          toggler-text="Remove"
+                          class="m-2"
+                          @click="onRemoveClaimItem(item)"
+                        >
+                          <CDropdownItem @click="createReceiptByItem(item)">Create Receipt</CDropdownItem>
+                        </CDropdown>
+
+                        <!-- <CButton
                           color="primary"
                           variant="outline"
                           square
@@ -193,7 +203,7 @@
                           @click="onRemoveClaimItem(item)"
                         >
                           Remove
-                        </CButton>
+                        </CButton> -->
                       </td>
                     </template>
 
@@ -221,7 +231,7 @@
                     label="Term & Conditions"
                     v-model="obj.note"
                     placeholder=""
-                    rows="2"
+                    rows="10"
                   />
                 </CCol>
               </CRow>
@@ -237,6 +247,19 @@
           </CCard>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader>Preview</CCardHeader>
+            <CCardBody>
+              <WidgetsReportInvoice
+                :invoice="computedPreviewItem"
+              ></WidgetsReportInvoice>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <!-- <CRow>
         <CCol>
           <WidgetsReportInvoice :invoice="obj"></WidgetsReportInvoice>
@@ -268,9 +291,80 @@ import "vue-select/dist/vue-select.css";
 import moment from "moment";
 import WidgetsReportInvoice from "../widgets/WidgetsReportInvoice";
 import QuotationApi from "@/lib/quotationApi";
+import BusinessApi from "@/lib/businessApi";
 
 const invoiceItems = [];
-const invoiceFields = [
+// const invoiceFields = [
+//   {
+//     key: "show_index",
+//     label: "#",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+//   { key: "position", label: "Position" },
+//   // { key: "productName", label: "Item" },
+//   {
+//     key: "show_item",
+//     label: "Item",
+//   },
+//   {
+//     key: "show_description",
+//     label: "Description",
+//   },
+//   {
+//     key: "show_quantity",
+//     label: "Quantity",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_price",
+//     label: "Price",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_total",
+//     label: "Total",
+//   },
+//   {
+//     key: "show_move",
+//     _style: "width:1%",
+//   },
+//   {
+//     key: "show_remove",
+//     _style: "width:1%",
+//   },
+// ];
+
+export default {
+  name: "Invoice",
+  components: {
+    vSelect,
+    WidgetsReportInvoice,
+  },
+  data: () => {
+    return {
+      businessApi: new BusinessApi(),
+
+      quotationApi: new QuotationApi(),
+      previewObj: {
+        business: {
+          name: "",
+          address: "",
+        },
+        items: [],
+        note: "",
+      },
+      invoicePreviewPopup: false,
+      invoiceStatuses: [],
+      issuedDate: Date(),
+      expiryDate: Date(),
+      // Invoice Itm
+      invoiceItems: invoiceItems.map((item, id) => {
+        return { ...item, id };
+      }),
+
+      invoiceFields:[
   {
     key: "show_index",
     label: "#",
@@ -278,11 +372,12 @@ const invoiceFields = [
     sorter: false,
     filter: false,
   },
-  { key: "position", label: "Position" },
+  // { key: "position", label: "Position" },
   // { key: "productName", label: "Item" },
   {
     key: "show_item",
     label: "Item",
+    _style: "width:100px",
   },
   {
     key: "show_description",
@@ -310,35 +405,7 @@ const invoiceFields = [
     key: "show_remove",
     _style: "width:1%",
   },
-];
-
-export default {
-  name: "Invoice",
-  components: {
-    vSelect,
-    WidgetsReportInvoice,
-  },
-  data: () => {
-    return {
-      quotationApi: new QuotationApi(),
-      previewObj: {
-        business: {
-          name: "",
-          address: "",
-        },
-        items: [],
-        note: "",
-      },
-      invoicePreviewPopup: false,
-      invoiceStatuses: [],
-      issuedDate: Date(),
-      expiryDate: Date(),
-      // Invoice Itm
-      invoiceItems: invoiceItems.map((item, id) => {
-        return { ...item, id };
-      }),
-
-      invoiceFields,
+],
 
       selectedItem: null,
 
@@ -370,6 +437,13 @@ export default {
     }
   },
   computed: {
+    computedPreviewItem() {
+      return {
+        ...this.obj,
+        items: this.computedInvoiceItems,
+        expiryDate: this.expiryDate, // Add this line to include the expiry date
+      };
+    },
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -706,6 +780,16 @@ export default {
           .then((response) => {
             self.obj.invoiceNumber = response.result;
             console.log(self.obj.invoiceNumber);
+          })
+          .catch(({ data }) => {});
+
+          this.businessApi
+          .getCurrentActiveBusiness()
+          .then((response) => {
+            console.log(response.result);
+            console.log(response.result.invoiceDefaultFooter);
+            self.obj.note = response.result.invoiceDefaultFooter;
+            // console.log(self.obj);
           })
           .catch(({ data }) => {});
       }

@@ -1,5 +1,14 @@
 class BusinessApi {
 
+    getCurrentActiveBusiness()
+    {
+        var url = apiUrl + 'businesses/currentActive/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
 
     getListByCurrentTenant() {
         var url = apiUrl + 'businesses/currentUser/';

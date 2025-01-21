@@ -109,6 +109,7 @@
 
 <script>
 import InvoiceApi from "@/lib/invoiceApi";
+import moment from "moment";
 
 const items = [];
 const fields = [
@@ -121,6 +122,7 @@ const fields = [
   },
   { key: "invoiceNumber", lable: "Invoice No" },
   { key: "customerName" },
+  { key: "displayIssuedDate", label: "Issued" },
   { key: "grandTotal" },
 
   { key: "show_status", label: "Status" },
@@ -160,6 +162,7 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
+          displayIssuedDate: this.getDisplayDate(item.issuedDate),
           customerName: this.getCustomerName(item),
           grandTotal: this.getGrandTotal(item),
         };
@@ -168,6 +171,9 @@ export default {
   },
 
   methods: {
+    getDisplayDate(dt) {
+      return moment(dt).format("DD/MM/YYYY");
+    },
     getCustomerName(item) {
       if (item.customer) {
         return item.customer.name;

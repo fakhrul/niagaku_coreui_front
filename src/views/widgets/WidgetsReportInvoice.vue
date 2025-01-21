@@ -10,6 +10,24 @@
       </CCardHeader>
       <CCardBody>
         <CRow class="justify-content-between align-items-center">
+          <CCol>
+            <img
+              :src="getImageUrl()"
+              alt="Logo Syarikat"
+              class="img-fluid logo-image"
+            />
+          </CCol>
+          <CCol class="text-right">
+            <h1>INVOICE</h1>
+            <h5>{{ invoice.business.name }}</h5>
+            <p>{{ "(" + invoice.business.regNo + ")" }}</p>
+            <p v-html="formatAddress(invoice.business.address)"></p>
+            <!--item.description is rendered from handlekeydown event and rerun format-->
+            <p>Tel: {{ invoice.business.phone }}</p>
+          </CCol>
+        </CRow>
+
+        <!-- <CRow class="justify-content-between align-items-center">
           <CCol xs="4" sm="3" md="2">
             <img
               :src="getImageUrl()"
@@ -23,56 +41,64 @@
             <p v-html="formatAddress(invoice.business.address)"></p>
             <p>Tel: {{ invoice.business.phone }}</p>
           </CCol>
-        </CRow>
+        </CRow> -->
         <hr class="thick-hr" />
         <div class="invoice-details">
-          <h3 class="text-center">INVOICE</h3>
           <CRow>
-            <CCol md="6">
+            <CCol sm="6">
               <p>
                 <strong>{{ getCustomerName() }}</strong>
               </p>
               <p v-html="formatAddress(getCustomerAddress())"></p>
             </CCol>
-            <CCol md="6" class="text-right">
-              <p>
-                <strong>Invoice No:</strong> {{ invoice.invoiceNumber }}
-              </p>
-              <p><strong>Issue Date:</strong> {{ getInvoiceIssuedDate() }}</p>
-              <p><strong>Due Date:</strong> {{ getInvoiceExpiryDate() }}</p>
+            <CCol sm="6" class="text-right">
+              <dl class="row">
+                <dt class="col-sm-6">Invoice No:</dt>
+                <dd class="col-sm-6">{{ invoice.invoiceNumber }}</dd>
+                <dt class="col-sm-6">Issue Date:</dt>
+                <dd class="col-sm-6">{{ getInvoiceIssuedDate() }}</dd>
+                <dt class="col-sm-6">Expiry Date:</dt>
+                <dd class="col-sm-6">{{ getInvoiceExpiryDate() }}</dd>
+              </dl>
             </CCol>
           </CRow>
-          <CRow>
+          <CRow v-if="invoice.title">
             <CCol>
               <p><strong>Title: </strong> {{ invoice.title }}</p>
             </CCol>
           </CRow>
         </div>
-
-        <table class="table table-bordered">
+        <div class="table-wrapper">
+        <table class="table table-striped">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Item & Description</th>
-              <th class="text-center">Quantity</th>
-              <th class="text-center">Price ({{ invoice.business.currency }})</th>
-              <th class="text-center">Total ({{ invoice.business.currency }})</th>
-            </tr>
+                <th class="index-column">#</th>
+                <th class="item-column">Item & Description</th>
+                <th class="text-center quantity-column">Quantity</th>
+                <th class="text-right price-column">
+                  Price ({{ invoice.business.currency }})
+                </th>
+                <th class="text-right total-column">
+                  Total ({{ invoice.business.currency }})
+                </th>
+              </tr>
           </thead>
           <tbody>
             <tr v-for="item in computedInvoiceItems" :key="item.name">
-              <td>{{ item.position }}</td>
-              <td>
-                <p>
-                  <strong>{{ item.product.name }}</strong>
-                </p>
-                <p>{{ item.description }}</p>
-              </td>
-              <td class="text-center">{{ item.quantity }}</td>
-              <td class="text-right">{{ item.price.toFixed(2) }}</td>
-              <td class="text-right">
-                {{ item.totalAmountPerItem.toFixed(2) }}
-              </td>
+              <td class="index-column">{{ item.position }}</td>
+                <td class="item-column">
+                  <p>
+                    <strong>{{ item.product.name }}</strong>
+                  </p>
+                  <p v-html="formatDescription(item.description)"></p>
+                </td>
+                <td class="text-center quantity-column">{{ item.quantity }}</td>
+                <td class="text-right price-column">
+                  {{ item.price.toFixed(2) }}
+                </td>
+                <td class="text-right total-column">
+                  {{ item.totalAmountPerItem.toFixed(2) }}
+                </td>
             </tr>
 
             <!-- <tr>
@@ -102,28 +128,30 @@
             </tr>  -->
           </tbody>
         </table>
+      </div>
         <!-- Terms and Conditions Section -->
         <div v-if="invoice.note" class="terms-and-conditions mt-4">
-          <h4>Terms and Conditions</h4>
+          <p><strong>Terms and Conditions</strong></p>
           <p v-html="formatNote(invoice.note)"></p>
         </div>
 
-     
-        <!--
-        <div class="vehicle-details">
-          <p><strong>Chassis No:</strong> {{ getVehicleChasisNo() }}</p>
-          <p><strong>Engine No:</strong> {{ getVehicleEngineNo() }}</p>
-          <p><strong>Regn. No:</strong> {{ getPlateNo() }}</p>
-          <p><strong>Model:</strong> {{ getBrandModelNo() }}</p>
-        </div>-->
-        <!-- <div class="signature text-right">
-          <p>{{ invoice.business.name }}</p>
+        <div class="report-footer">
+          <p>
+            {{ invoice.business.name }} | {{ invoice.business.website }} |
+            {{ invoice.business.phone }}
+          </p>
+          <p>
+            Powered By 
+            <img
+            
+              src="/logo.png"
+              alt="Niaga-ku Logo"
+              class="footer-logo"
+            />  Niaga-Ku.com
+          </p>
+        
         </div>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />  -->
+      
       </CCardBody>
     </CCard>
   </div>
@@ -164,6 +192,22 @@ export default {
     formatNote(note) {
       return note.replace(/\n/g, "<br />");
     },
+    formatDescription(description) {
+      // split item.description \n
+      return description
+        .split("\n") //split into an array
+        .map((line) => {
+          // check for indentation (e.g., spaces or tabs at the start)
+          const indentLevel = (line.match(/^(\s+)/) || [""])[0].length / 4;
+          return `<p style="padding-left: ${
+            indentLevel * 20
+          }px;">${line.trim()}</p>`;
+          //wraps in one line and padding for neatness
+        })
+        .join(""); //join into single html string and pass to <p>
+    },
+
+
     getTotalItemPrice(item) {
       try {
         return item.quantity * item.price;
@@ -282,32 +326,183 @@ export default {
     formatAddress(address) {
       return address.replace(/\n/g, "<br />");
     },
-    saveAsPDF() {
-      const element = this.$refs.pdfContent;
-      const options = {
-        margin: [0.5, 0.5, 0.5, 0.5], // Top, right, bottom, left
-        filename: "Invoice.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-      };
-      html2pdf().from(element).set(options).save();
+    forceA4Size() {
+      const pdfContent = this.$refs.pdfContent;
+      if (pdfContent) {
+        // Ensure the size is recalculated and displayed correctly
+        pdfContent.style.width = "210mm";
+        pdfContent.style.height = "297mm";
+      }
     },
     printContent() {
-      const printContents = this.$refs.pdfContent.innerHTML;
-      const originalContents = document.body.innerHTML;
+      this.forceA4Size(); // Ensure the content is set to A4 size
+      setTimeout(() => {
+        const originalTitle = document.title; // Save the current title
+        document.title =
+          "Print_" +
+          this.invoice.business.shortName +
+          "_" +
+          this.invoice.invoiceNumber; // Set the desired filename
 
-      document.body.innerHTML = printContents;
+        const printContents = this.$refs.pdfContent.innerHTML;
+        const originalContents = document.body.innerHTML;
 
-      window.print();
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        document.title = originalTitle; // Restore the original title
 
-      document.body.innerHTML = originalContents;
-      window.location.reload();
+        // Reattach Vue.js event listeners (important!)
+        this.$nextTick(() => {
+          this.$forceUpdate();
+          //window.location.reload(); // Refresh the page to reinitialize Vue bindings
+
+          // console.log(originalDate)
+          // console.log(originalSelectedDevice)
+          // this.queryDate = originalDate;
+          // this.selectedDeviceID = originalSelectedDevice.devicecID;
+        });
+      }, 100); // Delay slightly to allow reflow
     },
   },
 };
 </script>
 <style scoped>
+
+.report-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.report-footer p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.footer-logo {
+  max-width: 20px;
+  height: auto;
+  filter: grayscale(100%);
+}
+
+
+.logo-image {
+  max-width: 200px;
+}
+.pdf-content > .CRow:first-child {
+  margin-bottom: 0; /* Reduce space between header and content */
+}
+.pdf-content {
+  width: 210mm;
+  height: 297mm;
+  max-height: 297mm;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+  page-break-inside: auto;
+}
+
+.table tr {
+  page-break-inside: auto; /* Prevent page breaks inside table rows */
+  page-break-after: auto; /* Allow page breaks after rows */
+}
+
+.quantity-column {
+  width: 85px;
+  text-align: center;
+}
+
+.price-column {
+  width: 150px;
+  text-align: center;
+}
+
+.total-column {
+  width: 150px;
+  text-align: center;
+}
+
+.item-column {
+  width: 250px;
+}
+
+.index-column {
+  width: 50px;
+  text-align: center;
+}
+
+.table td,
+.table th {
+  white-space: normal; /* Ensure text wraps within cells */
+}
+
+@media screen and (max-width: 768px) {
+  .pdf-content {
+    width: 100%;
+    height: auto;
+  }
+
+  .table-wrapper {
+    display: block;
+    white-space: nowrap;
+  }
+}
+
+@media print {
+  .text-right {
+    text-align: right;
+  }
+  .pdf-content {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    page-break-inside: avoid;
+  }
+
+  .table-wrapper {
+    page-break-before: auto;
+    /*page-break-inside: avoid;*/
+    margin-top: 10px;
+  }
+
+  .invoice-details {
+    margin-right: 20px; /* Add some bottom margin to the header section */
+    margin-left: 20px; /* Add some bottom margin to the header section */
+    margin-bottom: 20px; /* Add some bottom margin to the header section */
+  }
+
+  .table tr {
+    /*page-break-inside: avoid; -- Remove this line */
+    page-break-after: auto;
+  }
+
+  .table {
+    width: 100%;
+    /*page-break-inside: auto;  -- Remove this line */
+    border-collapse: collapse;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
 .text-right {
   text-align: right;
 }
@@ -317,48 +512,7 @@ export default {
   margin: 10px 0;
 }
 
-.logo-image {
-  max-width: 100%;
-}
-
-.vehicle-details p,
-.signature p {
-  margin: 0;
-}
-
-.signature {
-  margin-top: 30px;
-}
-
 .terms-and-conditions {
-  margin-top: 20px;
-}
-
-.signature-section {
-  margin-top: 40px;
-  text-align: left;
-}
-
-.signature-area {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 40px;
-}
-
-.signature-space {
-  border-bottom: 1px solid #000;
-  width: 200px;
-  height: 25px; /* Adjust height for signature space */
-  margin-right: 30px; /* Space between signature and chop */
-}
-
-.chop-image {
-  width: 100px; /* Adjust size as needed */
-  height: auto;
-}
-
-.creator-info {
   margin-top: 20px;
 }
 

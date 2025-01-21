@@ -164,7 +164,7 @@
                               :label="'name'"
                               :options="computeProductItemsWithAddNew"
                               placeholder="Select product"
-                              @input="handleProductSelect"
+                              @input="handleProductSelect($event, item)"
                             />
                           </template>
                         </CFormGroup>
@@ -213,7 +213,9 @@
                           color="primary"
                           size="sm"
                           @click="moveItem(index, 'down')"
-                          :disabled="index === computedQuotationItems.length - 1"
+                          :disabled="
+                            index === computedQuotationItems.length - 1
+                          "
                         >
                           ↓
                         </CButton>
@@ -228,15 +230,10 @@
                           class="m-2"
                           @click="onRemoveClaimItem(item)"
                         >
-                          <CDropdownItem @click="createInvoiceByItem(item)">Create Invoice</CDropdownItem>
+                          <CDropdownItem @click="createInvoiceByItem(item)"
+                            >Create Invoice</CDropdownItem
+                          >
                         </CDropdown>
-                        <!--               
-                        <CButton
-                          color="light"
-                          @click="onRemoveClaimItem(item)"
-                        >
-                          Remove
-                        </CButton> -->
                       </td>
                     </template>
 
@@ -264,7 +261,7 @@
                     label="Term & Conditions"
                     v-model="obj.note"
                     placeholder=""
-                    rows="2"
+                    rows="10"
                   />
                 </CCol>
               </CRow>
@@ -381,6 +378,29 @@ Malaysia"
         </CRow>
       </CModal>
     </div>
+
+    <div>
+      <CModal
+        title="Add New Product"
+        size="xl"
+        :show.sync="addPoductFormPopup"
+        @update:show="onProductPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="12">
+            <CInput label="Name" horizontal v-model="itemAddNewProduct.name" />
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label">
+                Description
+              </CCol>
+              <CCol sm="9">
+                <CTextarea placeholder="" rows="5" v-model="itemAddNewProduct.description" />
+              </CCol>
+            </CRow>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
   </div>
 </template>
 
@@ -395,50 +415,51 @@ import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import moment from "moment";
 import WidgetsReportQuotation from "../widgets/WidgetsReportQuotation";
+import BusinessApi from "@/lib/businessApi";
 
 const quotationItems = [];
-const quotationFields = [
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  // { key: "position", label: "Position" },
-  // { key: "productName", label: "Item" },
-  {
-    key: "show_item",
-    label: "Item",
-    _style: "width:100px",
-  },
-  {
-    key: "show_description",
-    label: "Description",
-  },
-  {
-    key: "show_quantity",
-    label: "Quantity",
-    _style: "width:100px",
-  },
-  {
-    key: "show_price",
-    label: "Price",
-    _style: "width:100px",
-  },
-  {
-    key: "show_total",
-    label: "Total",
-  },
-  {
-    key: "show_move",
-    _style: "width:1%",
-  },
-  {
-    key: "show_remove",
-    _style: "width:1%",
-  },
-];
+// const quotationFields = [
+//   {
+//     key: "show_index",
+//     label: "#",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+//   // { key: "position", label: "Position" },
+//   // { key: "productName", label: "Item" },
+//   {
+//     key: "show_item",
+//     label: "Item",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_description",
+//     label: "Description",
+//   },
+//   {
+//     key: "show_quantity",
+//     label: "Quantity",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_price",
+//     label: "Price",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_total",
+//     label: "Total",
+//   },
+//   {
+//     key: "show_move",
+//     _style: "width:1%",
+//   },
+//   {
+//     key: "show_remove",
+//     _style: "width:1%",
+//   },
+// ];
 
 export default {
   name: "Quotation",
@@ -448,6 +469,12 @@ export default {
   },
   data: () => {
     return {
+      itemPendingNewProduct: null,
+      businessApi: new BusinessApi(),
+
+      itemAddNewProduct: {},
+      addPoductFormPopup: false,
+
       itemAddNewCustomer: {},
       addCustomerFormPopup: false,
 
@@ -469,7 +496,48 @@ export default {
         return { ...item, id };
       }),
 
-      quotationFields,
+      quotationFields: [
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        // { key: "position", label: "Position" },
+        // { key: "productName", label: "Item" },
+        {
+          key: "show_item",
+          label: "Item",
+          _style: "width:100px",
+        },
+        {
+          key: "show_description",
+          label: "Description",
+        },
+        {
+          key: "show_quantity",
+          label: "Quantity",
+          _style: "width:100px",
+        },
+        {
+          key: "show_price",
+          label: "Price",
+          _style: "width:100px",
+        },
+        {
+          key: "show_total",
+          label: "Total",
+        },
+        {
+          key: "show_move",
+          _style: "width:1%",
+        },
+        {
+          key: "show_remove",
+          _style: "width:1%",
+        },
+      ],
 
       selectedItem: null,
 
@@ -500,13 +568,11 @@ export default {
         expiryDate: this.expiryDate, // Add this line to include the expiry date
       };
     },
-    computeProductItemsWithAddNew()
-    {
+    computeProductItemsWithAddNew() {
       return [
         ...this.productItems,
         { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
       ];
-
     },
     customerItemsWithAddNew() {
       return [
@@ -540,13 +606,11 @@ export default {
     },
   },
   methods: {
-    createInvoiceByItem(item)
-    {
+    createInvoiceByItem(item) {
       var self = this;
       self.$router.push({
         path: `/tenants/Invoice/${item.id}/convertFromItem`,
       });
-
     },
     onConvertToInvoice(item) {
       var self = this;
@@ -573,9 +637,35 @@ export default {
       }
       this.itemAddNewCustomer = {};
     },
-    handleProductSelect(selected) {
+    onProductPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.productApi
+          .create(this.itemAddNewProduct)
+          .then((response) => {
+            console.log("onProductPopupConfirmation", response);
+            var addedProduct = response.result;
+            this.refreshProduct();
+            this.itemPendingNewProduct.product = addedProduct;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      else
+      {
+        this.itemPendingNewProduct.product = null;
+      }
+      this.itemAddNewProduct = {};
+    },
+
+    handleProductSelect(selected, item) {
       if (selected.id === "add_new") {
-        alert('add new')
+        this.itemPendingNewProduct = item;
+        this.itemAddNewProduct = {};
+        this.addPoductFormPopup = true;
+
         // // Trigger action to add a new customer
         // this.addNewProduct();
         // this.selectedCustomer = null; // Reset selection
@@ -591,8 +681,6 @@ export default {
     addNewCustomer() {
       this.itemAddNewCustomer = {};
       this.addCustomerFormPopup = true;
-      // Logic to handle adding a new customer
-      // alert("Add New Customer clicked!");
     },
 
     cancel() {
@@ -795,16 +883,29 @@ export default {
       );
     },
     addNewItem() {
-       const newPosition = this.computedQuotationItems.length + 1;
-      this.computedQuotationItems.push({
-        id: this.generateGUID(),
-        product: this.productItems[0],
-        price: 0,
-        quantity: 0,
-        description: "",
-        position: newPosition,
-      });
-      console.log(this.computedQuotationItems);
+      console.log("addNewItem");
+      if (this.quotationItems.length == 0) {
+        this.quotationItems.push({
+          id: this.generateGUID(),
+          product: this.productItems[0],
+          price: 0,
+          quantity: 0,
+          description: "",
+          position: 1,
+        });
+      } else {
+        const newPosition = this.computedQuotationItems.length + 1;
+        this.computedQuotationItems.push({
+          id: this.generateGUID(),
+          product: this.productItems[0],
+          price: 0,
+          quantity: 0,
+          description: "",
+          position: newPosition,
+        });
+      }
+
+      console.log("this.computedQuotationItems", this.computedQuotationItems);
     },
     getTotalItemPrice(item) {
       try {
@@ -909,6 +1010,16 @@ export default {
             console.log(response.result);
             self.obj.quotationNumber = response.result;
             console.log(self.obj);
+          })
+          .catch(({ data }) => {});
+
+        this.businessApi
+          .getCurrentActiveBusiness()
+          .then((response) => {
+            console.log(response.result);
+            console.log(response.result.quotationDefaultFooter);
+            self.obj.note = response.result.quotationDefaultFooter;
+            // console.log(self.obj);
           })
           .catch(({ data }) => {});
       }

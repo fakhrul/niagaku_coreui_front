@@ -30,13 +30,13 @@
         <br />
         <div class="invoice-details">
           <CRow>
-            <CCol md="6">
+            <CCol sm="6">
               <p>
                 <strong>{{ getCustomerName() }}</strong>
               </p>
               <p v-html="formatAddress(getCustomerAddress())"></p>
             </CCol>
-            <CCol md="6" class="text-right">
+            <CCol sm="6" class="text-right">
               <dl class="row">
                 <dt class="col-sm-6">Quotation No:</dt>
                 <dd class="col-sm-6">{{ quotation.quotationNumber }}</dd>
@@ -45,12 +45,6 @@
                 <dt class="col-sm-6">Expiry Date:</dt>
                 <dd class="col-sm-6">{{ getQuotationExpiryDate() }}</dd>
               </dl>
-
-              <!-- <p>
-                <strong>Quotation No:</strong> {{ quotation.quotationNumber }}
-              </p>
-              <p><strong>Issue Date:</strong> {{ getQuotationIssuedDate() }}</p>
-              <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p> -->
             </CCol>
           </CRow>
           <CRow v-if="quotation.title">
