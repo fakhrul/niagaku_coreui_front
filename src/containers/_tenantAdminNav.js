@@ -269,7 +269,108 @@ export default [
           text: 'PRO'
         }
       },
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Sales'],
+      },
+      {
+        _name: 'CSidebarNavDropdown',
+        name: 'Rental & Leasing',
+        route: '/tenants/incomeDashBoard',
+        icon: 'cilBarChart',
+        _children: [
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Products',
+            to: '/tenants/rentalProductList',
+            icon: 'cilFile'
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Availability',
+            to: '/tenants/rentalAvailability',
+            icon: 'cilFile'
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Reservation',
+            to: '/tenants/rentalReservation',
+            icon: 'cilFile'
+          },
+        ]
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Retail & E-Commerce',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Service-Based',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Transportation',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Subscription',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Health & Wellness',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
 
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Tourism',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Investment',
+        to: '/tenants/quotationList',
+        icon: 'cilFile',
+        badge: {
+          color: 'light',
+          text: 'FUTURE'
+        },
+      },
+     
     ]
   }
 ]

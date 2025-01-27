@@ -66,6 +66,9 @@
                       <CDropdownItem @click="onEdit(item)"
                         >View/Edit</CDropdownItem
                       >
+                      <CDropdownItem @click="onDuplicate(item)"
+                        >Duplicate</CDropdownItem
+                      >
                       <CDropdownDivider />
                       <CDropdownItem @click="showDeleteConfirmation(item)"
                         >Delete</CDropdownItem
@@ -114,9 +117,13 @@
               </CDataTable>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="addNew"
+              <CButton  type="submit" color="light" @click="addNew()"
+                          >Add New</CButton
+                        >
+
+              <!-- <CButton type="submit" size="sm" color="primary" @click="addNew"
                 ><CIcon name="cil-check-circle" /> Add New</CButton
-              >
+              > -->
             </CCardFooter>
           </CCard>
           <CModal
@@ -291,6 +298,13 @@ export default {
     //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
     //   });
     // },
+    onDuplicate(item) {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/OtherExpense/${item.id}/duplicate`,
+      });
+    },
+
     onEdit(item) {
       var self = this;
       self.$router.push({

@@ -118,8 +118,15 @@
                       :checked.sync="obj.isPaid"
                       label-on="YES"
                       label-off="NO"
+                      :disabled="obj.expenseStateDescription !== 'Approve'"
                     >
                     </CSwitch>
+                    <div
+                      v-if="obj.expenseStateDescription !== 'Approve'"
+                      class="text-muted small mt-1"
+                    >
+                      Only can change when status is <strong>Approve</strong>.
+                    </div>
                   </CCol>
                 </CRow>
                 <CInput
@@ -901,16 +908,43 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            console.log(self.obj);
+            console.log("self.obj",self.obj);
             self.obj.totalAmount = self.obj.totalAmount.toFixed(2);
             self.issuedDate = self.obj.date;
             self.selectedVendor = self.obj.vendor;
 
-            self.selectedChartOfAccount = self.obj.chartAccount;
+            // self.selectedChartOfAccount = self.obj.chartAccount;
+
+            if (self.$route.name === "OtherExpenseDuplicate") {
+              delete self.obj.id; // Remove `id` for duplication
+              delete self.obj.documentInvoice; // Remove `id` for duplication
+              delete self.obj.documentPayment; // Remove `id` for duplication
+              delete self.obj.documentReceipt; // Remove `id` for duplication
+
+              delete self.obj.documentInvoiceId; // Remove `id` for duplication
+              delete self.obj.documentPaymentId; // Remove `id` for duplication
+              delete self.obj.documentReceiptId; // Remove `id` for duplication
+
+              delete self.obj.vendor; // Remove `id` for duplication
+
+              let currentDate = new Date();
+              this.issuedDate = new Date(
+                currentDate.toISOString().split("T")[0] + "T00:00:00"
+              ); // Set issuedDate
+              // self.objexpenseState = 0;
+
+              self.obj.createdAt = null; // Clear timestamps
+              self.obj.updatedAt = null;
+
+              // Optionally modify any other fields if required
+              this.toast("Info", "You are duplicating a quotation.", "info");
+            }
+
+
+
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
-            // console.log(data);
           });
       } else {
         self.obj = self.getEmptyObj();

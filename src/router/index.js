@@ -43,6 +43,7 @@ const Subscription = () => import('@/views/tenants/Subscription')
 
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
+
 const IncomeReceipt = () => import('@/views/tenants/IncomeReceipt')
 const IncomeReceiptList = () => import('@/views/tenants/IncomeReceiptList')
 
@@ -103,6 +104,10 @@ const RegisterCompleted = () => import('@/views/pages/RegisterCompleted')
 
 const Profile = () => import('@/views/pages/Profile')
 
+const RentalProductList = () => import('@/views/tenants/RentalProductList')
+const RentalProduct = () => import('@/views/tenants/RentalProduct')
+const RentalAvailability = () => import('@/views/tenants/RentalAvailability')
+const RentalReservation = () => import('@/views/tenants/RentalReservation')
 
 
 Vue.use(Router)
@@ -565,6 +570,12 @@ function configRoutes() {
               component: OtherExpense
             },
             {
+              path: '/tenants/OtherExpense/:id/duplicate', // New route
+              name: 'OtherExpenseDuplicate',
+              component: OtherExpense // Use the same component or create a new one if needed
+            },
+
+            {
               path: '/tenants/OtherExpenseList',
               name: 'OtherExpenseList',
               component: OtherExpenseList
@@ -686,6 +697,32 @@ function configRoutes() {
               component: BankStatement
             },
 
+
+            {
+              path: '/tenants/RentalProduct',
+              name: 'RentalProduct',
+              component: RentalProduct
+            },
+            {
+              path: '/tenants/RentalProduct/:id',
+              name: 'RentalProductById',
+              component: RentalProduct
+            },
+            {
+              path: '/tenants/RentalProductList',
+              name: 'RentalProductList',
+              component: RentalProductList
+            },
+            {
+              path: '/tenants/RentalAvailability',
+              name: 'RentalAvailability',
+              component: RentalAvailability
+            },
+            {
+              path: '/tenants/RentalReservation',
+              name: 'RentalReservation',
+              component: RentalReservation
+            },
           ]
         },
         {

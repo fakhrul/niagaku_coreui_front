@@ -23,9 +23,9 @@
                 {{ obj.statusDescription }}
               </a>
               <div class="card-header-actions">
-                <CButton size="sm" color="primary" @click="preview">
+                <!-- <CButton size="sm" color="primary" @click="preview">
                   Preview</CButton
-                >
+                > -->
                 <CDropdown
                   placement="bottom-end"
                   toggler-text="Change Status"
@@ -64,29 +64,29 @@
             </CCardHeader>
             <CCardBody>
               <CRow>
-                <CCol sm="12" lg="4"
-                  ><CFormGroup wrapperClasses="input-group pt-2 mb-2">
-                    <template #label>Customer </template>
-                    <template #input>
-                      <v-select
-                        style="width: 100%"
-                        v-model="selectedCustomer"
-                        :label="'name'"
-                        :options="customerItems"
-                        placeholder="Select customer"
-                      />
-                    </template>
-                  </CFormGroup>
+                <CCol sm="12" md="12" lg="4">
+                  <v-select
+                    class="form-control-lg"
+                    style="width: 100%; padding: 0"
+                    v-model="selectedCustomer"
+                    :label="'name'"
+                    :options="customerItemsWithAddNew"
+                    placeholder="Select customer"
+                    @input="handleCustomerSelect"
+                  />
+                  <div class="text-muted small mt-1">Custoner</div>
                 </CCol>
-                <CCol sm="12" lg="2"
-                  ><CInput
-                    label="Receipt No"
+                <CCol sm="12" md="12" lg="4">
+                  <CInput
+                    size="lg"
+                    description="Receipt No"
                     placeholder=""
                     v-model="obj.incomeReceiptNumber"
                 /></CCol>
-                <CCol sm="12" lg="2">
+                <CCol sm="12" lg="4">
                   <CInput
-                    label="Date"
+                    size="lg"
+                    description="Date"
                     type="date"
                     :value="computeIssuedDate"
                     @change="setIssuedDate"
@@ -279,6 +279,20 @@
       </CRow>
       <!-- <CRow>
         <CCol>
+          <CCard>
+            <CCardHeader>Preview</CCardHeader>
+            <CCardBody>
+              <WidgetsReportIncomeReceipt
+              :receipt="previewObj"
+            ></WidgetsReportIncomeReceipt>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow> -->
+
+
+      <!-- <CRow>
+        <CCol>
           <WidgetsReportQuotation :quotation="obj"></WidgetsReportQuotation>
         </CCol>
       </CRow> -->
@@ -294,6 +308,53 @@
             <WidgetsReportIncomeReceipt
               :receipt="previewObj"
             ></WidgetsReportIncomeReceipt>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
+    <div>
+      <CModal
+        title="Add New Customer"
+        size="xl"
+        :show.sync="addCustomerFormPopup"
+        @update:show="onCustomerPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="6">
+            <CInput
+              label="Name"
+              v-model="itemAddNewCustomer.name"
+              placeholder="Customer Sdn Bhd"
+              required
+              was-validated
+            />
+            <CInput
+              label="Contact Name"
+              v-model="itemAddNewCustomer.contactName"
+            />
+            <CInput
+              label="Contact Email"
+              v-model="itemAddNewCustomer.contactEmail"
+            />
+            <CInput
+              label="Contact Phone"
+              v-model="itemAddNewCustomer.contactPhone"
+            />
+          </CCol>
+          <CCol md="6">
+            <CTextarea
+              label="Address"
+              placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
+              rows="5"
+              v-model="itemAddNewCustomer.address"
+
+            />
+
+            <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
+            <CInput label="Website" v-model="itemAddNewCustomer.website" />
           </CCol>
         </CRow>
       </CModal>
@@ -364,6 +425,10 @@ export default {
   },
   data: () => {
     return {
+      itemAddNewCustomer: {},
+      addCustomerFormPopup: false,
+
+
       incomeReceiptFields: [
         {
           key: "show_index",
@@ -447,14 +512,19 @@ export default {
     self.resetObj();
   },
   computed: {
+    customerItemsWithAddNew() {
+      return [
+        ...this.customerItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
     computedPreviewItem() {
       return {
         ...this.obj,
         items: this.computedincomeReceiptItems,
-        expiryDate: this.expiryDate, // Add this line to include the expiry date
       };
     },
-    
+
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -481,6 +551,37 @@ export default {
     },
   },
   methods: {
+    onCustomerPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.customerApi
+          .create(this.itemAddNewCustomer)
+          .then((response) => {
+            console.log("onCustomerPopupConfirmation", response);
+
+            var addedCustomer = response.result;
+            this.refreshCustomer();
+            this.selectedCustomer = addedCustomer;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewCustomer = {};
+    },
+
+    handleCustomerSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewCustomer();
+        this.selectedCustomer = null; // Reset selection
+      }
+    },
+    addNewCustomer() {
+      this.itemAddNewCustomer = {};
+      this.addCustomerFormPopup = true;
+    },
     cancel() {
       this.$router.push({ path: "/tenants/incomeReceipt" });
     },
@@ -791,6 +892,11 @@ export default {
           .create(self.obj)
           .then((response) => {
             self.toast("Success", "Updated", "success");
+            var newObj = response.result;
+            self.$router.push({
+              path: `/tenants/IncomeReceipt/${newObj.id}`,
+            });
+
             self.resetObj();
             // self.$router.push({ path: "/tenants/quotationList" });
           })

@@ -17,38 +17,47 @@
               class="img-fluid logo-image"
             />
           </CCol>
+          <CCol class="text-right">
+            <h1>RECEIPT</h1>
+            <h5>{{ receipt.business.name }}</h5>
+            <p>{{ "(" + receipt.business.regNo + ")" }}</p>
+            <p v-html="formatAddress(receipt.business.address)"></p>
+            <!--item.description is rendered from handlekeydown event and rerun format-->
+            <p v-if="receipt.business.phone">Tel: {{ receipt.business.phone }}</p>
+          </CCol>
+
           <!-- <CCol>
             <h1>{{ receipt.business.name }}</h1>
             <p>{{ "(" + receipt.business.regNo + ")" }}</p>
             <p v-html="formatAddress(receipt.business.address)"></p> 
             <p>Tel: {{ receipt.business.phone }}</p>
           </CCol> -->
-          <CCol class="text-right">
+          <!-- <CCol class="text-right">
             <h1>OFFICIAL RECEIPT</h1>
             <h5>{{ receipt.business.name }}</h5>
             <p>{{ "(" + receipt.business.regNo + ")" }}</p>
             <p v-html="formatAddress(receipt.business.address)"></p>
-            <!--item.description is rendered from handlekeydown event and rerun format-->
             <p>Tel: {{ receipt.business.phone }}</p>
           </CCol>
-        
+         -->
         </CRow>
         <hr class="thick-hr" />
         <div class="invoice-details">
-          <h3 class="text-center">RECEIPT</h3>
           <CRow>
-            <CCol md="6">
+            <CCol sm="6">
               <p>
                 <strong>{{ getCustomerName() }}</strong>
               </p>
               <p v-html="formatAddress(getCustomerAddress())"></p>
+              <!-- <p v-html="formatAddress(getCustomerAddress())"></p>  -->
             </CCol>
-            <CCol md="6" class="text-right">
-              <p>
-                <strong>Receipt No:</strong> {{ receipt.incomeReceiptNumber }}
-              </p>
-              <p><strong>Date:</strong> {{ getQuotationIssuedDate() }}</p>
-              <!-- <p><strong>Due Date:</strong> {{ getQuotationExpiryDate() }}</p> -->
+            <CCol sm="6" class="text-right">
+              <dl class="row">
+                <dt class="col-sm-6">Receipt No:</dt>
+                <dd class="col-sm-6">{{ receipt.incomeReceiptNumber }}</dd>
+                <dt class="col-sm-6">Date:</dt>
+                <dd class="col-sm-6">{{ getQuotationIssuedDate() }}</dd>
+              </dl>
             </CCol>
           </CRow>
           <CRow v-if="receipt.title">
@@ -59,7 +68,7 @@
         </div>
 
         <div class="table-wrapper">
-          <table class="table table-bordered">
+          <table class="table table-striped">
             <thead>
               <tr>
                 <th class="index-column">#</th>
@@ -109,6 +118,23 @@
           <h4>Terms and Conditions</h4>
           <p v-html="formatNote(receipt.note)"></p>
         </div>
+
+        <div class="report-footer">
+          <p>
+            {{ receipt.business.name }} | {{ receipt.business.website }} |
+            {{ receipt.business.phone }}
+          </p>
+          <p>
+            Powered By 
+            <img
+            
+              src="/logo.png"
+              alt="Niaga-ku Logo"
+              class="footer-logo"
+            />  Niaga-Ku.com
+          </p>
+        
+        </div>
       </CCardBody>
     </CCard>
   </div>
@@ -151,18 +177,19 @@ export default {
       return note.replace(/\n/g, "<br />");
     },
 
-
     formatDescription(description) {
       // split item.description \n
       return description
-        .split('\n') //split into an array
-        .map(line => {
+        .split("\n") //split into an array
+        .map((line) => {
           // check for indentation (e.g., spaces or tabs at the start)
-          const indentLevel = (line.match(/^(\s+)/) || [''])[0].length / 4; 
-          return `<p style="padding-left: ${indentLevel * 20}px;">${line.trim()}</p>`;
+          const indentLevel = (line.match(/^(\s+)/) || [""])[0].length / 4;
+          return `<p style="padding-left: ${
+            indentLevel * 20
+          }px;">${line.trim()}</p>`;
           //wraps in one line and padding for neatness
         })
-        .join(''); //join into single html string and pass to <p>
+        .join(""); //join into single html string and pass to <p>
     },
 
     getTotalItemPrice(item) {
@@ -180,6 +207,11 @@ export default {
     },
     getCustomerAddress() {
       try {
+        console.log(
+          "getCustomerAddress this.receipt.customer",
+          this.receipt.customer
+        );
+        if (!this.receipt.customer.address) return "";
         return this.receipt.customer.address;
       } catch (error) {
         return "N/A";
@@ -187,6 +219,7 @@ export default {
     },
     getCustomerName() {
       try {
+        console.log("this.receipt.customer.name", this.receipt.customer.name);
         return this.receipt.customer.name;
       } catch (error) {
         return "N/A";
@@ -198,9 +231,7 @@ export default {
 
     getImageUrl() {
       try {
-        return (
-          this.removeTrailingSlash(apiUrl) + this.receipt.business.logoUrl
-        );
+        return this.removeTrailingSlash(apiUrl) + this.receipt.business.logoUrl;
       } catch (error) {
         return "";
       }
@@ -220,7 +251,11 @@ export default {
       this.forceA4Size(); // Ensure the content is set to A4 size
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
-        document.title = "Print_" + this.receipt.business.shortName + "_" + this.receipt.quotationNumber; // Set the desired filename
+        document.title =
+          "Print_" +
+          this.receipt.business.shortName +
+          "_" +
+          this.receipt.incomeReceiptNumber; // Set the desired filename
 
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;
@@ -247,7 +282,6 @@ export default {
 </script>
 
 <style scoped>
-
 .report-footer {
   text-align: center;
   margin-top: 20px;
@@ -266,7 +300,6 @@ export default {
   height: auto;
   filter: grayscale(100%);
 }
-
 
 .logo-image {
   max-width: 200px;

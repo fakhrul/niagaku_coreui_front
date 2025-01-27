@@ -1,23 +1,4 @@
 
-To enhance the UI/UX of your dropdown and make it more visually appealing and intuitive, consider the following adjustments:
-
-Add Hover and Click Styles:
-
-Update the CHeaderNavLink and CDropdownItem styles to include hover and click feedback. This can make it clear that the elements are interactive.
-Use Icons:
-
-Add a dropdown icon (e.g., a caret or arrow) to indicate that it can be clicked to reveal more options.
-Custom Styling for Dropdown Items:
-
-Style the dropdown items to make them visually distinct and easy to differentiate.
-Improve the CDropdown Toggler Appearance:
-
-Make the toggler visually engaging with a border, background color, or slight shadow.
-Here’s your updated code with UI/UX enhancements:
-
-Updated Code:
-vue
-Copy code
 <template>
   <div class="wrapper">
     <CDropdown
@@ -30,6 +11,11 @@ Copy code
     >
       <template #toggler>
         <CHeaderNavLink class="dropdown-toggler">
+          <img
+          :src="getBusinessIcon(currentBusiness)"
+          alt="Business Logo"
+          class="business-icon"
+        />
           {{ currentBusinessShortName }}
           <CIcon name="cil-chevron-bottom" class="ml-2 dropdown-icon" />
         </CHeaderNavLink>
@@ -43,6 +29,11 @@ Copy code
         @click="changeBusiness(item)"
         class="dropdown-item"
       >
+        <img
+          :src="getBusinessIcon(item)"
+          alt="Business Logo"
+          class="business-icon"
+        />
         {{ item.name }}
       </CDropdownItem>
     </CDropdown>
@@ -60,6 +51,7 @@ export default {
   name: "TheHeaderDropdownNotif",
   data() {
     return {
+      defaultIcon: "/img/avatars/6.jpg",
       profileaApi: new ProfileApi(),
       businessApi: new BusinessApi(),
       businessList: [],
@@ -76,6 +68,15 @@ export default {
     currentRole() {
       return this.currentProfile.appUser.role;
     },
+    currentBusiness()
+    {
+      try {
+        return this.currentProfile.defaultBusiness;
+      } catch (error) {
+        return null;
+      }
+
+    },
     currentBusinessShortName() {
       try {
         return this.currentProfile.defaultBusiness.shortName;
@@ -86,6 +87,20 @@ export default {
   },
 
   methods: {
+    getBusinessIcon(item) {
+      try {
+        return item.logoUrl ? this.getImageUrl(item.logoUrl) : this.defaultIcon;
+        
+      } catch (error) {
+        return this.defaultIcon;
+      }
+    },
+    getImageUrl(url) {
+      return this.removeTrailingSlash(apiUrl) + url;
+    },
+    removeTrailingSlash(str) {
+      return str.endsWith("/") ? str.slice(0, -1) : str;
+    },
     isTenantAdmin() {
       var role = auth.getRole();
       if (role == "TenantAdmin") return true;
@@ -137,7 +152,7 @@ export default {
         .getListByCurrentTenant()
         .then((response) => {
           self.businessList = response.result;
-          // console.log(self.businessList);
+          console.log(self.businessList);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -175,5 +190,13 @@ export default {
 .dropdown-item:hover {
   background-color: var(--cui-hover-bg);
   color: var(--cui-primary);
+}
+
+.business-icon {
+  width: 24px; /* Set a fixed width */
+  height: 24px; /* Set a fixed height */
+  margin-right: 8px;
+  border-radius: 50%; /* Make it circular */
+  object-fit: cover; /* Ensures the image fits well */
 }
 </style>

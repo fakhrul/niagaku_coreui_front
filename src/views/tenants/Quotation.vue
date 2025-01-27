@@ -23,9 +23,9 @@
                 {{ obj.statusDescription }}
               </a>
               <div class="card-header-actions">
-                <CButton size="sm" color="primary" @click="preview">
+                <!-- <CButton size="sm" color="primary" @click="preview">
                   Preview</CButton
-                >
+                > -->
                 <CDropdown
                   placement="bottom-end"
                   toggler-text="Action"
@@ -79,6 +79,11 @@
                     placeholder="Select customer"
                     @input="handleCustomerSelect"
                   />
+                  <div
+                      class="text-muted small mt-1"
+                    >
+                      Custoner
+                    </div>
                 </CCol>
                 <CCol sm="12" md="12" lg="6"
                   ><CInput

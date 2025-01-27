@@ -14,346 +14,88 @@
         </template>
       </CToaster>
       <CRow>
-        <CCol sm="8">
+        <CCol>
           <CCard>
             <CCardHeader>
-              <strong> Bill </strong> Image
+              <strong>Purchase Invoice (Bill)</strong>
+              <a href="" target="_blank" :class="getBadgeClass()">
+                {{ obj.stateDescription }}
+              </a>
               <div class="card-header-actions">
-                <div class="row">
-                  <div class="col-2">
-                    <!-- <a @click="toolClick('rotate')" v-c-tooltip="'Rotate'">
-                      <span class="material-icons">rotate_right</span>
-                    </a> -->
-                  </div>
-                  <div class="col-2">
-                    <a
-                      @click="toolClick('companyName')"
-                      v-c-tooltip="'Company Name'"
-                    >
-                      <span class="material-icons">home_work</span>
-                    </a>
-                  </div>
+                <CDropdown
+                  placement="bottom-end"
+                  toggler-text="Action"
+                  color="light"
+                  class="m-2 d-inline-block tour-cdropdown"
+                  size="sm"
+                >
+                  <CDropdownItem @click="onConvertToInvoice(obj)"
+                    >Duplicate</CDropdownItem
+                  >
+                  <CDropdownDivider />
+                  <CDropdownHeader>Change Status To:</CDropdownHeader>
+                  <template v-for="status in statuses">
+                    <CDropdownItem @click="changeState(status)">{{
+                      status.name
+                    }}</CDropdownItem>
+                  </template>
+                </CDropdown>
+                <!-- Start Tour Button -->
+                <!-- <CButton size="sm" color="info" @click="startTour">
+                  Guide
+                </CButton> -->
 
-                  <div
-                    class="col-2"
-                    @click="toolClick('date')"
-                    v-c-tooltip="'Bill Date'"
+                <!-- <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                  <CDropdownItem @click="startTour"
+                    >Onboarding Tour</CDropdownItem
                   >
-                    <a>
-                      <span class="material-icons">calendar_month</span>
-                    </a>
-                  </div>
-                  <div
-                    class="col-2"
-                    @click="toolClick('billNo')"
-                    v-c-tooltip="'Bill No'"
-                  >
-                    <a>
-                      <span class="material-icons">tag</span>
-                    </a>
-                  </div>
-                  <div
-                    class="col-2"
-                    @click="toolClick('totalAmount')"
-                    v-c-tooltip="'Total Amount'"
-                  >
-                    <a>
-                      <span class="material-icons">paid</span>
-                    </a>
-                  </div>
-                  <div
-                    class="col-2"
-                    @click="toolClick('billItem')"
-                    v-c-tooltip="'Bill item'"
-                  >
-                    <a>
-                      <span class="material-icons">list</span>
-                    </a>
-                  </div>
-                  <!-- <div
-                    class="col-2"
-                    @click="toolClick('items')"
-                    v-c-tooltip="'Items'"
-                  >
-                    <a>
-                      <span class="material-icons">list</span>
-                    </a>
-                  </div> -->
-                </div>
+                  <CDropdownItem disabled>Quick Info</CDropdownItem>
+                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+                  <CDropdownItem disabled>Live Chat</CDropdownItem>
+                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
+                </CDropdown> -->
               </div>
             </CCardHeader>
             <CCardBody>
               <CForm>
-                <CRow>
-                  <CCol sm="12">
-                    <div id="stage-container">
-                      <v-stage
-                        ref="stage"
-                        :config="stageSize"
-                        :style="{
-                          top: 0,
-                          overflow: 'auto',
-                        }"
-                        @click="handleStageMouseClick"
-                      >
-                        <v-layer>
-                          <!-- Company Name -->
-                          <v-image ref="image" :config="imageConfig" />
-                          <v-line :config="obj.drawCompany" />
-                          <v-circle
-                            v-for="anchor in getAnchors(obj.drawCompany)"
-                            @dragmove="updatePolyCompany"
-                            :key="anchor.code"
-                            :config="{
-                              // roomId: anchor.roomId,
-                              // roomCode: anchor.roomCode,
-                              pointFirstIndex: anchor.pointFirstIndex,
-                              code: anchor.code,
-                              x: anchor.x,
-                              y: anchor.y,
-                              radius: 4,
-                              fill: 'white',
-                              stroke: 'black',
-                              draggable: true,
-                            }"
-                          />
-                          <v-label
-                            :config="{
-                              x: getCenterOfShape(obj.drawCompany)[0], // item.points[0],
-                              y: getCenterOfShape(obj.drawCompany)[1], //item.points[1],
-                            }"
-                          >
-                            <v-text
-                              :config="{
-                                text: getLableInfo(obj.drawCompany),
-                                fill: 'white',
-                              }"
-                            />
-                          </v-label>
-
-                          <!-- Bill Date -->
-                          <v-line :config="obj.drawDate" />
-                          <v-circle
-                            v-for="anchor in getAnchors(obj.drawDate)"
-                            @dragmove="updatePolyDate"
-                            :key="anchor.code"
-                            :config="{
-                              // roomId: anchor.roomId,
-                              // roomCode: anchor.roomCode,
-                              pointFirstIndex: anchor.pointFirstIndex,
-                              code: anchor.code,
-                              x: anchor.x,
-                              y: anchor.y,
-                              radius: 4,
-                              fill: 'white',
-                              stroke: 'black',
-                              draggable: true,
-                            }"
-                          />
-                          <v-label
-                            :config="{
-                              x: getCenterOfShape(obj.drawDate)[0], // item.points[0],
-                              y: getCenterOfShape(obj.drawDate)[1], //item.points[1],
-                            }"
-                          >
-                            <v-text
-                              :config="{
-                                text: getLableInfo(obj.drawDate),
-                                fill: 'white',
-                              }"
-                            />
-                          </v-label>
-
-                          <!-- Bill No -->
-                          <v-line :config="obj.drawBillNo" />
-                          <v-circle
-                            v-for="anchor in getAnchors(obj.drawBillNo)"
-                            @dragmove="updatePolyBillNo"
-                            :key="anchor.code"
-                            :config="{
-                              // roomId: anchor.roomId,
-                              // roomCode: anchor.roomCode,
-                              pointFirstIndex: anchor.pointFirstIndex,
-                              code: anchor.code,
-                              x: anchor.x,
-                              y: anchor.y,
-                              radius: 4,
-                              fill: 'white',
-                              stroke: 'black',
-                              draggable: true,
-                            }"
-                          />
-                          <v-label
-                            :config="{
-                              x: getCenterOfShape(obj.drawBillNo)[0], // item.points[0],
-                              y: getCenterOfShape(obj.drawBillNo)[1], //item.points[1],
-                            }"
-                          >
-                            <v-text
-                              :config="{
-                                text: getLableInfo(obj.drawBillNo),
-                                fill: 'white',
-                              }"
-                            />
-                          </v-label>
-
-                          <!-- Total Amount -->
-                          <v-line :config="obj.drawTotalAmount" />
-                          <v-circle
-                            v-for="anchor in getAnchors(obj.drawTotalAmount)"
-                            @dragmove="updatePolyTotalAmount"
-                            :key="anchor.code"
-                            :config="{
-                              // roomId: anchor.roomId,
-                              // roomCode: anchor.roomCode,
-                              pointFirstIndex: anchor.pointFirstIndex,
-                              code: anchor.code,
-                              x: anchor.x,
-                              y: anchor.y,
-                              radius: 4,
-                              fill: 'white',
-                              stroke: 'black',
-                              draggable: true,
-                            }"
-                          />
-                          <v-label
-                            :config="{
-                              x: getCenterOfShape(obj.drawTotalAmount)[0], // item.points[0],
-                              y: getCenterOfShape(obj.drawTotalAmount)[1], //item.points[1],
-                            }"
-                          >
-                            <v-text
-                              :config="{
-                                text: getLableInfo(obj.drawTotalAmount),
-                                fill: 'white',
-                              }"
-                            />
-                          </v-label>
-
-                          <!-- Itemized -->
-                          <v-line :config="obj.drawBillItem" />
-                          <v-circle
-                            v-for="anchor in getAnchors(obj.drawBillItem)"
-                            @dragmove="updatePolyBillItem"
-                            :key="anchor.code"
-                            :config="{
-                              // roomId: anchor.roomId,
-                              // roomCode: anchor.roomCode,
-                              pointFirstIndex: anchor.pointFirstIndex,
-                              code: anchor.code,
-                              x: anchor.x,
-                              y: anchor.y,
-                              radius: 4,
-                              fill: 'white',
-                              stroke: 'black',
-                              draggable: true,
-                            }"
-                          />
-                          <v-label
-                            :config="{
-                              x: getCenterOfShape(obj.drawBillItem)[0], // item.points[0],
-                              y: getCenterOfShape(obj.drawBillItem)[1], //item.points[1],
-                            }"
-                          >
-                            <v-text
-                              :config="{
-                                text: getLableInfo(obj.drawBillItem),
-                                fill: 'white',
-                              }"
-                            />
-                          </v-label>
-                        </v-layer>
-                      </v-stage>
-                    </div>
-                  </CCol>
-                </CRow>
-                <CRow form class="form-group">
-                  <CCol sm="12">
-                    <WidgetsUploadImage
-                      :billImageUrl="billImageUrl"
-                      @uploaded="uploaded"
-                    />
-                  </CCol>
-                </CRow>
-              </CForm>
-            </CCardBody>
-            <CCardFooter>
-              <CButton
-                type="submit"
-                class="ml-1"
-                color="primary"
-                @click="analyze"
-                >Analyze Image</CButton
-              >
-              <CButton
-                type="submit"
-                class="ml-1"
-                color="primary"
-                @click="extract"
-                >Extract Text</CButton
-              >
-              <!-- <CButton  size="sm" color="primary" @click="downloadImage" >Download</CButton> -->
-              <CButton
-                type="submit"
-                class="ml-1"
-                color="primary"
-                :href="billImageUrl"
-                download="download.jpg"
-                target="_blank"
-              >
-                Download
-              </CButton>
-            </CCardFooter>
-          </CCard>
-        </CCol>
-        <CCol sm="4">
-          <CCard>
-            <CCardHeader> <strong> Bill </strong> Info </CCardHeader>
-            <CCardBody>
-              <CForm>
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Vendor (Supplier) </template>
+                  <template #input>
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedVendor"
+                      :label="'name'"
+                      :options="vendorItemsWithAddNew"
+                      placeholder="Select vendor"
+                      @input="handleVendorSelect"
+                    >
+                    </v-select>
+                  </template>
+                </CFormGroup>
+                <CLink href="javascript:void(0);" @click="viewVendorDetails">
+                  View
+                </CLink>
                 <CInput
-                  label="Created On"
-                  horizontal
-                  :value="getDisplayDateTime(obj.createdOn)"
-                  readonly
-                />
-                <CInput
-                  label="Document Id"
-                  horizontal
-                  :value="obj.documentId"
-                  readonly
+                  label="Date"
+                  type="date"
+                  :value="computeIssuedDate"
+                  @change="setIssuedDate"
                 />
 
-                <CSelect
-                  label="Document Type"
-                  horizontal
-                  :options="[
-                    'Receipt',
-                    'Invoice',
-                    'Cheque',
-                    'Purchase Order',
-                    'Credit Card',
-                    'Payment voucher',
-                    'Insurance policy',
-                    'Others (with amount)',
-                    'Others (no amount)',
-                  ]"
-                  :value.sync="obj.documentType"
-                />
-                <CInput
-                  label="Profile"
-                  horizontal
-                  :value="getProfileEmail(obj)"
-                  readonly
-                />
-                <!--  -->
-                <CInput
+                <!-- <CInput
                   label="Company Name"
                   horizontal
                   v-model="obj.companyName"
-                />
-                <CInput label="Bill No" horizontal v-model="obj.billNo" />
-                <CRow form class="form-group">
+                  @input="onCompanyNameChange"
+                /> -->
+                <!-- <CInput label="Bill No" horizontal v-model="obj.billNo" /> -->
+                <!-- <CRow form class="form-group">
                   <CCol tag="label" sm="3" class="col-form-label"> Date </CCol>
                   <CCol sm="9">
                     <input
@@ -363,91 +105,311 @@
                       class="mr-2"
                     />
                   </CCol>
-                </CRow>
-                <CInput
-                  label="Total Amount"
-                  horizontal
-                  v-model="obj.totalAmount"
-                />
-
-                <CInput
-                  label="Chart of Account"
-                  horizontal
-                  readonly
-                  v-model="selectedChartOfAccount.name"
-                >
-                  <template #append>
-                    <CButton color="primary" @click="onSearchChartOfAccount()">
-                      Search
-                    </CButton>
-                  </template>
-                </CInput>
-
+                </CRow> -->
+                <CInput label="Total Amount" v-model="obj.totalAmount" />
                 <CRow form class="form-group">
                   <CCol tag="label" sm="3" class="col-form-label">
-                    Is For ML?
+                    Is Paid?
                   </CCol>
                   <CCol sm="9">
                     <CSwitch
                       class="mr-1"
                       color="primary"
-                      :checked.sync="obj.isUseForMLTraining"
+                      :checked.sync="obj.isPaid"
                       label-on="YES"
                       label-off="NO"
+                      :disabled="obj.stateDescription !== 'Approve'"
                     >
                     </CSwitch>
+                    <div
+                      v-if="obj.stateDescription !== 'Approve'"
+                      class="text-muted small mt-1"
+                    >
+                      Only can change when status is <strong>Approve</strong>.
+                    </div>
                   </CCol>
                 </CRow>
+                <CInput
+                  label="Date"
+                  type="date"
+                  :value="computePaymentDate"
+                  @change="setPaymentDate"
+                  v-if="obj.isPaid"
+                />
+                <CTextarea
+                  label="Description"
+                  v-model="obj.description"
+                  placeholder=""
+                  rows="4"
+                />
+
+                <!-- <CRow form class="form-group">
+                  <CCol tag="label" sm="3" class="col-form-label">
+                    Chart of Account
+                  </CCol>
+                  <CCol sm="9">
+                    <v-select
+                      style="width: 100%"
+                      v-model="selectedChartOfAccount"
+                      :label="'name'"
+                      :options="chartOfAccountItems"
+                      placeholder="Select COA"
+                    />
+                  </CCol>
+                </CRow> -->
               </CForm>
             </CCardBody>
             <CCardFooter>
-              <CButton
-                type="submit"
-                class="ml-1"
-                color="primary"
-                @click="submit"
-                >Save</CButton
+              <CButton type="submit" color="light" @click="submit">
+                Save</CButton
               >
-              <CButton class="ml-1" color="primary" @click="addNew"
-                >New</CButton
-              >
-              <CButton class="ml-1" color="primary" @click="previous"
-                >Prev</CButton
-              >
-              <CButton class="ml-1" color="primary" @click="next">Next</CButton>
             </CCardFooter>
           </CCard>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol sm="4">
+          <CCard>
+            <CCardHeader> <strong> Invoice/Bill </strong></CCardHeader>
+            <CCardBody>
+              <!-- Progress Bar Section -->
+              <CForm>
+                <CRow v-if="obj.documentInvoice">
+                  <CCol sm="12">
+                    <div v-if="isPdf(obj.documentInvoice)">
+                      <!-- Render PDF -->
+                      <iframe
+                        :src="getDocumentUrl(obj.documentInvoice)"
+                        width="100%"
+                      ></iframe>
+                    </div>
+                    <div v-else>
+                      <!-- Render Image -->
+                      <CImg
+                        :src="getDocumentUrl(obj.documentInvoice)"
+                        width="100%"
+                        responsive
+                      />
+                    </div>
+                    <a
+                      :href="getDocumentUrl(obj.documentInvoice)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary"
+                    >
+                      Open in new tab
+                    </a>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      class="mt-2"
+                      @click="removeInvoiceDocumentConfirmation()"
+                    >
+                      Remove
+                    </CButton>
+                    <!-- <CImg :src="invoiceImageUrl" class="mb-2" responsive /> -->
+                  </CCol>
+                </CRow>
+                <CRow form class="form-group">
+                  <CCol sm="12">
+                    <WidgetsUploadImage
+                      :billImageUrl="invoiceImageUrl"
+                      @uploaded="uploaded_invoice"
+                    />
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol sm="4">
+          <CCard>
+            <CCardHeader> <strong> Proof Payment </strong> </CCardHeader>
+            <CCardBody>
+              <CForm>
+                <CRow v-if="obj.documentPayment">
+                  <CCol sm="12">
+                    <div v-if="isPdf(obj.documentPayment)">
+                      <!-- Render PDF -->
+                      <iframe
+                        :src="getDocumentUrl(obj.documentPayment)"
+                        width="100%"
+                      ></iframe>
+                    </div>
+                    <div v-else>
+                      <!-- Render Image -->
+                      <CImg
+                        :src="getDocumentUrl(obj.documentPayment)"
+                        width="100%"
+                        responsive
+                      />
+                    </div>
+                    <a
+                      :href="getDocumentUrl(obj.documentPayment)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary"
+                    >
+                      Open in new tab
+                    </a>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      class="mt-2"
+                      @click="removePaymenttDocumentConfirmation()"
+                    >
+                      Remove
+                    </CButton>
+                  </CCol>
+                </CRow>
+                <CRow form class="form-group">
+                  <CCol sm="12">
+                    <WidgetsUploadImage
+                      :billImageUrl="paymentImageUrl"
+                      @uploaded="uploaded_payment"
+                    />
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        <CCol sm="4">
+          <CCard>
+            <CCardHeader> <strong> Receipt </strong> </CCardHeader>
+            <CCardBody>
+              <CForm>
+                <CRow v-if="obj.documentReceipt">
+                  <CCol sm="12">
+                    <div v-if="isPdf(obj.documentReceipt)">
+                      <!-- Render PDF -->
+                      <iframe
+                        :src="getDocumentUrl(obj.documentReceipt)"
+                        width="100%"
+                      ></iframe>
+                    </div>
+                    <div v-else>
+                      <!-- Render Image -->
+                      <CImg
+                        :src="getDocumentUrl(obj.documentReceipt)"
+                        width="100%"
+                        responsive
+                      />
+                    </div>
+                    <a
+                      :href="getDocumentUrl(obj.documentReceipt)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary"
+                    >
+                      Open in new tab
+                    </a>
+                    <CButton
+                      color="danger"
+                      size="sm"
+                      class="mt-2"
+                      @click="removeReceiptDocumentConfirmation()"
+                    >
+                      Remove
+                    </CButton>
+                  </CCol>
+                </CRow>
+                <CRow form class="form-group">
+                  <CCol sm="12">
+                    <WidgetsUploadImage
+                      :billImageUrl="receiptImageUrl"
+                      @uploaded="uploaded_receipt"
+                    />
+                  </CCol>
+                </CRow>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+    </div>
+    <div>
+      <CModal
+        title="Confirm Remove Document"
+        color="warning"
+        :show.sync="removeInvoiceDocumentWarningModal"
+        @update:show="onRemoveInvoiceDocumentConfirmation"
+      >
+        Are you sure you want to delete?
+      </CModal>
     </div>
 
     <div>
-      <CModal :show.sync="chartOfAccountSearchPopup" size="xl">
-        <CRow>
-          <CCol sm="12">
-            <CDataTable
-              :items="chartOfAccountList"
-              :fields="chartOfAccountFieldList"
-              column-filter
-              items-per-page-select
-              :items-per-page="10"
-              hover
-              sorter
-              pagination
-            >
-              <template #show_details="{ item, index }">
-                <td class="py-2">
-                  <CButton
-                    color="primary"
-                    variant="outline"
-                    square
-                    @click="onChartOfAccountSelected(item, index)"
-                  >
-                    Select
-                  </CButton>
-                </td>
-              </template>
-            </CDataTable>
+      <CModal
+        title="Confirm Remove Document"
+        color="warning"
+        :show.sync="removePaymentDocumentWarningModal"
+        @update:show="onRemovePaymentDocumentConfirmation"
+      >
+        Are you sure you want to delete?
+      </CModal>
+    </div>
+
+    <div>
+      <CModal
+        title="Confirm Remove Document"
+        color="warning"
+        :show.sync="removeReceiptDocumentWarningModal"
+        @update:show="onRemoveReceiptDocumentConfirmation"
+      >
+        Are you sure you want to delete?
+      </CModal>
+    </div>
+
+    <div>
+      <CModal
+        title="Add New Vendor"
+        size="xl"
+        :close-on-backdrop="false"
+        :show.sync="addVendorFormPopup"
+        @update:show="onVendorPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="6">
+            <CInput
+              label="Name"
+              v-model="itemAddNewVendor.name"
+              placeholder="Vendor Sdn Bhd"
+              required
+              was-validated
+            />
+            <CInput
+              label="Contact Name"
+              v-model="itemAddNewVendor.contactName"
+            />
+            <CInput
+              label="Contact Email"
+              v-model="itemAddNewVendor.contactEmail"
+            />
+            <CInput
+              label="Contact Phone"
+              v-model="itemAddNewVendor.contactPhone"
+            />
+          </CCol>
+          <CCol md="6">
+            <CTextarea
+              label="Address"
+              placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
+              rows="5"
+              v-model="itemAddNewVendor.address"
+              required
+              was-validated
+            />
+            <CInput label="City" v-model="itemAddNewVendor.city" />
+            <CInput label="Country" v-model="itemAddNewVendor.country" />
+            <CInput label="State" v-model="itemAddNewVendor.state" />
+
+            <CInput label="Postcode" v-model="itemAddNewVendor.postcode" />
+            <CInput label="Phone" v-model="itemAddNewVendor.phone" />
+            <CInput label="Website" v-model="itemAddNewVendor.website" />
           </CCol>
         </CRow>
       </CModal>
@@ -457,536 +419,488 @@
 
 <script>
 import BillApi from "../../lib/billApi";
+import ResitAiApi from "@/lib/resitaiApi";
+import DocumentApi from "@/lib/documentApi";
+
 import ChartOfAccountApi from "../../lib/chartOfAccountApi";
 import WidgetsUploadImage from "../widgets/WidgetsUploadImage.vue";
-import OcrApi from "../../lib/ocrApi";
 import moment from "moment";
-
-import { validationMixin } from "vuelidate";
-import {
-  required,
-  minLength,
-  email,
-  sameAs,
-  helpers,
-  numeric,
-  maxLength,
-} from "vuelidate/lib/validators";
-import { resolvePlugin } from "@babel/core";
-
-const chartOfAccountList = [];
-const chartOfAccountFieldList = [
-  { key: "category" },
-  { key: "accountNo" },
-  { key: "name" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-];
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+import VendorApi from "@/lib/vendorApi";
 
 export default {
   name: "Bill",
   components: {
     WidgetsUploadImage,
+    vSelect,
   },
   data: () => {
     return {
-      chartOfAccountSearchPopup: false,
-      chartOfAccountList: chartOfAccountList.map((item, id) => {
-        return { ...item, id };
-      }),
-      chartOfAccountFieldList,
-      selectedChartOfAccount: {
-        id: null,
-        name: "",
-      },
-      imageConfig: {
-        x: 0,
-        y: 0,
-        offset: {
-          x: 0,
-          y: 0,
-        },
-        image: null,
-        rotation: 0,
-      },
-      organizationTypeList: [],
+      statuses: [],
+      itemAddNewVendor: {},
+      addVendorFormPopup: false,
+
+      removeInvoiceDocumentWarningModal: false,
+      removePaymentDocumentWarningModal: false,
+      removeReceiptDocumentWarningModal: false,
+
+      vendorApi: new VendorApi(),
+      vendorItems: [],
+      selectedVendor: null,
+      selectedChartOfAccount: null,
+      chartOfAccountItems: [],
+      isLoading: false, // Track loading state
+      isLoadingSearchChartOfAccount: false,
+      progressValue: 0, // Track progress
+      documentApi: new DocumentApi(),
       infoList: [],
-      uploadedFiles: [],
-      // image: null,
-      stageSize: {
-        width: 20,
-        height: 20,
-      },
-      obj: {
-        drawCompanyId: "",
-        drawCompany: {
-          code: "",
-          name: "",
-        },
-        date: new Date(),
-        documentId: "",
-        assemblyLessConcentrated: "",
-        standingSpace: "",
-        kitchen: "",
-      },
-      billDateTime: new Date(),
+      // uploadedFiles: [],
+      obj: {},
+      issuedDate: Date(),
+      paymentDate: Date(),
       submitted: false,
       drawType: "",
       drawingState: "",
       api: new BillApi(),
-      ocrApi: new OcrApi(),
+      resitAiApi: new ResitAiApi(),
+      // ocrApi: new OcrApi(),
       chartOfAccountApi: new ChartOfAccountApi(),
       loading: false,
     };
   },
   mounted() {
     var self = this;
-    // self.refreshOrganizationType();
-    window.addEventListener("resize", this.onResize);
+    this.setIssuedDate(new Date().toISOString().split("T")[0]);
+    this.setPaymentDate(new Date().toISOString().split("T")[0]);
+    this.fetchStatuses();
+    self.refreshChartOfAccount();
+    self.refreshVendor();
     self.resetObj();
+
+    this.debounceSearchChartOfAccount = this.debounce(
+      this.searchChartOfAccount,
+      1000 // Adjust the delay as needed
+    );
   },
-  // validations: {
-  //   obj: {
-  //     code: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //     name: {
-  //       required,
-  //       minLength: minLength(2),
-  //       maxLength: maxLength(20),
-  //     },
-  //   },
-  // },
   computed: {
-    isBillImageUrl() {
-      if (this.obj.documentId == null) return false;
-      if (this.obj.documentId == "") return false;
-      return true;
+    vendorItemsWithAddNew() {
+      return [
+        ...this.vendorItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
     },
-    billImageUrl() {
+    invoiceImageUrl() {
       var self = this;
-      return (
-        apiUrl + "documents/file/" + self.obj.documentId
-      );
+      return apiUrl + "documents/file/" + self.obj.documentInvoiceId;
     },
-    computeBillDate() {
-      return moment(this.billDateTime).format("YYYY-MM-DDTHH:mm");
+    paymentImageUrl() {
+      var self = this;
+      return apiUrl + "documents/file/" + self.obj.documentPaymentId;
     },
-  },
-  watch: {
-    obj(newVal, oldVal) {
-      console.log("obj", newVal);
+    receiptImageUrl() {
+      var self = this;
+      return apiUrl + "documents/file/" + self.obj.documentReceiptId;
     },
-    drawingMeta(newVal, oldVal) {
-      console.log("drawingMeta value changed", newVal);
+    computeIssuedDate() {
+      return moment(this.issuedDate).format("YYYY-MM-DD");
+    },
+    computePaymentDate() {
+      return moment(this.paymentDate).format("YYYY-MM-DD");
     },
   },
 
   methods: {
-    extract() {
-      console.log(this.obj);
-
-      var companyPoints = "";
-      var datePoints = "";
-      var numberPoints = "";
-      var amountPoints = "";
-      var itemPoints = "";
-
-      if (this.obj.drawCompany != null)
-        if (this.obj.drawCompany.points != null)
-          companyPoints = this.obj.drawCompany.points.join(",");
-      if (this.obj.drawDate != null) {
-        if (this.obj.drawDate.points != null) {
-          datePoints = this.obj.drawDate.points.join(",");
-        }
+    viewVendorDetails() {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Vendor/${this.selectedVendor.id}`,
+      });
+    },
+    changeState(item) {
+      var self = this;
+      self.obj.state = item.id;
+      if (self.obj.id) {
+        this.api
+          .updateState(self.obj)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
       }
-      if (this.obj.drawBillNo != null)
-        if (this.obj.drawBillNo.points != null)
-          numberPoints = this.obj.drawBillNo.points.join(",");
-      if (this.obj.drawTotalAmount != null)
-        if (this.obj.drawTotalAmount.points != null)
-          amountPoints = this.obj.drawTotalAmount.points.join(",");
-      if (this.obj.drawBillItem != null)
-        if (this.obj.drawBillItem.points != null)
-          itemPoints = this.obj.drawBillItem.points.join(",");
-
-      var data = {
-        uri: this.billImageUrl,
-        company_box: companyPoints,
-        date_box: datePoints,
-        number_box: numberPoints,
-        amount_box: amountPoints,
-        item_box: itemPoints,
-      };
-
-      // var data = this.ocrApi.imageToText(data);
-
-      this.ocrApi
-        .imageToText(data)
-        .then((response) => {
-          console.log(response);
-
-          var tempObj = response;
-          if(tempObj.company != "")
-          {
-            this.obj.companyName = tempObj.company;
-          }
-
-          if(tempObj.date != "")
-          {
-            //2022-04-09 00:00:00
-            var dateObj = moment(tempObj.date, 'YYYY-MM-DD HH:mm:ss');
-            this.obj.date = dateObj.format();
-            this.billDateTime = this.obj.date;
-          }
-
-          if(tempObj.number != "")
-          {
-            this.obj.billNo = tempObj.number;
-          }
-          if(tempObj.amount != "")
-          {
-            this.obj.totalAmount = tempObj.amount;
-          }
-          // self.$router.push({ path: "/tenants/chartOfAccountList" });
-        })
-        .catch(({ data }) => {
-          this.toast("Error", helper.getErrorMessage(data), "danger");
-        });
     },
-    getProfileEmail(item) {
-      if (item.profile == null) return "N/A";
-      return item.profile.email;
-    },
-    updatePolyCompany(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawCompany.points[pointFirstIndex] = x;
-      this.obj.drawCompany.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyDate(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawDate.points[pointFirstIndex] = x;
-      this.obj.drawDate.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyBillNo(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawBillNo.points[pointFirstIndex] = x;
-      this.obj.drawBillNo.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyTotalAmount(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawTotalAmount.points[pointFirstIndex] = x;
-      this.obj.drawTotalAmount.points[pointFirstIndex + 1] = y;
-    },
-    updatePolyBillItem(event) {
-      const mousePos = this.$refs.stage.getNode().getPointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      const pointFirstIndex = event.target.attrs.pointFirstIndex;
-      this.obj.drawBillItem.points[pointFirstIndex] = x;
-      this.obj.drawBillItem.points[pointFirstIndex + 1] = y;
-    },
-
-    onSearchChartOfAccount() {
+    fetchStatuses() {
       var self = this;
-      self.refreshTableChartOfAccount();
-      self.chartOfAccountSearchPopup = true;
-    },
-
-    refreshTableChartOfAccount() {
-      var self = this;
-      self.loading = true;
-      self.chartOfAccountList = [];
-      self.chartOfAccountApi
-        .getList()
+      self.api
+        .getStatusTypes()
         .then((response) => {
-          self.chartOfAccountList = response.result;
+          this.statuses = response.result;
+          console.log(this.statuses);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
         });
     },
+    getBadgeClass() {
+      if (this.obj.stateDescription == "Draft") {
+        return "badge badge-secondary ml-1";
+      } else if (this.obj.stateDescription == "Accepted") {
+        return "badge badge-primary ml-1";
+      } else if (this.obj.stateDescription == "Approve") {
+        return "badge badge-primary ml-1";
+      } else if (this.obj.stateDescription == "Sent") {
+        return "badge badge-success ml-1";
+      } else if (this.obj.stateDescription == "Rejected") {
+        return "badge badge-warning ml-1";
+      } else if (this.obj.stateDescription == "Cancelled") {
+        return "badge badge-danger ml-1";
+      } else {
+        return "badge badge-secondary ml-1";
+      }
+    },
+    onVendorPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.vendorApi
+          .create(this.itemAddNewVendor)
+          .then((response) => {
+            var addedVendor = response.result;
+            this.refreshVendor();
+            this.selectedVendor = addedVendor;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewVendor = {};
+    },
+
+    removePaymenttDocumentConfirmation() {
+      this.removePaymenttDocumentWarningModal = true;
+    },
+    onRemovePaymentDocumentConfirmation(status, evt, accept) {
+      if (accept) {
+        var self = this;
+        self.api
+          .removePaymenttDocument(self.obj.id, self.obj.documentPaymenttId)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+
+    removeReceiptDocumentConfirmation() {
+      this.removeReceiptDocumentWarningModal = true;
+    },
+    onRemoveReceiptDocumentConfirmation(status, evt, accept) {
+      if (accept) {
+        var self = this;
+        self.api
+          .removeReceiptDocument(self.obj.id, self.obj.documentReceiptId)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+
+    removeInvoiceDocumentConfirmation() {
+      this.removeInvoiceDocumentWarningModal = true;
+    },
+    onRemoveInvoiceDocumentConfirmation(status, evt, accept) {
+      if (accept) {
+        var self = this;
+        self.api
+          .removeInvoiceDocument(self.obj.id, self.obj.documentInvoiceId)
+          .then((response) => {
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+    },
+
+    removeDocument(type) {
+      switch (type) {
+        case "invoice":
+          this.obj.documentInvoice = null; // Remove invoice document
+          this.obj.documentInvoiceId = null; // Remove invoice ID if applicable
+          break;
+        case "payment":
+          this.obj.documentPayment = null; // Remove payment document
+          this.obj.documentPaymentId = null; // Remove payment ID if applicable
+          break;
+        case "receipt":
+          this.obj.documentReceipt = null; // Remove receipt document
+          this.obj.documentReceiptId = null; // Remove receipt ID if applicable
+          break;
+        default:
+          console.error("Unknown document type:", type);
+      }
+    },
+    isPdf(document) {
+      try {
+        if (document.contentType == "application/pdf") return true;
+        return false;
+      } catch (error) {
+        return false;
+      }
+    },
+    getDocumentUrl(document) {
+      try {
+        return apiUrl + "documents/file/" + document.id;
+      } catch (error) {
+        return "";
+      }
+    },
+    handleVendorSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewVendor();
+        this.selectedVendor = null; // Reset selection
+      }
+    },
+    addNewVendor() {
+      this.itemAddNewVendor = {};
+      this.addVendorFormPopup = true;
+      // Logic to handle adding a new customer
+      // alert("Add New Customer clicked!");
+    },
+    refreshVendor() {
+      var self = this;
+      self.loading = false;
+      self.vendorApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.vendorItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+
+    // Wrap the search function in debounce
+    // Debounce function added here
+    debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    },
+
+    searchChartOfAccount(merchantName) {
+      console.log("searchChartOfAccount", merchantName);
+
+      var suggestDto = {
+        businessId: this.obj.businessId,
+        merchantName: merchantName,
+      };
+
+      this.isLoadingSearchChartOfAccount = true;
+      this.chartOfAccountApi
+        .suggestChartOfAccount(suggestDto)
+        .then((response) => {
+          console.log(response.result);
+          this.selectedChartOfAccount = response.result;
+        })
+        .catch((error) => {
+          console.error("Error suggesting chart of account:", error);
+        })
+        .finally(() => {
+          this.isLoadingSearchChartOfAccount = false;
+        });
+    },
+
+    debounceSearchChartOfAccount: null,
+    onCompanyNameChange() {
+      // Trigger the debounced search function whenever the company name changes
+      this.debounceSearchChartOfAccount(this.obj.companyName);
+    },
+
+    refreshChartOfAccount() {
+      var self = this;
+      self.chartOfAccountApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.chartOfAccountItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+    extractImageFromUrl(imageUrl) {
+      this.isLoading = true;
+      this.progressValue = 0; // Reset progress
+
+      const interval = setInterval(() => {
+        if (this.progressValue < 95) {
+          this.progressValue += 5; // Simulate progress
+        }
+      }, 500);
+
+      // Fetch the image from the URL
+      fetch(imageUrl)
+        .then((response) => {
+          // Convert the response to a Blob
+
+          return response.blob();
+        })
+        .then((imageBlob) => {
+          // Create a FormData object to send the image Blob and OCR engine choice
+          const formData = new FormData();
+          formData.append("file", imageBlob, "image.jpg"); // Append the image as a Blob
+          formData.append("ocr_engine", "googlevision"); // Append the OCR engine
+
+          // Use your custom API wrapper to make the call
+          const resitAiApi = new ResitAiApi();
+          return resitAiApi.extract(formData); // Return the API call so we can chain the next .then()
+        })
+        .then((result) => {
+          // Handle the result of the extraction
+          this.progressValue = 100; // Complete progress
+          this.toast("Success", "Extracted info successfully", "success");
+
+          console.log(result);
+
+          // Assuming the result contains parsed data, populate the obj fields
+          this.obj.companyName = this.getMerchantName(result.parsed_data);
+          this.obj.billNo = result.parsed_data.billNo;
+          this.billDateTime = this.getDateTime(result.parsed_data);
+          this.obj.totalAmount = this.getAmount(result.parsed_data);
+
+          this.debounceSearchChartOfAccount(this.obj.companyName);
+          // ... map other fields as necessary
+        })
+        .catch((error) => {
+          // Handle any errors that occurred during the fetch or the API call
+          console.error("Error extracting data:", error);
+          this.toast("Error", "Failed to extract data.", "danger");
+        })
+        .finally(() => {
+          // Optionally, do something after the entire chain is complete, like hiding a loading spinner
+          console.log("Extraction process finished.");
+          clearInterval(interval);
+          this.isLoading = false;
+        });
+    },
+    getDateTime(parsedData) {
+      try {
+        // Extract the date part (YYYY-MM-DD) and time part (HH:MM)
+        const datePart = parsedData.date.split("T")[0]; // Extract just the date portion from the string
+        const timePart = parsedData.time; // The time is already in HH:MM format
+
+        // Combine the date and time into a full datetime string
+        const dateTimeString = `${datePart}T${timePart}:00`; // Add ":00" for the seconds part if necessary
+
+        // Convert to a JavaScript Date object
+        const dateTimeObject = new Date(dateTimeString);
+        console.log(dateTimeObject); // Output: 2024-09-06T09:10:00.000Z (or your local time zone)
+        return dateTimeObject;
+      } catch (error) {
+        return Date();
+      }
+    },
+    getAmount(parsedData) {
+      var amount = parsedData.amount;
+      try {
+        if (Array.isArray(amount)) {
+          // If it's an array, return the highest value
+          return Math.max(...amount);
+        } else {
+          // If it's a single value, return it directly
+          return amount;
+        }
+      } catch (error) {
+        return 0;
+      }
+    },
+
+    getMerchantName(parsedData) {
+      try {
+        return parsedData.merchant_name;
+      } catch (error) {
+        return "";
+      }
+    },
+    extract() {
+      this.extractImageFromUrl(this.billImageUrl);
+    },
+
     downloadImage() {},
     getDisplayDateTime(dt) {
       return moment(dt).format("DD/MM/YYYY HH:mm:ss");
     },
-    onResize() {
-      return;
-      var stage = this.$refs.stage.getStage();
-      var container = document.querySelector("#stage-container");
-      var containerWidth = container.offsetWidth;
-      var sceneWidth = this.stageSize.width;
-      var sceneHeight = this.stageSize.height;
-      var scale = containerWidth / sceneWidth;
 
-      stage.width(sceneWidth * scale);
-      stage.height(sceneHeight * scale);
-      stage.scale({ x: scale, y: scale });
-    },
-    loadImage() {
-      const image = new window.Image();
-      image.src = this.billImageUrl;
-      image.crossOrigin = "anonymous";
-      image.onload = () => {
-        this.imageConfig.image = image;
-        this.stageSize.width = image.width;
-        this.stageSize.height = image.height;
-
-        this.onResize();
-      };
-    },
-    getLableInfo(item) {
-      if (item) return item.name;
-      return "";
-    },
-    getCenterOfShape(draw) {
-      if (draw == undefined) return [0, 0];
-      if (draw.points == undefined) return [0, 0];
-      if (draw.points.length < 2) return [0, 0];
-      return drawing.getCenterOfShape(draw.points);
-    },
-    getAnchors(item) {
-      var anchors = [];
-      // var room = item;
-      if (item == null) return [];
-      if (item.points == null) return [];
-      if (item.points.length == 0) return [];
-
-      for (let i = 0; i < item.points.length; i += 2) {
-        var anchorCode = item.code + "_points_" + i;
-        anchors.push({
-          // roomId: room.id,
-          // roomCode: room.code,
-          code: anchorCode,
-          pointFirstIndex: i,
-          x: item.points[i],
-          y: item.points[i + 1],
-        });
-      }
-      return anchors;
-    },
-
-    toolClick(item) {
-      switch (item) {
-        case "rotate":
-          {
-            this.imageConfig.rotation = this.imageConfig.rotation + 90;
-            this.imageConfig.x = this.imageConfig.image.height;
-
-            // this.$refs.image.rotation = 15;
-            this.$refs.stage.getStage().draw();
-          }
-          break;
-        default:
-          this.drawTypeSelect(item);
-          break;
-      }
-    },
-    drawTypeSelect(draw) {
-      if (draw == "cancel") {
-        this.handleDone();
-        this.drawType = "";
-        return;
-      }
-      this.drawType = draw;
-      this.drawingState = "";
-
-      this.analysisMethod = {
-        category: "",
-        method: "",
-      };
-
-      this.updateCursor("crosshair");
-      this.stroke = "yellow";
-    },
-    handleDone() {
-      this.drawingState = "end";
-      if (this.drawType === "companyName") {
-        this.handleDrawCompanyName();
-      } else if (this.drawType === "date") {
-        this.handleDrawDate();
-      } else if (this.drawType === "billNo") {
-        this.handleDrawBillNo();
-      } else if (this.drawType === "totalAmount") {
-        this.handleDrawTotalAmount();
-      } else if (this.drawType === "billItem") {
-        this.handleDrawBillItem();
-      }
-
-      this.updateCursor("default");
-    },
-
-    handleStageMouseClick(event) {
-      if (event.evt.button == 2) {
-        this.handleDone();
-        this.drawType = "";
-      } else {
-        console.log("handleStageMouseClick", this.drawType);
-
-        if (this.drawType === "companyName") {
-          this.handleDrawCompanyName();
-        } else if (this.drawType === "date") {
-          this.handleDrawDate();
-        } else if (this.drawType === "billNo") {
-          this.handleDrawBillNo();
-        } else if (this.drawType === "totalAmount") {
-          this.handleDrawTotalAmount();
-        } else if (this.drawType === "billItem") {
-          this.handleDrawBillItem();
-        }
-      }
-    },
-    handleDrawCompanyName() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawCompany = {
-          code: "companyName" + 1,
-          name: "Company Name" + 1,
-          points: [x, y],
-          stroke: "#FF0000",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FF0000", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawCompany.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawDate() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawDate = {
-          code: "date" + 1,
-          name: "Bill Date" + 1,
-          points: [x, y],
-          stroke: "#FFFF00",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FFFF00", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawDate.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-    handleDrawBillNo() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawBillNo = {
-          code: "bill" + 1,
-          name: "Bill No" + 1,
-          points: [x, y],
-          stroke: "#FF00FF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#FF00FF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawBillNo.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawTotalAmount() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawTotalAmount = {
-          code: "total_amount" + 1,
-          name: "Total Amount" + 1,
-          points: [x, y],
-          stroke: "#0000FF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#0000FF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawTotalAmount.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    handleDrawBillItem() {
-      const mousePos = this.$refs.stage.getStage().getRelativePointerPosition();
-      const x = mousePos.x;
-      const y = mousePos.y;
-      if (this.drawingState === "") {
-        this.obj.drawBillItem = {
-          code: "bill_item",
-          name: "Bill Item",
-          points: [x, y],
-          stroke: "#0FFFFF",
-          strokeWidth: 1,
-          closed: true,
-          fill: helper.hexToRgbA("#0FFFFF", 50),
-        };
-        this.drawingState = "progress";
-      } else if (this.drawingState === "progress") {
-        this.obj.drawBillItem.points.push(x, y);
-      } else if (this.drawingState == "end") {
-        this.drawingState = "";
-      }
-      const stage = this.$refs.stage.getStage();
-      stage.draw();
-    },
-
-    uploaded(data) {
+    uploaded_invoice(data) {
       var self = this;
-      self.uploadedFiles = data.uploadedFiles;
-      if (self.uploadedFiles.length > 0) {
-        self.obj.documentId = self.uploadedFiles[0].id;
-        this.loadImage();
+      var uploadedFiles = data.uploadedFiles;
+      if (uploadedFiles.length > 0) {
+        self.obj.documentInvoiceId = uploadedFiles[0].id;
+        this.api
+          .update(self.obj)
+          .then((response) => {
+            self.toast("Save", "Save Success", "success");
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
+          });
+        // this.loadImage();
       }
       // console.log(data);
     },
-    updateCursor(cursor) {
-      let stage = this.$refs.stage.getStage();
-      stage.container().style.cursor = cursor;
+    uploaded_payment(data) {
+      var self = this;
+      var uploadedFiles = data.uploadedFiles;
+      if (uploadedFiles.length > 0) {
+        self.obj.documentPaymentId = uploadedFiles[0].id;
+        this.api
+          .update(self.obj)
+          .then((response) => {
+            self.toast("Save", "Save Success", "success");
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
+          });
+        // this.loadImage();
+      }
+      // console.log(data);
     },
+
+    uploaded_receipt(data) {
+      var self = this;
+      var uploadedFiles = data.uploadedFiles;
+      if (uploadedFiles.length > 0) {
+        self.obj.documentReceiptId = uploadedFiles[0].id;
+        this.api
+          .update(self.obj)
+          .then((response) => {
+            self.toast("Save", "Save Success", "success");
+            self.resetObj();
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+            // console.log(data);
+          });
+      }
+      // console.log(data);
+    },
+
+    // updateCursor(cursor) {
+    //   let stage = this.$refs.stage.getStage();
+    //   stage.container().style.cursor = cursor;
+    // },
     resetObj() {
       var self = this;
       if (self.$route.params.id) {
@@ -994,13 +908,12 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            self.billDateTime = self.obj.date;
+            console.log(self.obj);
+            self.obj.totalAmount = self.obj.totalAmount.toFixed(2);
+            self.issuedDate = self.obj.date;
+            self.selectedVendor = self.obj.vendor;
+
             self.selectedChartOfAccount = self.obj.chartAccount;
-            if (self.selectedChartOfAccount == null)
-              self.selectedChartOfAccount = {
-                name: "",
-              };
-            self.loadImage();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -1010,19 +923,23 @@ export default {
         self.obj = self.getEmptyObj();
       }
     },
-    setDateFilter(e) {
-      this.billDateTime = new Date(e.target.value).getTime();
+    // setDateFilter(e) {
+    //   this.billDateTime = new Date(e.target.value).getTime();
+    // },
+    setIssuedDate(e) {
+      this.issuedDate = new Date(e + "T00:00:00"); // ISO format assumes local time
+    },
+    setPaymentDate(e) {
+      this.paymentDate = new Date(e + "T00:00:00"); // ISO format assumes local time
     },
     onSubmit() {
       var self = this;
+      self.obj.date = self.issuedDate;
+      if (self.selectedVendor) {
+        self.obj.vendorId = self.selectedVendor.id;
+      }
 
-      self.obj.date = moment(self.billDateTime).format();
-
-      // if (self.uploadedFiles.length > 0)
-      //   self.obj.documentId = self.uploadedFiles[0].id;
-
-      //self.obj.drawCompany = this.drawCompany;
-
+      console.log("self.obj", self.obj);
       if (!self.obj.id) {
         this.api
           .create(self.obj)
@@ -1078,16 +995,12 @@ export default {
       return {
         date: new Date(),
         name: "",
-        documentId: "",
         drawCompany: {},
       };
     },
-    analyze() {
-
-      
-    },
+    analyze() {},
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/tenants/Receipt" });
     },
     previous() {
       var self = this;
@@ -1096,7 +1009,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenants/Bill/${nextObj.id}`,
+            path: `/tenants/Receipt/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
@@ -1110,7 +1023,7 @@ export default {
         .then((response) => {
           var nextObj = response.result;
           this.$router.push({
-            path: `/tenants/Bill/${nextObj.id}`,
+            path: `/tenants/Receipt/${nextObj.id}`,
           });
         })
         .catch(({ data }) => {
@@ -1127,12 +1040,12 @@ export default {
       this.$router.push({ path: "/tenant/maplist" });
     },
 
-    onChartOfAccountSelected(item, index) {
-      var self = this;
-      self.selectedChartOfAccount = item;
-      self.obj.chartAccountId = item.id.toString();
-      self.chartOfAccountSearchPopup = false;
-    },
+    // onChartOfAccountSelected(item, index) {
+    //   var self = this;
+    //   self.selectedChartOfAccount = item;
+    //   self.obj.chartAccountId = item.id.toString();
+    //   self.chartOfAccountSearchPopup = false;
+    // },
   },
 };
 </script>

@@ -18,7 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Bill </strong> List </CCardHeader>
+            <CCardHeader> <strong> Product </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -48,8 +48,8 @@
                 </template>
                 <template #expenseStateDescription="{ item }">
                   <td>
-                    <CBadge :color="getBadge(item.stateDescription)">
-                      {{ item.stateDescription }}</CBadge
+                    <CBadge :color="getBadge(item.expenseStateDescription)">
+                      {{ item.expenseStateDescription }}</CBadge
                     >
                   </td>
                 </template>
@@ -66,13 +66,16 @@
                       <CDropdownItem @click="onEdit(item)"
                         >View/Edit</CDropdownItem
                       >
+                      <CDropdownItem @click="onDuplicate(item)"
+                        >Duplicate</CDropdownItem
+                      >
                       <CDropdownDivider />
                       <CDropdownItem @click="showDeleteConfirmation(item)"
                         >Delete</CDropdownItem
                       >
                     </CDropdown>
-                    <!--                     
-                    <CButton
+
+                    <!-- <CButton
                       color="primary"
                       variant="outline"
                       square
@@ -117,6 +120,7 @@
               <CButton type="submit" color="light" @click="addNew()"
                 >Add New</CButton
               >
+
               <!-- <CButton type="submit" size="sm" color="primary" @click="addNew"
                 ><CIcon name="cil-check-circle" /> Add New</CButton
               > -->
@@ -137,45 +141,16 @@
 </template>
 
 <script>
-import BillApi from "@/lib/billApi";
+// import BillApi from "@/lib/billApi";
+import RentalProductApi from "@/lib/rentalProductApi";
 import moment from "moment";
-
-const items = [];
-// const fields = [
-// {
-//     key: "show_index",
-//     label: "#",
-//     _style: "width:1%",
-//     sorter: false,
-//     filter: false,
-//   },
-//   { key: "createdOn" },
-//   { key: "date" },
-//   { key: "companyName" },
-//   { key: "billNo" },
-//   { key: "totalAmount" },
-//   {
-//     key: "show_image",
-//     label: "Image",
-//   },
-
-//   {
-//     key: "show_details",
-//     label: "",
-//     _style: "width:1%",
-//     sorter: false,
-//     filter: false,
-//   },
-// ];
 
 export default {
   name: "BillList",
   data() {
     return {
       loading: false,
-      items: items.map((item, id) => {
-        return { ...item, id };
-      }),
+      items: [],
       infoList: [],
       fields: [
         // { key: "createdOn" },
@@ -186,30 +161,9 @@ export default {
           sorter: false,
           filter: false,
         },
-        { key: "date" },
-        // { key: "profileName", label: "Profile" },
-        { key: "vendorName", label: "Company" },
-        // { key: "billNo" },
-        { key: "totalAmount" },
-        {
-          key: "expenseStateDescription",
-          label: "Status",
-          sorter: false,
-        },
-
-        // { key: "isPaid" },
-
-        {
-          key: "paidStatus",
-          label: "Is Paid",
-          sorter: false,
-        },
-
+        { key: "name" },
+        { key: "type" },
         { key: "description" },
-        // {
-        //   key: "show_image",
-        //   label: "Image",
-        // },
 
         {
           key: "show_details",
@@ -221,7 +175,7 @@ export default {
       ],
       details: [],
       collapseDuration: 0,
-      api: new BillApi(),
+      api: new RentalProductApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -235,16 +189,18 @@ export default {
       return this.items.map((item) => {
         return {
           ...item,
-          createdOn: this.getDisplayDateTime(item.createdOn),
-          date: this.getDisplayDateTime(item.date),
-          vendorName: this.getVendorName(item),
-          totalAmount: item.totalAmount.toFixed(2),
-          isPaid: item.isPaid ? "Yes" : "No",
         };
       });
     },
   },
   methods: {
+    // getProfileName(item) {
+    //   try {
+    //     return item.profile.fullName;
+    //   } catch (error) {
+    //     return "N/A";
+    //   }
+    // },
     getBadge(status) {
       if (status == "Draft") {
         return "light";
@@ -260,18 +216,18 @@ export default {
     getPaidStatus(status) {
       return status === "Yes" ? "success" : "danger";
     },
+
     getVendorName(item) {
       if (item.vendor.name) return item.vendor.name;
       return "N/A";
     },
-
     getImage(item) {
       var url = apiUrl + "documents/file/" + item.documentId;
       return url;
     },
 
     getDisplayDateTime(dt) {
-      return moment(dt).format("DD/MM/YYYY HH:mm:ss");
+      return moment(dt).format("DD/MM/YYYY");
     },
     toast(header, message, color) {
       var self = this;
@@ -296,6 +252,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
+          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -309,10 +266,17 @@ export default {
     //     path: `/admin/advertiser/0/area/${item.id}/email/${item.email}`,
     //   });
     // },
+    onDuplicate(item) {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/RentalProduct/${item.id}/duplicate`,
+      });
+    },
+
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Bill/${item.id}`,
+        path: `/tenants/RentalProduct/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -336,7 +300,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Bill" });
+      this.$router.push({ path: "/tenants/RentalProduct" });
     },
     toast(header, message, color) {
       var self = this;
