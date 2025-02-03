@@ -35,21 +35,32 @@ class RentalReservationApi {
 
     getList({
         rentalProductId = '',
-    }
-    ) {
+        startDate = '',
+        endDate = '',
+        totalDays = '',
+        cleaningIsPaid = '',
+        minDaysFilter = false,
+    }) {
         var url = apiUrl + 'rentalreservations/filter';
         const params = new URLSearchParams();
-
-        params.append('rentalProductId', rentalProductId);
+    
+        if (rentalProductId) params.append('rentalProductId', rentalProductId);
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        if (totalDays) params.append('totalDays', totalDays);
+        if (cleaningIsPaid !== '') params.append('cleaningIsPaid', cleaningIsPaid);
+        params.append("minDaysFilter", minDaysFilter); // Boolean value
 
         url += `?${params.toString()}`;
-
-
-        return api.call('get', url, )
+    
+        console.log('Generated API URL:', url);
+    
+        return api.call('get', url)
             .then(({ data }) => {
-                return data
+                return data;
             });
     }
+    
 
 
     // getList() {
@@ -87,6 +98,14 @@ class RentalReservationApi {
             });
 
     }
+    updateBatch(data) {
+        var url = apiUrl + 'rentalreservations/batch/';
+        return api.call('put', url, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     update(data) {
         var url = apiUrl + 'rentalreservations/';
         return api.call('put', url + data.id, data)

@@ -42,6 +42,7 @@
     "@coreui/vue-chartjs": "^1.0.6",
     "@coreui/vue-pro": "~3.2.3",
     "@stripe/stripe-js": "^4.4.0",
+    "html2canvas": "^1.4.1",
     "jimp": "^0.16.2",
     "konva": "^8.3.2",
     "material-design-icons-iconfont": "^6.7.0",

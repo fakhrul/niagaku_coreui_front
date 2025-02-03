@@ -15,6 +15,97 @@
       </CToaster>
     </div>
     <div>
+      <!-- Filter Inputs -->
+
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader>
+              <strong>Additional Filter</strong>
+            </CCardHeader>
+            <CCardBody>
+              <CRow>
+                <CCol sm="4">
+                  <CSelect
+                    v-model="filterCriteria.rentalProductId"
+                    :options="filterRentalProducts"
+                    label="Rental Product"
+                  />
+                </CCol>
+                <CCol sm="4">
+                  <CInput
+                    label="Start Date"
+                    type="date"
+                    v-model="filterCriteria.startDate"
+                  />
+                </CCol>
+                <CCol sm="4">
+                  <CInput
+                    label="End Date"
+                    type="date"
+                    v-model="filterCriteria.endDate"
+                  />
+                </CCol>
+                <CCol sm="4">
+                  <CSelect
+                    v-model="filterCriteria.cleaningIsPaid"
+                    :options="[
+                      { value: '', label: 'All' },
+                      { value: 'true', label: 'Paid' },
+                      { value: 'false', label: 'Not Paid' },
+                    ]"
+                    label="Cleaning Paid?"
+                  />
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sm="4">
+                  <CFormGroup wrapperClasses="input-group pt-2">
+                    <template #label>Is Minimum Days? </template>
+                    <template #input>
+                      <CSwitch
+                        class="mr-1"
+                        color="primary"
+                        :checked.sync="filterCriteria.minDaysFilter"
+                        label-on="YES"
+                        label-off="NO"
+                      />
+                    </template>
+                  </CFormGroup>
+                </CCol>
+                <CCol sm="4">
+                  <CInput
+                    label="Total Days"
+                    type="number"
+                    v-model="filterCriteria.totalDays"
+                  />
+                </CCol>
+              </CRow>
+              <!-- Row for Button -->
+              <CRow class="d-flex justify-content-end mt-3">
+                <CCol sm="auto">
+                  <CButton
+                    size="sm"
+                    color="secondary"
+                    class="ml-1"
+                    @click="onCleanerClick"
+                  >
+                    Clear
+                  </CButton>
+                  <CButton
+                    size="sm"
+                    color="info"
+                    class="ml-1"
+                    @click="refreshTable"
+                  >
+                    Search
+                  </CButton>
+                </CCol>
+              </CRow>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
       <CRow>
         <CCol sm="12">
           <CCard>
@@ -64,12 +155,112 @@
           </CCard>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader> Reservation Date </CCardHeader>
+            <CCardBody>
+              <CDataTable :items="computedItems" :fields="fields">
+                <template #show_select="{ item }">
+                  <td class="py-2">
+                    <CInputCheckbox
+                      :checked="selectedReservations.includes(item.id)"
+                      @change="toggleSelection(item.id)"
+                    />
+
+                    <!-- <CInput
+                      type="checkbox"
+                      v-model="selectedReservations"
+                      :value="item.id"
+                    /> -->
+                  </td>
+                </template>
+
+                <template #show_index="{ index }">
+                  <td class="py-2">
+                    {{ index + 1 }}
+                  </td>
+                </template>
+                <template #show_details="{ item, index }">
+                  <td class="py-2">
+                    <CDropdown toggler-text="Action" class="m-2" color="light">
+                      <CDropdownItem @click="onEdit(item)"
+                        >View/Edit</CDropdownItem
+                      >
+                      <CDropdownItem @click="onDuplicate(item)"
+                        >Duplicate</CDropdownItem
+                      >
+                      <CDropdownDivider />
+                      <CDropdownItem>Print</CDropdownItem>
+                      <CDropdownItem>Export to PDF</CDropdownItem>
+                      <CDropdownDivider />
+                      <CDropdownItem @click="showDeleteConfirmation(item)"
+                        >Delete</CDropdownItem
+                      >
+                    </CDropdown>
+                  </td>
+                </template>
+                <!-- ✅ Add Footer -->
+                <template #footer>
+                  <tr>
+                    <td colspan="6"><strong></strong></td>
+                    <td>
+                      <strong> {{ totalDays }}</strong>
+                    </td>
+                    <td colspan="1"></td>
+                    <td>
+                      <strong>{{ totalCleaningCost.toFixed(2) }}</strong>
+                    </td>
+                    <td colspan="1"></td>
+                    <td>
+                      <strong>{{ totalLaundryCost.toFixed(2) }}</strong>
+                    </td>
+                    <td>
+                      <strong>{{ totalCost.toFixed(2) }}</strong>
+                    </td>
+                  </tr>
+                </template>
+              </CDataTable>
+            </CCardBody>
+            <CCardFooter>
+              <CRow>
+                <CCol>
+                  <CButton color="secondary" @click="selectAllFiltered">
+                    Select All Filtered
+                  </CButton>
+                  <CButton color="secondary" @click="deselectAll">
+                    Deselect All
+                  </CButton>
+                  <CButton
+                    color="primary"
+                    :disabled="selectedReservations.length === 0"
+                    @click="openBatchEditModal"
+                  >
+                    Batch Edit
+                  </CButton>
+                  <CButton color="primary" @click="exportTableAsImage"
+                    >Export as Image</CButton
+                  >
+                  <!-- <CButton
+                    color="danger"
+                    :disabled="selectedReservations.length === 0"
+                    @click="deleteBatchReservations"
+                  >
+                    Delete Selected
+                  </CButton> -->
+                </CCol>
+              </CRow>
+            </CCardFooter>
+          </CCard>
+        </CCol>
+      </CRow>
     </div>
     <div>
       <CModal
         title="Add/Update Reservation"
         size="xl"
         :show.sync="addReservationFormPopup"
+        :no-close-on-backdrop="true"
       >
         <CRow form>
           <CCol sm="12">
@@ -91,10 +282,44 @@
               placeholder="End Date"
             />
             <CInput
+              label="Customer Name"
+              v-model="itemReservationTemp.customerName"
+            />
+            <CInput
+              label="Customer Phone"
+              v-model="itemReservationTemp.customerPhone"
+            />
+
+            <CInput
               label="Price"
               type="number"
               v-model="itemReservationTemp.price"
               placeholder="Price"
+            />
+
+            <CInput
+              label="Cleaning Cost"
+              type="number"
+              v-model="itemReservationTemp.cleaningCost"
+              placeholder="Price"
+            />
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label"> Is Paid? </CCol>
+              <CCol sm="9">
+                <CSwitch
+                  class="mr-1"
+                  color="primary"
+                  :checked.sync="itemReservationTemp.cleaningIsPaid"
+                  label-on="YES"
+                  label-off="NO"
+                >
+                </CSwitch
+              ></CCol>
+            </CRow>
+            <CInput
+              label="Cleaning Payment Date"
+              type="date"
+              v-model="itemReservationTemp.cleaningPaymentDate"
             />
             <!-- <CButton color="primary" @click="saveReservation"
               >Save Reservation</CButton
@@ -118,6 +343,136 @@
         </template>
       </CModal>
     </div>
+    <div>
+      <CModal
+        title="Batch Edit Reservations"
+        size="lg"
+        :show.sync="batchEditPopup"
+        :no-close-on-backdrop="true"
+      >
+        <CRow form>
+          <CCol>
+            <CRow>
+              <CCol><strong>Item To Edit</strong></CCol>
+              <CCol><strong>Edit Info</strong></CCol>
+            </CRow>
+            <CRow>
+              <CCol sm="6">
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Cleaning Payment Status? </template>
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.editCleaningIsPaid"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                </CFormGroup>
+              </CCol>
+              <CCol sm="6">
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <!-- <template #label>Cleaning Is Paid? </template> -->
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.cleaningIsPaid"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                  <template #description>Cleaning Is Paid? </template>
+                </CFormGroup>
+              </CCol>
+            </CRow>
+            <hr />
+            <CRow>
+              <CCol>
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Cleaning Cost? </template>
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.editCleaningCost"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                </CFormGroup>
+              </CCol>
+              <CCol>
+                <CInput type="number" v-model="batchEditData.cleaningCost" />
+              </CCol>
+            </CRow>
+            <hr />
+            <CRow>
+              <CCol sm="6">
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Laundry Payment Status? </template>
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.editLaundryIsPaid"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                </CFormGroup>
+              </CCol>
+              <CCol sm="6">
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <!-- <template #label>Cleaning Is Paid? </template> -->
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.laundryIsPaid"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                  <template #description>Laundry Is Paid? </template>
+                </CFormGroup>
+              </CCol>
+            </CRow>
+            <hr />
+            <CRow>
+              <CCol>
+                <CFormGroup wrapperClasses="input-group pt-2">
+                  <template #label>Laundry Cost? </template>
+                  <template #input>
+                    <CSwitch
+                      class="mr-1"
+                      color="primary"
+                      :checked.sync="batchEditData.editLaundryCost"
+                      label-on="YES"
+                      label-off="NO"
+                    />
+                  </template>
+                </CFormGroup>
+              </CCol>
+              <CCol>
+                <CInput type="number" v-model="batchEditData.laundryCost" />
+              </CCol>
+            </CRow>
+          </CCol>
+        </CRow>
+
+        <!-- Modal Footer -->
+        <template #footer>
+          <CButton color="secondary" @click="batchEditPopup = false">
+            Cancel
+          </CButton>
+          <CButton color="primary" @click="saveBatchEdit">
+            Save Changes
+          </CButton>
+        </template>
+      </CModal>
+    </div>
   </div>
 </template>
 
@@ -137,6 +492,7 @@ import {
 import "vue-simple-calendar/static/css/default.css";
 import "vue-simple-calendar/static/css/holidays-us.css";
 import RentalProductApi from "@/lib/rentalProductApi";
+import html2canvas from "html2canvas";
 
 const currDate = new Date();
 const currYear = currDate.getFullYear();
@@ -150,7 +506,87 @@ export default {
     CalendarViewHeader,
   },
   data() {
+    const today = new Date();
+
+    // Convert to Malaysia Timezone (UTC+8) without shifting date unexpectedly
+    function toMalaysiaISODate(date) {
+      const localDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      );
+      return localDate.toISOString().split("T")[0];
+    }
+
+    // Get first day of the current month
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    const lastDayOfYear = new Date(today.getFullYear(), 11, 31);
+
+    // Get date three months from today
+    const threeMonthsLater = new Date(
+      today.getFullYear(),
+      today.getMonth() + 3,
+      today.getDate()
+    );
+
     return {
+      batchEditPopup: false, // Controls the modal visibility
+      batchEditData: {
+        editCleaningIsPaid: false,
+        cleaningIsPaid: false, // Default value
+        editCleaningCost: false,
+        cleaningCost: 0, // Default value
+
+        editLaundryIsPaid: false,
+        laundryIsPaid: false, // Default value
+        editLaundryCost: false,
+        laundryCost: 0, // Default value
+      },
+      selectedReservations: [],
+      filterCriteria: {
+        rentalProductId: "",
+        startDate: toMalaysiaISODate(firstDayOfYear),
+        endDate: toMalaysiaISODate(lastDayOfYear),
+        totalDays: "", // ✅ New filter for total days
+        cleaningIsPaid: "", // ✅ New filter for cleaning payment status
+        minDaysFilter: false, // false = exact match, true = minimum days filter
+      },
+      fields: [
+        {
+          key: "show_select",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        { key: "productName", label: "Rental" },
+        { key: "customerName", label: "Customer" },
+        { key: "startDate", label: "Start" },
+        { key: "endDate", label: "End" },
+        { key: "totalDays", label: "Total Days" }, // ✅ New column
+        { key: "cleaningIsPaid", label: "Housekeeping Paid?" }, // ✅ New column
+        { key: "cleaningCostInRM", label: "Housekeeping" }, // ✅ New column
+        // { key: "cleaningPaymentDate", label: "Payment Date" }, // ✅ New column
+
+        { key: "laundryIsPaid", label: "Laundry Paid?" }, // ✅ New column
+        { key: "laundryCostInRM", label: "Laundry" }, // ✅ New column
+        // { key: "laundryPaymentDate", label: "Payment Date" }, // ✅ New column
+
+        // { key: "price", label: "Price" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+      ],
       itemReservationTemp: {},
       addReservationFormPopup: false,
 
@@ -162,6 +598,7 @@ export default {
         price: 0,
         status: 0,
       },
+      filterRentalProducts: [],
       rentalProducts: [],
       infoList: [],
       message: "",
@@ -185,6 +622,47 @@ export default {
     // console.log("CalendarView.props", CalendarView.props);
   },
   computed: {
+    totalDays() {
+      return this.computedItems.reduce((sum, item) => {
+        return sum + (item.totalDays || 0);
+      }, 0);
+    },
+    totalCost() {
+      return this.totalLaundryCost + this.totalCleaningCost;
+    },
+    totalLaundryCost() {
+      return this.computedItems.reduce((sum, item) => {
+        return sum + (parseFloat(item.laundryCost) || 0);
+      }, 0);
+    },
+    totalCleaningCost() {
+      return this.computedItems.reduce((sum, item) => {
+        return sum + (parseFloat(item.cleaningCost) || 0);
+      }, 0);
+    },
+    computedItems() {
+      return this.items.map((item) => {
+        return {
+          ...item,
+          productName: this.getProductName(item),
+          // customerName: this.getCustomerName(item),
+          startDate: this.getDisplayDate(item.startDate),
+          endDate: this.getDisplayDate(item.endDate),
+          totalDays: this.calculateTotalDays(item.startDate, item.endDate), // ✅ Calculate days
+          cleaningIsPaid: item.cleaningIsPaid ? "✅ Yes" : "❌ No", // ✅ Convert boolean to Yes/No
+          cleaningCostInRM: item.cleaningCost ? `RM ${item.cleaningCost}` : "-", // ✅ Show cost or dash
+          cleaningPaymentDate: item.cleaningPaymentDate
+            ? this.getDisplayDate(item.cleaningPaymentDate)
+            : "-", // ✅ Show formatted date or "-"
+          laundryIsPaid: item.laundryIsPaid ? "✅ Yes" : "❌ No", // ✅ Convert boolean to Yes/No
+          laundryCostInRM: item.laundryCost ? `RM ${item.laundryCost}` : "-", // ✅ Show cost or dash
+          laundryPaymentDate: item.laundryPaymentDate
+            ? this.getDisplayDate(item.laundryPaymentDate)
+            : "-", // ✅ Show formatted date or "-"
+        };
+      });
+    },
+
     themeClasses() {
       return {
         "theme-default": this.useDefaultTheme,
@@ -194,6 +672,161 @@ export default {
     },
   },
   methods: {
+    exportTableAsImage() {
+      // const tableElement = document.querySelector(".c-data-table"); // Adjust the selector if needed
+      const tableElement = document.querySelector("table"); // Adjust selector
+      if (!tableElement) {
+        alert("Table not found!");
+        return;
+      }
+
+      html2canvas(tableElement, { scale: 2 }).then((canvas) => {
+        const image = canvas.toDataURL("image/png"); // Convert to PNG format
+
+        // Create a download link
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = "Rental_Reservations.png"; // Set the file name
+        link.click();
+      });
+    },
+
+    saveBatchEdit() {
+      const updatedReservations = this.selectedReservations.map((id) => ({
+        id,
+        editCleaningIsPaid: this.batchEditData.editCleaningIsPaid,
+        cleaningIsPaid: this.batchEditData.cleaningIsPaid,
+        editCleaningCost: this.batchEditData.editCleaningCost,
+        cleaningCost: this.batchEditData.cleaningCost,
+
+        editLaundryIsPaid: this.batchEditData.editLaundryIsPaid,
+        laundryIsPaid: this.batchEditData.laundryIsPaid,
+        editLaundryCost: this.batchEditData.editLaundryCost,
+        laundryCost: this.batchEditData.laundryCost,
+      }));
+
+      console.log("Batch updating reservations:", updatedReservations);
+
+      this.api
+        .updateBatch(updatedReservations)
+        .then((response) => {
+          this.refreshTable();
+          this.deselectAll();
+          this.infoList.push({
+            header: "Success",
+            message: "Reservation update",
+            color: "success",
+          });
+          this.batchEditPopup = false;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+
+      // Send batch update request to API
+      //await this.api.batchUpdateCleaning(updatedReservations);
+
+      // Refresh the table after update
+      // this.refreshTable();
+      // this.batchEditPopup = false; // Close modal
+      // this.toast("Success", "Batch update successful", "success");
+    },
+
+    calculateTotalDays(startDate, endDate) {
+      if (!startDate || !endDate) return 0;
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // ✅ Convert to days
+    },
+    openBatchEditModal() {
+      console.log("openBatchEditModal");
+
+      if (this.selectedReservations.length === 0) {
+        alert("Please select at least one reservation.");
+        return;
+      }
+
+      // Pre-fill batch edit fields with the first selected reservation (if available)
+      const firstReservation = this.items.find(
+        (item) => item.id === this.selectedReservations[0]
+      );
+
+      this.batchEditData.editCleaningIsPaid = false;
+      this.batchEditData.editCleaningCost = false;
+      this.batchEditData.editLaundryIsPaid = false;
+      this.batchEditData.editLaundryCost = false;
+
+      if (firstReservation) {
+        this.batchEditData.cleaningIsPaid = firstReservation.cleaningIsPaid;
+        this.batchEditData.cleaningCost = firstReservation.cleaningCost || 0;
+        this.batchEditData.laundryIsPaid = firstReservation.laundryIsPaid;
+        this.batchEditData.laundryCost = firstReservation.laundryCost || 0;
+      }
+
+      this.batchEditPopup = true; // Show modal
+    },
+    toggleSelection(id) {
+      const index = this.selectedReservations.indexOf(id);
+      if (index === -1) {
+        this.selectedReservations = [...this.selectedReservations, id]; // Ensure reactivity
+      } else {
+        this.selectedReservations = this.selectedReservations.filter(
+          (item) => item !== id
+        );
+      }
+      console.log("this.selectedReservations", this.selectedReservations);
+    },
+    deselectAll() {
+      this.selectedReservations = [];
+      console.log("Deselected all reservations");
+    },
+    selectAllFiltered() {
+      this.selectedReservations = []; // Reset first to force reactivity
+      this.$nextTick(() => {
+        this.selectedReservations = this.computedItems.map((item) => item.id);
+      });
+      console.log("this.selectedReservations", this.selectedReservations);
+    },
+    onCleanerClick() {},
+    getDisplayDate(dt) {
+      return moment(dt).format("DD/MM/YYYY");
+    },
+
+    onEdit(item) {
+      console.log("item", item);
+      this.itemReservationTemp.id = item.id;
+      this.itemReservationTemp.rentalProductId = item.rentalProductId;
+
+      let startDate = new Date(
+        item.startDate.getTime() - item.startDate.getTimezoneOffset() * 60000
+      );
+      this.itemReservationTemp.startDate = startDate
+        .toISOString()
+        .split("T")[0];
+      let endDate = new Date(
+        item.endDate.getTime() - item.endDate.getTimezoneOffset() * 60000
+      );
+
+      this.itemReservationTemp.endDate = endDate.toISOString().split("T")[0];
+      this.itemReservationTemp.price = item.price;
+      this.itemReservationTemp.customerName = item.customerName;
+      this.addReservationFormPopup = true;
+    },
+
+    getProductName(item) {
+      if (item.rentalProduct) {
+        return item.rentalProduct.name;
+      }
+      return "N/A";
+    },
+
+    getCustomerName(item) {
+      if (item.customer) {
+        return item.customer.name;
+      }
+      return "N/A";
+    },
+
     deleteReservation() {
       if (confirm("Are you sure you want to delete this reservation?")) {
         // Perform delete operation
@@ -220,6 +853,12 @@ export default {
       // Simply close the modal without saving any changes
       this.itemReservationTemp = {};
       this.addReservationFormPopup = false;
+      this.availability.startDate = "";
+      this.availability.endDate = "";
+      this.message = `Start Date Reset to: ${this.availability.startDate}`;
+
+      // Remove previous temporary event
+      this.events = this.events.filter((event) => !event.tempEvent);
     },
 
     saveReservation() {
@@ -256,7 +895,6 @@ export default {
               color: "success",
             });
             this.addReservationFormPopup = false;
-
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -346,8 +984,14 @@ export default {
       console.log("refreshTable");
 
       const params = {
-        rentalProductId: "",
+        rentalProductId: this.filterCriteria.rentalProductId,
+        startDate: this.filterCriteria.startDate,
+        endDate: this.filterCriteria.endDate,
+        totalDays: this.filterCriteria.totalDays || 0, // ✅ Pass totalDays if set
+        cleaningIsPaid: this.filterCriteria.cleaningIsPaid, // ✅ Pass cleaningIsPaid if selected
+        minDaysFilter: this.filterCriteria.minDaysFilter,
       };
+
       console.log("params", params);
       self.api
         .getList(params)
@@ -355,7 +999,7 @@ export default {
           self.items = response.result;
           console.log("self.items", self.items);
           this.events = response.result.map((a) => ({
-            title: a.rentalProduct.name,
+            title: a.customerName,
             startDate: new Date(a.startDate),
             endDate: new Date(a.endDate),
             allDay: true, // ✅ Ensures the full day is covered
@@ -364,6 +1008,12 @@ export default {
             price: a.price,
             remarks: a.remarks,
             rentalProductId: a.rentalProductId,
+            customerName: a.customerName,
+            customerPhone: a.customerPhone,
+            cleaningVendorId: a.cleaningVendorId,
+            cleaningCost: a.cleaningCost,
+            cleaningIsPaid: a.cleaningIsPaid,
+            cleaningPaymentDate: new Date(a.cleaningPaymentDate),
           }));
 
           console.log("this.events", this.events);
@@ -416,13 +1066,22 @@ export default {
       this.rentalProductApi
         .getListByCurrentBusiness()
         .then((response) => {
+          this.filterRentalProducts = [
+            { value: "", label: "ALL" }, // Add default option
+            ...response.result.map((p) => ({
+              value: p.id,
+              label: p.name,
+              color: p.color || "rgba(0, 123, 255, 0.2)",
+            })),
+          ];
+
           this.rentalProducts = response.result.map((p) => ({
             value: p.id,
             label: p.name,
             color: p.color || "rgba(0, 123, 255, 0.2)",
           }));
           console.log("this.rentalProducts", this.rentalProducts);
-          this.selectedProductId = response.result[0].id;
+          this.selectedProductId = "";
         })
         .catch(({ data }) => {
           this.toast("Error", helper.getErrorMessage(data), "danger");
@@ -525,7 +1184,14 @@ export default {
         .toISOString()
         .split("T")[0];
       this.itemReservationTemp.price = e.originalEvent.price;
-
+      this.itemReservationTemp.customerName = e.originalEvent.customerName;
+      this.itemReservationTemp.customerPhone = e.originalEvent.customerPhone;
+      this.itemReservationTemp.cleaningVendorId =
+        e.originalEvent.cleaningVendorId;
+      this.itemReservationTemp.cleaningCost = e.originalEvent.cleaningCost;
+      this.itemReservationTemp.cleaningIsPaid = e.originalEvent.cleaningIsPaid;
+      this.itemReservationTemp.cleaningPaymentDate =
+        e.originalEvent.cleaningPaymentDate.toISOString().split("T")[0];
       console.log("this.itemReservationTemp", this.itemReservationTemp);
       this.addReservationFormPopup = true;
     },
@@ -659,4 +1325,12 @@ export default {
 .theme-default .cv-day.draghover {
   box-shadow: inset 0 0 0.2em 0.2em #321fdb;
 }
+
+// .cv-header-day:first-child {
+//   order: 6; /* Move Sunday to the last position */
+// }
+
+// .cv-header-day:nth-child(2) {
+//   order: 1; /* Move Monday to the first position */
+// }
 </style>

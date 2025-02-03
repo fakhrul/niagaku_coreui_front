@@ -29,6 +29,7 @@
                   class="m-2 d-inline-block tour-cdropdown"
                   size="sm"
                 >
+                  <CDropdownItem @click="addNew()">Add New</CDropdownItem>
                   <CDropdownItem @click="onConvertToInvoice(obj)"
                     >Duplicate</CDropdownItem
                   >
@@ -511,6 +512,9 @@ export default {
   },
 
   methods: {
+    addNew() {
+      this.$router.push({ path: "/tenants/otherExpense" });
+    },
     viewVendorDetails() {
       var self = this;
       self.$router.push({
@@ -908,7 +912,7 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            console.log("self.obj",self.obj);
+            console.log("self.obj", self.obj);
             self.obj.totalAmount = self.obj.totalAmount.toFixed(2);
             self.issuedDate = self.obj.date;
             self.selectedVendor = self.obj.vendor;
@@ -939,9 +943,6 @@ export default {
               // Optionally modify any other fields if required
               this.toast("Info", "You are duplicating a quotation.", "info");
             }
-
-
-
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -1025,9 +1026,7 @@ export default {
       };
     },
     analyze() {},
-    addNew() {
-      this.$router.push({ path: "/tenants/Receipt" });
-    },
+  
     previous() {
       var self = this;
       this.api

@@ -156,103 +156,103 @@ import RentalProductApi from "@/lib/rentalProductApi";
 const currDate = new Date();
 const currYear = currDate.getFullYear();
 const currMonth = currDate.getMonth();
-const sampleEvents = [
-  {
-    title: "Test 1",
-    allDay: true,
-    startDate: new Date(2025, 0, 1),
-    endDate: new Date(2025, 0, 1),
-  },
+// const sampleEvents = [
+//   {
+//     title: "Test 1",
+//     allDay: true,
+//     startDate: new Date(2025, 0, 1),
+//     endDate: new Date(2025, 0, 1),
+//   },
 
-  {
-    title: "All Day Event very long title",
-    allDay: true,
-    startDate: new Date(currYear, currMonth, 0),
-    endDate: new Date(currYear, currMonth, 1),
-  },
-  {
-    title: "Long Event",
-    startDate: new Date(currYear, currMonth, 7),
-    endDate: new Date(currYear, currMonth, 10),
-  },
+//   {
+//     title: "All Day Event very long title",
+//     allDay: true,
+//     startDate: new Date(currYear, currMonth, 0),
+//     endDate: new Date(currYear, currMonth, 1),
+//   },
+//   {
+//     title: "Long Event",
+//     startDate: new Date(currYear, currMonth, 7),
+//     endDate: new Date(currYear, currMonth, 10),
+//   },
 
-  {
-    title: "DTS STARTS",
-    startDate: new Date(currYear + 1, 2, 13, 0, 0, 0),
-    endDate: new Date(currYear + 1, 2, 20, 0, 0, 0),
-  },
+//   {
+//     title: "DTS STARTS",
+//     startDate: new Date(currYear + 1, 2, 13, 0, 0, 0),
+//     endDate: new Date(currYear + 1, 2, 20, 0, 0, 0),
+//   },
 
-  {
-    title: "DTS ENDS",
-    startDate: new Date(currYear + 1, 10, 6, 0, 0, 0),
-    endDate: new Date(currYear + 1, 10, 13, 0, 0, 0),
-  },
+//   {
+//     title: "DTS ENDS",
+//     startDate: new Date(currYear + 1, 10, 6, 0, 0, 0),
+//     endDate: new Date(currYear + 1, 10, 13, 0, 0, 0),
+//   },
 
-  {
-    title: "Some Event",
-    startDate: new Date(currYear, currMonth, 9, 0, 0, 0),
-    endDate: new Date(currYear, currMonth, 9, 0, 0, 0),
-  },
-  {
-    title: "Conference",
-    startDate: new Date(currYear, currMonth, 11),
-    endDate: new Date(currYear, currMonth, 13),
-    desc: "Big conference for important people",
-    classes: "orange",
-  },
-  {
-    title: "Meeting",
-    startDate: new Date(currYear, currMonth, 12, 10, 30, 0, 0),
-    endDate: new Date(currYear, currMonth, 12, 12, 30, 0, 0),
-    desc: "Pre-meeting meeting, to prepare for the meeting",
-  },
-  {
-    title: "Lunch",
-    startDate: new Date(currYear, currMonth, 12, 12, 0, 0, 0),
-    endDate: new Date(currYear, currMonth, 12, 13, 0, 0, 0),
-    desc: "Power lunch",
-  },
-  {
-    title: "Meeting",
-    startDate: new Date(currYear, currMonth, 14, 14, 0, 0, 0),
-    endDate: new Date(currYear, currMonth, 14, 15, 0, 0, 0),
-  },
-  {
-    title: "Happy Hour",
-    startDate: new Date(currYear, currMonth, 12, 17, 0, 0, 0),
-    endDate: new Date(currYear, currMonth, 12, 17, 30, 0, 0),
-    desc: "Most important meal of the day",
-    classes: "primary",
-  },
-  {
-    title: "Dinner",
-    startDate: new Date(currYear, currMonth, 26, 20, 0, 0, 0),
-    endDate: new Date(currYear, currMonth, 26, 21, 0, 0, 0),
-    classes: "success",
-  },
-  {
-    title: "Birthday Party",
-    startDate: new Date(currYear, currMonth, 13, 7, 0, 0),
-    endDate: new Date(currYear, currMonth, 13, 10, 30, 0),
-  },
-  {
-    title: "Birthday Party 2",
-    startDate: new Date(currYear, currMonth, 24, 17, 0, 0),
-    endDate: new Date(currYear, currMonth, 24, 18, 30, 0),
-    classes: "primary",
-  },
-  {
-    title: "Late Night Event",
-    startDate: new Date(currYear, currMonth, 17, 19, 30, 0),
-    endDate: new Date(currYear, currMonth, 18, 2, 0, 0),
-    classes: "danger",
-  },
-  {
-    title: "Multi-day Event",
-    startDate: new Date(currYear, currMonth, 20, 19, 30, 0),
-    endDate: new Date(currYear, currMonth, 22, 2, 0, 0),
-  },
-];
+//   {
+//     title: "Some Event",
+//     startDate: new Date(currYear, currMonth, 9, 0, 0, 0),
+//     endDate: new Date(currYear, currMonth, 9, 0, 0, 0),
+//   },
+//   {
+//     title: "Conference",
+//     startDate: new Date(currYear, currMonth, 11),
+//     endDate: new Date(currYear, currMonth, 13),
+//     desc: "Big conference for important people",
+//     classes: "orange",
+//   },
+//   {
+//     title: "Meeting",
+//     startDate: new Date(currYear, currMonth, 12, 10, 30, 0, 0),
+//     endDate: new Date(currYear, currMonth, 12, 12, 30, 0, 0),
+//     desc: "Pre-meeting meeting, to prepare for the meeting",
+//   },
+//   {
+//     title: "Lunch",
+//     startDate: new Date(currYear, currMonth, 12, 12, 0, 0, 0),
+//     endDate: new Date(currYear, currMonth, 12, 13, 0, 0, 0),
+//     desc: "Power lunch",
+//   },
+//   {
+//     title: "Meeting",
+//     startDate: new Date(currYear, currMonth, 14, 14, 0, 0, 0),
+//     endDate: new Date(currYear, currMonth, 14, 15, 0, 0, 0),
+//   },
+//   {
+//     title: "Happy Hour",
+//     startDate: new Date(currYear, currMonth, 12, 17, 0, 0, 0),
+//     endDate: new Date(currYear, currMonth, 12, 17, 30, 0, 0),
+//     desc: "Most important meal of the day",
+//     classes: "primary",
+//   },
+//   {
+//     title: "Dinner",
+//     startDate: new Date(currYear, currMonth, 26, 20, 0, 0, 0),
+//     endDate: new Date(currYear, currMonth, 26, 21, 0, 0, 0),
+//     classes: "success",
+//   },
+//   {
+//     title: "Birthday Party",
+//     startDate: new Date(currYear, currMonth, 13, 7, 0, 0),
+//     endDate: new Date(currYear, currMonth, 13, 10, 30, 0),
+//   },
+//   {
+//     title: "Birthday Party 2",
+//     startDate: new Date(currYear, currMonth, 24, 17, 0, 0),
+//     endDate: new Date(currYear, currMonth, 24, 18, 30, 0),
+//     classes: "primary",
+//   },
+//   {
+//     title: "Late Night Event",
+//     startDate: new Date(currYear, currMonth, 17, 19, 30, 0),
+//     endDate: new Date(currYear, currMonth, 18, 2, 0, 0),
+//     classes: "danger",
+//   },
+//   {
+//     title: "Multi-day Event",
+//     startDate: new Date(currYear, currMonth, 20, 19, 30, 0),
+//     endDate: new Date(currYear, currMonth, 22, 2, 0, 0),
+//   },
+// ];
 
 export default {
   name: "RentalAvailability",
@@ -277,8 +277,8 @@ export default {
       message: "",
       showDate: currDate,
       displayPeriod: "month",
-      events: sampleEvents,
-      // events: [],
+      // events: sampleEvents,
+      events: [],
       useDefaultTheme: true,
       coloredDays: {},
       // useHolidayTheme: true,
