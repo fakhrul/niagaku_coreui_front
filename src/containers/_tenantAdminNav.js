@@ -19,6 +19,16 @@ export default [
       //   icon: 'cilIndustry'
       // },
       {
+        _name: 'CSidebarNavItem',
+        name: 'Dashboard',
+        to: '/dashboard',
+        icon: 'cil-speedometer',
+        // badge: {
+        //   color: 'primary',
+        //   text: 'NEW'
+        // }
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Company'],
       },
