@@ -245,6 +245,47 @@ export default [
 
         ]
       },
+
+      {
+        _name: 'CSidebarNavDropdown',
+        name: 'Documents',
+        route: '/tenants/documentList',
+        icon: 'cil-layers',
+        _children: [
+          {
+            _name: 'CSidebarNavItem',
+            name: 'License/Certificate',
+            to: '/tenants/certificateList',
+            icon: 'cilPeople',
+            // badge: {
+            //   color: 'danger',
+            //   text: 'PRO'
+            // }
+          },
+          // {
+          //   _name: 'CSidebarNavItem',
+          //   name: 'PaySlip',
+          //   to: '/tenants/paySlipList',
+          //   icon: 'cilCalendarCheck',
+          //   badge: {
+          //     color: 'danger',
+          //     text: 'PRO'
+          //   }
+          // },
+          // {
+          //   _name: 'CSidebarNavItem',
+          //   name: 'Claims',
+          //   to: '/tenants/claimList',
+          //   icon: 'cilRestaurant',
+          //   badge: {
+          //     color: 'danger',
+          //     text: 'PRO'
+          //   }
+          // },
+
+        ]
+      },
+
       {
         _name: 'CSidebarNavTitle',
         _children: ['My Records'],

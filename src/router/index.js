@@ -66,6 +66,9 @@ const Product = () => import('@/views/tenants/Product')
 const SalesOrderList = () => import('@/views/tenants/SalesOrderList')
 const SalesOrder = () => import('@/views/tenants/SalesOrder')
 
+const CertificateList = () => import('@/views/tenants/CertificateList')
+const Certificate = () => import('@/views/tenants/Certificate')
+
 const PurchaseQuotationList = () => import('@/views/tenants/PurchaseQuotationList')
 const PurchaseQuotation = () => import('@/views/tenants/PurchaseQuotation')
 
@@ -723,6 +726,24 @@ function configRoutes() {
               name: 'RentalReservation',
               component: RentalReservation
             },
+
+             //
+             {
+              path: '/tenants/Certificate',
+              name: 'Certificate',
+              component: Certificate
+            },
+            {
+              path: '/tenants/Certificate/:id',
+              name: 'CertificateById',
+              component: Certificate
+            },
+            {
+              path: '/tenants/CertificateList',
+              name: 'CertificateList',
+              component: CertificateList
+            },
+
           ]
         },
         {
