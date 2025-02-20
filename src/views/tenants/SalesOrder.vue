@@ -20,6 +20,22 @@
           </CCardHeader>
           <CCardBody>
             <CForm>
+              <CRow form class="form-group">
+                <CCol tag="label" sm="3" class="col-form-label">
+                  Customer
+                </CCol>
+                <CCol sm="9">
+                  <v-select
+                    style="width: 100%"
+                    v-model="selectedCustomer"
+                    :label="'name'"
+                    :options="customerItemsWithAddNew"
+                    placeholder="Select customer"
+                    @input="handleCustomerSelect"
+                  />
+                </CCol>
+              </CRow>
+
               <CInput label="Order No" horizontal v-model="obj.orderNo" />
               <CInput
                 horizontal
@@ -28,11 +44,37 @@
                 :value="computeDate"
                 @change="setDate"
               />
+              <CInput label="Amount" horizontal v-model="obj.totalAmount" />
               <CRow form class="form-group">
                 <CCol tag="label" sm="3" class="col-form-label">
                   Document
                 </CCol>
                 <CCol sm="9">
+                  <div v-if="isPdf(obj.document)">
+                      <!-- Render PDF -->
+                      <iframe
+                        :src="getDocumentUrl()"
+                        width="100%"
+                        height="600"
+                      ></iframe>
+                    </div>
+                    <div v-else>
+                      <!-- Render Image -->
+                      <CImg
+                        :src="getDocumentUrl()"
+                        width="100%"
+                        height="600"
+                        responsive
+                      />
+                    </div>
+                    <a
+                      :href="getDocumentUrl()"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary"
+                    >
+                      Open in new tab
+                    </a>
                   <CLink
                     target="_blank"
                     :href="getDocumentUrl()"
@@ -68,14 +110,23 @@
 import SalesOrderApi from "@/lib/salesOrderApi";
 import moment from "moment";
 import WidgetsUploadDocument from "../widgets/WidgetsUploadDocument.vue";
-
+import CustomerApi from "@/lib/customerApi";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 export default {
   name: "SalesOrder",
   components: {
+    vSelect,
     WidgetsUploadDocument,
   },
   data: () => {
     return {
+      selectedCustomer: null,
+      customerItems: [],
+      customerApi: new CustomerApi(),
+      itemAddNewCustomer: {},
+      addCustomerFormPopup: false,
+
       uploadedFiles: [],
       orderDate: Date(),
       organizationTypeList: [],
@@ -91,9 +142,17 @@ export default {
   mounted() {
     var self = this;
     this.initializeDefaultDate();
+    self.refreshCustomer();
     self.resetObj();
   },
   computed: {
+    customerItemsWithAddNew() {
+      return [
+        ...this.customerItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
+    
     computeDate() {
       return moment(this.orderDate).format("YYYY-MM-DD");
     },
@@ -102,7 +161,57 @@ export default {
     },
   },
   methods: {
-    cancel() {
+    refreshCustomer() {
+      var self = this;
+      self.loading = false;
+      self.customerApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.customerItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
+
+    onCustomerPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.customerApi
+          .create(this.itemAddNewCustomer)
+          .then((response) => {
+            console.log("onCustomerPopupConfirmation", response);
+
+            var addedCustomer = response.result;
+            this.refreshCustomer();
+            this.selectedCustomer = addedCustomer;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewCustomer = {};
+    },
+    handleCustomerSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewCustomer();
+        this.selectedCustomer = null; // Reset selection
+      }
+    },
+    addNewCustomer() {
+      this.itemAddNewCustomer = {};
+      this.addCustomerFormPopup = true;
+    },
+
+        isPdf(document) {
+      try {
+        if (document.contentType == "application/pdf") return true;
+        return false;
+      } catch (error) {
+        return false;
+      }
+    },
+        cancel() {
       this.$router.push({ path: "/tenants/SalesOrderList" });
     },
     initializeDefaultDate() {
@@ -143,6 +252,7 @@ export default {
           .then((response) => {
             self.obj = response.result;
             this.orderDate = self.obj.date;
+            self.selectedCustomer = self.obj.customer;
 
             console.log(self.obj);
           })
@@ -156,12 +266,15 @@ export default {
     onSubmit() {
       var self = this;
       self.obj.date = self.orderDate;
-
+      if (self.selectedCustomer) {
+        self.obj.customerId = self.selectedCustomer.id;
+      }
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/salesOrderList" });
+            self.obj = response.result;
+            self.$router.push({ path: `/tenants/salesOrder/${self.obj.id}` });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -170,7 +283,9 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.$router.push({ path: "/tenants/salesOrderList" });
+            self.toast("Save", "Save Success", "success");
+
+            // self.$router.push({ path: "/tenants/salesOrderList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");

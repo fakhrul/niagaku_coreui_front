@@ -43,7 +43,6 @@ const Subscription = () => import('@/views/tenants/Subscription')
 
 const QuotationList = () => import('@/views/tenants/QuotationList')
 const Quotation = () => import('@/views/tenants/Quotation')
-const IncomeMain = () => import('@/views/tenants/IncomeMain')
 
 const IncomeReceipt = () => import('@/views/tenants/IncomeReceipt')
 const IncomeReceiptList = () => import('@/views/tenants/IncomeReceiptList')
@@ -308,58 +307,6 @@ function configRoutes() {
         },
         {
           path: 'tenants',
-          redirect: '/tenants/incomeMain',
-          name: 'Incomes',
-          component: {
-            render(c) { return c('router-view') }
-          },
-          children: [
-            {
-              path: '/tenants/incomeMain',
-              name: 'QuickLink',
-              component: IncomeMain
-            },
-            {
-              path: '/tenants/quotation',
-              name: 'Quotation',
-              component: Quotation
-            },
-            {
-              path: '/tenants/quotation/:id',
-              name: 'QuotationById',
-              component: Quotation
-            },
-            {
-              path: '/tenants/quotation/:id/duplicate', // New route
-              name: 'QuotationDuplicate',
-              component: Quotation // Use the same component or create a new one if needed
-            },
-            {
-              path: '/tenants/quotationList',
-              name: 'QuotationList',
-              component: QuotationList
-            },
-            //
-            {
-              path: '/tenants/SalesOrder',
-              name: 'SalesOrder',
-              component: SalesOrder
-            },
-            {
-              path: '/tenants/SalesOrder/:id',
-              name: 'SalesOrderById',
-              component: SalesOrder
-            },
-            {
-              path: '/tenants/SalesOrderList',
-              name: 'SalesOrderList',
-              component: SalesOrderList
-            },
-          ]
-        },
-
-        {
-          path: 'tenants',
           redirect: '/tenants/subsription',
           name: 'Tenants',
           component: {
@@ -460,7 +407,7 @@ function configRoutes() {
               name: 'IncomeReceiptList',
               component: IncomeReceiptList
             },
-
+  
 
             {
               path: '/tenants/Customer',
@@ -494,7 +441,22 @@ function configRoutes() {
               component: ProductList
             },
 
-
+            //
+            {
+              path: '/tenants/SalesOrder',
+              name: 'SalesOrder',
+              component: SalesOrder
+            },
+            {
+              path: '/tenants/SalesOrder/:id',
+              name: 'SalesOrderById',
+              component: SalesOrder
+            },
+            {
+              path: '/tenants/SalesOrderList',
+              name: 'SalesOrderList',
+              component: SalesOrderList
+            },
             //
             {
               path: '/tenants/PurchaseQuotation',
@@ -575,7 +537,7 @@ function configRoutes() {
               name: 'InvoiceDuplicate',
               component: Invoice // Use the same component or create a new one if needed
             },
-
+            
             {
               path: '/tenants/invoice/:id/convertFromItem', // New route
               name: 'InvoiceConvertFromItem',
@@ -632,7 +594,7 @@ function configRoutes() {
               component: ChartOfAccount
             },
 
-
+            
             {
               path: '/tenants/receiptList',
               name: 'TenantReceiptList',
@@ -759,8 +721,8 @@ function configRoutes() {
               component: RentalReservation
             },
 
-            //
-            {
+             //
+             {
               path: '/tenants/Certificate',
               name: 'Certificate',
               component: Certificate

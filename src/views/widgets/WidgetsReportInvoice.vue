@@ -339,7 +339,6 @@ export default {
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
         document.title =
-          "Print_" +
           this.invoice.business.shortName +
           "_" +
           this.invoice.invoiceNumber; // Set the desired filename

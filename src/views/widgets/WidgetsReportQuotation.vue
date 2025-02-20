@@ -235,7 +235,6 @@ export default {
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
         document.title =
-          "Print_" +
           this.quotation.business.shortName +
           "_" +
           this.quotation.quotationNumber; // Set the desired filename

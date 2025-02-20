@@ -252,10 +252,9 @@ export default {
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
         document.title =
-          "Print_" +
           this.receipt.business.shortName +
           "_" +
-          this.receipt.incomeReceiptNumber; // Set the desired filename
+          this.receipt.incomeReceiptNumber ; // Set the desired filename
 
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;

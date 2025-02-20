@@ -423,49 +423,6 @@ import WidgetsReportQuotation from "../widgets/WidgetsReportQuotation";
 import BusinessApi from "@/lib/businessApi";
 
 const quotationItems = [];
-// const quotationFields = [
-//   {
-//     key: "show_index",
-//     label: "#",
-//     _style: "width:1%",
-//     sorter: false,
-//     filter: false,
-//   },
-//   // { key: "position", label: "Position" },
-//   // { key: "productName", label: "Item" },
-//   {
-//     key: "show_item",
-//     label: "Item",
-//     _style: "width:100px",
-//   },
-//   {
-//     key: "show_description",
-//     label: "Description",
-//   },
-//   {
-//     key: "show_quantity",
-//     label: "Quantity",
-//     _style: "width:100px",
-//   },
-//   {
-//     key: "show_price",
-//     label: "Price",
-//     _style: "width:100px",
-//   },
-//   {
-//     key: "show_total",
-//     label: "Total",
-//   },
-//   {
-//     key: "show_move",
-//     _style: "width:1%",
-//   },
-//   {
-//     key: "show_remove",
-//     _style: "width:1%",
-//   },
-// ];
-
 export default {
   name: "Quotation",
   components: {

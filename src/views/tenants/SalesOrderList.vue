@@ -116,8 +116,10 @@ const fields = [
     sorter: false,
     filter: false,
   },
-  { key: "orderNo" },
+  { key: "orderNo", label: "PO Number"  },
+  { key: "customerName", label: "Customer" },
   { key: "displayDate", label: "Date" },
+  { key: "totalAmount", label: "Amount" },
 
   {
     key: "document_link",
@@ -163,12 +165,24 @@ export default {
           displayDate: this.getDisplayDate(item.date),
           documentName: this.getDocumentName(item),
           documentUrl: this.getDocumentUrl(item),
+          customerName: this.getCustomerName(item),
+          totalAmount: this.getGrandTotal(item),
         };
       });
     },
   },
 
   methods: {
+    getCustomerName(item) {
+      if (item.customer) {
+        return item.customer.name;
+      }
+      return "N/A";
+    },
+    getGrandTotal(item) {
+      return item.totalAmount.toFixed(2);
+    },
+
     getDocumentName(item) {
       if (item.document == null) return "Unknown";
       if (item.document.fileName == null) return "Unknown";
