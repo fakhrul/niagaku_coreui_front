@@ -48,7 +48,7 @@
                 </CCol>
                 <CCol sm="4">
                   <CSelect
-                    v-model="filterCriteria.cleaningIsPaid"
+                  :value.sync="filterCriteria.cleaningIsPaid"
                     :options="[
                       { value: '', label: 'All' },
                       { value: 'true', label: 'Paid' },
@@ -916,7 +916,7 @@ export default {
     },
 
     getClassByColor(colorName) {
-      console.log("getClassByColor", colorName);
+      // console.log("getClassByColor", colorName);
       return colorName.toLowerCase();
     },
 
@@ -935,7 +935,7 @@ export default {
             color: this.getStatusColor(state.name),
           }));
 
-          console.log("this.statuses", this.statuses);
+          // console.log("this.statuses", this.statuses);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -956,7 +956,7 @@ export default {
       }
     },
     getEventClass(event) {
-      console.log("Applying event class:", event);
+      // console.log("Applying event class:", event);
       if (event.customColor) {
         return `event-${event.customColor.replace(/[^a-z0-9]/gi, "")}`; // Creates a unique class
       }
@@ -981,7 +981,7 @@ export default {
     refreshTable() {
       var self = this;
       self.loading = true;
-      console.log("refreshTable");
+      // console.log("refreshTable");
 
       const params = {
         rentalProductId: this.filterCriteria.rentalProductId,
@@ -1213,7 +1213,7 @@ export default {
 @import "../../assets/scss/style";
 #calendar {
   color: $body-color;
-  height: 63vh;
+  height: 100vh;
   margin-left: auto;
   margin-right: auto;
 }
@@ -1239,11 +1239,15 @@ export default {
 .theme-default .cv-event.red {
   background-color: #ff5733;
   border-color: lighten(#ff5733, 5%);
+  color: white !important;
+
 }
 
 .theme-default .cv-event.blue {
   background-color: #007bff;
   border-color: lighten(#007bff, 5%);
+  color: white !important;
+
 }
 
 .theme-default .cv-event.green {
@@ -1259,11 +1263,13 @@ export default {
 .theme-default .cv-event.purple {
   background-color: #6f42c1;
   border-color: lighten(#6f42c1, 5%);
+  color: white !important;
 }
 
 .theme-default .cv-event.black {
   background-color: #343a40;
   border-color: lighten(#343a40, 5%);
+
 }
 
 .theme-default .cv-event.white {
@@ -1325,6 +1331,7 @@ export default {
 .theme-default .cv-day.draghover {
   box-shadow: inset 0 0 0.2em 0.2em #321fdb;
 }
+
 
 // .cv-header-day:first-child {
 //   order: 6; /* Move Sunday to the last position */

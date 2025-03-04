@@ -23,7 +23,44 @@
                 {{ obj.statusDescription }}
               </a>
               <div class="card-header-actions">
-                <CButton size="sm" color="primary" @click="preview">
+                <CDropdown
+                  placement="bottom-end"
+                  toggler-text="Action"
+                  color="light"
+                  class="m-2 d-inline-block tour-cdropdown"
+                  size="sm"
+                >
+                <CDropdownItem @click="addNew()"
+                    >Add New</CDropdownItem
+                  >
+                  <CDropdownItem @click="onConvertToReceipt(obj)"
+                    >Convert To Receipt</CDropdownItem
+                  >
+                  <CDropdownDivider />
+                  <CDropdownHeader>Change Status To:</CDropdownHeader>
+                  <template v-for="status in invoiceStatuses">
+                    <CDropdownItem @click="changeState(status)">{{
+                      status.name
+                    }}</CDropdownItem>
+                  </template>
+                </CDropdown>
+                <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                  <CDropdownItem @click="startTour"
+                    >Onboarding Tour</CDropdownItem
+                  >
+                  <CDropdownItem disabled>Quick Info</CDropdownItem>
+                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+                  <CDropdownItem disabled>Live Chat</CDropdownItem>
+                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
+                </CDropdown>
+
+                <!-- <CButton size="sm" color="primary" @click="preview">
                   Preview</CButton
                 >
                 <CDropdown
@@ -38,7 +75,7 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
-                </CDropdown>
+                </CDropdown> -->
               </div>
             </CCardHeader>
             <CCardBody>
@@ -51,9 +88,12 @@
                         style="width: 100%"
                         v-model="selectedCustomer"
                         :label="'name'"
-                        :options="customerItems"
+                        :options="customerItemsWithAddNew"
                         placeholder="Select customer"
-                      />
+                        @input="handleCustomerSelect"
+                      >
+                        <span slot="no-options" @click="addNewCustomer"> No More Options. Click to add New.</span>
+                      </v-select>
                     </template>
                   </CFormGroup>
                 </CCol>
@@ -192,7 +232,9 @@
                           class="m-2"
                           @click="onRemoveClaimItem(item)"
                         >
-                          <CDropdownItem @click="createReceiptByItem(item)">Create Receipt</CDropdownItem>
+                          <CDropdownItem @click="createReceiptByItem(item)"
+                            >Create Receipt</CDropdownItem
+                          >
                         </CDropdown>
 
                         <!-- <CButton
@@ -279,6 +321,57 @@
         </CRow>
       </CModal>
     </div>
+    <div>
+      <CModal
+        title="Add New Customer"
+        size="xl"
+        :show.sync="addCustomerFormPopup"
+        @update:show="onCustomerPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="6">
+            <CInput
+              label="Name"
+              v-model="itemAddNewCustomer.name"
+              placeholder="Customer Sdn Bhd"
+              required
+              was-validated
+            />
+            <CInput
+              label="Contact Name"
+              v-model="itemAddNewCustomer.contactName"
+            />
+            <CInput
+              label="Contact Email"
+              v-model="itemAddNewCustomer.contactEmail"
+            />
+            <CInput
+              label="Contact Phone"
+              v-model="itemAddNewCustomer.contactPhone"
+            />
+          </CCol>
+          <CCol md="6">
+            <CTextarea
+              label="Address"
+              placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
+              rows="5"
+              v-model="itemAddNewCustomer.address"
+              required
+              was-validated
+            />
+            <CInput label="City" v-model="itemAddNewCustomer.city" />
+            <CInput label="Country" v-model="itemAddNewCustomer.country" />
+            <CInput label="State" v-model="itemAddNewCustomer.state" />
+            <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" />
+            <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
+            <CInput label="Website" v-model="itemAddNewCustomer.website" />
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
   </div>
 </template>
 
@@ -344,6 +437,9 @@ export default {
   },
   data: () => {
     return {
+      itemAddNewCustomer: {},
+      addCustomerFormPopup: false,
+
       businessApi: new BusinessApi(),
 
       quotationApi: new QuotationApi(),
@@ -364,48 +460,48 @@ export default {
         return { ...item, id };
       }),
 
-      invoiceFields:[
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  // { key: "position", label: "Position" },
-  // { key: "productName", label: "Item" },
-  {
-    key: "show_item",
-    label: "Item",
-    _style: "width:100px",
-  },
-  {
-    key: "show_description",
-    label: "Description",
-  },
-  {
-    key: "show_quantity",
-    label: "Quantity",
-    _style: "width:100px",
-  },
-  {
-    key: "show_price",
-    label: "Price",
-    _style: "width:100px",
-  },
-  {
-    key: "show_total",
-    label: "Total",
-  },
-  {
-    key: "show_move",
-    _style: "width:1%",
-  },
-  {
-    key: "show_remove",
-    _style: "width:1%",
-  },
-],
+      invoiceFields: [
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        // { key: "position", label: "Position" },
+        // { key: "productName", label: "Item" },
+        {
+          key: "show_item",
+          label: "Item",
+          _style: "width:100px",
+        },
+        {
+          key: "show_description",
+          label: "Description",
+        },
+        {
+          key: "show_quantity",
+          label: "Quantity",
+          _style: "width:100px",
+        },
+        {
+          key: "show_price",
+          label: "Price",
+          _style: "width:100px",
+        },
+        {
+          key: "show_total",
+          label: "Total",
+        },
+        {
+          key: "show_move",
+          _style: "width:1%",
+        },
+        {
+          key: "show_remove",
+          _style: "width:1%",
+        },
+      ],
 
       selectedItem: null,
 
@@ -437,6 +533,12 @@ export default {
     }
   },
   computed: {
+    customerItemsWithAddNew() {
+      return [
+        ...this.customerItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
     computedPreviewItem() {
       return {
         ...this.obj,
@@ -470,6 +572,48 @@ export default {
     },
   },
   methods: {
+    startTour()
+    {
+
+    },
+    onConvertToReceipt(item)
+    {
+
+    },
+    addNew() {
+      this.$router.push({ path: "/tenants/Invoice" });
+    },
+    onCustomerPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.customerApi
+          .create(this.itemAddNewCustomer)
+          .then((response) => {
+            console.log("onCustomerPopupConfirmation", response);
+
+            var addedCustomer = response.result;
+            this.refreshCustomer();
+            this.selectedCustomer = addedCustomer;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewCustomer = {};
+    },
+    handleCustomerSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewCustomer();
+        this.selectedCustomer = null; // Reset selection
+      }
+    },
+    addNewCustomer() {
+      this.selectedCustomer = null; // Reset selection
+      this.itemAddNewCustomer = {};
+      this.addCustomerFormPopup = true;
+    },
     cancel() {
       this.$router.push({ path: "/tenants/InvoiceList" });
     },
@@ -783,7 +927,7 @@ export default {
           })
           .catch(({ data }) => {});
 
-          this.businessApi
+        this.businessApi
           .getCurrentActiveBusiness()
           .then((response) => {
             console.log(response.result);

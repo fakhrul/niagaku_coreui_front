@@ -365,17 +365,6 @@ Malaysia"
             <CInput label="City" v-model="itemAddNewCustomer.city" />
             <CInput label="Country" v-model="itemAddNewCustomer.country" />
             <CInput label="State" v-model="itemAddNewCustomer.state" />
-            <!-- <CSelect
-                  :value.sync="obj.country"
-                  :options="aseanCountries"
-                  label="Country"
-                /> -->
-            <!-- State Selection -->
-            <!-- <CSelect
-                  :value.sync="obj.state"
-                  :options="stateOptions"
-                  label="State"
-                /> -->
             <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" />
             <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
             <CInput label="Website" v-model="itemAddNewCustomer.website" />
