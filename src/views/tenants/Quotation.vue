@@ -23,9 +23,6 @@
                 {{ obj.statusDescription }}
               </a>
               <div class="card-header-actions">
-                <!-- <CButton size="sm" color="primary" @click="preview">
-                  Preview</CButton
-                > -->
                 <CDropdown
                   placement="bottom-end"
                   toggler-text="Action"
@@ -131,7 +128,7 @@
               <CRow>
                 <CCol>
                   <CTextarea
-                    label="Quotation Title"
+                    label="Title"
                     v-model="obj.title"
                     placeholder=""
                     rows="2"

@@ -59,7 +59,7 @@ export default [
         _children: [
           {
             _name: 'CSidebarNavItem',
-            name: 'Purchase Quotation',
+            name: 'Supplier Quotation',
             to: '/tenants/purchaseQuotationList',
             icon: 'cilBookmark'
           },

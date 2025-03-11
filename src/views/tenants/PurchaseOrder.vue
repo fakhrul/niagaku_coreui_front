@@ -23,10 +23,7 @@
                 {{ obj.statusDescription }}
               </a>
               <div class="card-header-actions">
-                <CButton size="sm" color="primary" @click="preview">
-                  Preview</CButton
-                >
-                <CDropdown
+                <!-- <CDropdown
                   placement="bottom-end"
                   toggler-text="Change Status"
                   color="primary"
@@ -38,57 +35,97 @@
                       status.name
                     }}</CDropdownItem>
                   </template>
+                </CDropdown> -->
+                <CDropdown
+                  placement="bottom-end"
+                  toggler-text="Action"
+                  color="light"
+                  class="m-2 d-inline-block tour-cdropdown"
+                  size="sm"
+                >
+                  <CDropdownItem @click="onConvertToInvoice(obj)"
+                    >Convert To Invoice</CDropdownItem
+                  >
+                  <CDropdownDivider />
+                  <CDropdownHeader>Change Status To:</CDropdownHeader>
+                  <template v-for="status in purchaseorderStatuses">
+                    <CDropdownItem @click="changeState(status)">{{
+                      status.name
+                    }}</CDropdownItem>
+                  </template>
+                </CDropdown>
+                <CDropdown
+                  size="sm"
+                  toggler-text="Help"
+                  color="link"
+                  class="m-0 d-inline-block"
+                >
+                  <!-- <CIcon name="cil-x-circle"/> -->
+                  <!-- <CDropdownItem @click="startTour"
+                    >Onboarding Tour</CDropdownItem
+                  > -->
+                  <CDropdownItem disabled>Quick Info</CDropdownItem>
+                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+                  <CDropdownItem disabled>Live Chat</CDropdownItem>
+                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
                 </CDropdown>
               </div>
             </CCardHeader>
             <CCardBody>
               <CRow>
-                <CCol
-                  ><CFormGroup wrapperClasses="input-group pt-2">
-                    <template #label>Vendor/Supplier </template>
-                    <template #input>
-                      <v-select
-                        style="width: 100%"
-                        v-model="selectedVendor"
-                        :label="'name'"
-                        :options="vendorItems"
-                        placeholder="Select vendor"
-                      />
-                    </template>
-                  </CFormGroup>
+                <CCol sm="12" md="12" lg="6">
+                  <v-select
+                    class="form-control-lg"
+                    style="width: 100%"
+                    v-model="selectedVendor"
+                    :label="'name'"
+                    :options="vendorItemsWithAddNew"
+                    placeholder="Select Supplier"
+                    @input="handleVendorSelect"
+                  />
+                  <div class="text-muted small mt-1">Custoner</div>
                 </CCol>
-                <CCol
+                <CCol sm="12" md="12" lg="6"
                   ><CInput
-                    label="PO No"
-                    placeholder=""
+                    size="lg"
+                    placeholder="PO No"
                     v-model="obj.orderNumber"
-                /></CCol>
-                <CCol>
+                    description="P.O. No"
+                  >
+                    <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
+                  </CInput></CCol
+                >
+              </CRow>
+
+              <CRow>
+                <CCol sm="12" md="8" lg="4">
                   <CInput
-                    label="Date"
                     type="date"
+                    size="lg"
                     :value="computeIssuedDate"
                     @change="setIssuedDate"
+                    description="Issue Date"
                   />
 
-                  <!-- <input
-                  type="date"
-                  :value="computeIssuedDate"
-                  @change="setIssuedDate"
-                  class="mr-2"
-                /> -->
+                
                 </CCol>
-                <CCol>
+                <CCol sm="12" md="8" lg="4">
                   <CInput
-                    label="Expiry"
+                    size="lg"
+                    description="Expriry Date"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
                 /></CCol>
-                <CCol>
-                  <CInput label="Reference" v-model="obj.reference"
+                <CCol sm="12" md="8" lg="4">
+                  <CInput
+                    size="lg"
+                    description="Reference"
+                    v-model="obj.reference"
                 /></CCol>
               </CRow>
+
 
               <CRow>
                 <CCol>
@@ -128,8 +165,9 @@
                               style="width: 100%"
                               v-model="item.purchaseProduct"
                               :label="'name'"
-                              :options="productItems"
+                              :options="computeProductItemsWithAddNew"
                               placeholder="Select product"
+                              @input="handleProductSelect($event, item)"
                             />
                           </template>
                         </CFormGroup>
@@ -199,11 +237,11 @@
 
                     <template #footer>
                       <td>
-                        <CButton @click="addNewItem()" color="primary"
-                          >Add</CButton
+                        <CButton color="light" @click="addNewItem()"
+                          >Add Item</CButton
                         >
                       </td>
-                      <td colspan="5" class="text-right">
+                      <td colspan="3" class="text-right">
                         <strong>Grand Total:</strong>
                       </td>
                       <td>{{ grandTotal.toFixed(2) }}</td>
@@ -237,6 +275,19 @@
           </CCard>
         </CCol>
       </CRow>
+      <CRow>
+        <CCol>
+          <CCard>
+            <CCardHeader>Preview</CCardHeader>
+            <CCardBody>
+              <WidgetsReportPurchaseOrder
+                :document="computedPreviewItem"
+              ></WidgetsReportPurchaseOrder>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
       <!-- <CRow>
         <CCol>
           <WidgetsReportPurchaseOrder :purchaseorder="obj"></WidgetsReportPurchaseOrder>
@@ -256,6 +307,80 @@
         </CRow>
       </CModal>
     </div>
+
+    <div>
+      <CModal
+        title="Add New Vendor"
+        size="xl"
+        :show.sync="addVendorFormPopup"
+        @update:show="onVendorPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="6">
+            <CInput
+              label="Name"
+              v-model="itemAddNewVendor.name"
+              placeholder="Vendor Sdn Bhd"
+              required
+              was-validated
+            />
+            <CInput
+              label="Contact Name"
+              v-model="itemAddNewVendor.contactName"
+            />
+            <CInput
+              label="Contact Email"
+              v-model="itemAddNewVendor.contactEmail"
+            />
+            <CInput
+              label="Contact Phone"
+              v-model="itemAddNewVendor.contactPhone"
+            />
+          </CCol>
+          <CCol md="6">
+            <CTextarea
+              label="Address"
+              placeholder="No. 123, Jalan Example
+Taman Example, 
+12345 Kuala Lumpur,
+Malaysia"
+              rows="5"
+              v-model="itemAddNewVendor.address"
+              required
+              was-validated
+            />
+            <CInput label="City" v-model="itemAddNewVendor.city" />
+            <CInput label="Country" v-model="itemAddNewVendor.country" />
+            <CInput label="State" v-model="itemAddNewVendor.state" />
+            <CInput label="Postcode" v-model="itemAddNewVendor.postcode" />
+            <CInput label="Phone" v-model="itemAddNewVendor.phone" />
+            <CInput label="Website" v-model="itemAddNewVendor.website" />
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
+    <div>
+      <CModal
+        title="Add New Product"
+        size="xl"
+        :show.sync="addPoductFormPopup"
+        @update:show="onProductPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="12">
+            <CInput label="Name" horizontal v-model="itemAddNewProduct.name" />
+            <CRow form class="form-group">
+              <CCol tag="label" sm="3" class="col-form-label">
+                Description
+              </CCol>
+              <CCol sm="9">
+                <CTextarea placeholder="" rows="5" v-model="itemAddNewProduct.description" />
+              </CCol>
+            </CRow>
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
   </div>
 </template>
 
@@ -269,7 +394,74 @@ import moment from "moment";
 import WidgetsReportPurchaseOrder from "../widgets/WidgetsReportPurchaseOrder";
 
 const purchaseOrderItems = [];
-const purchaseOrderFields = [
+// const purchaseOrderFields = [
+//   {
+//     key: "show_index",
+//     label: "#",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+//   { key: "position", label: "Position" },
+//   // { key: "productName", label: "Item" },
+//   {
+//     key: "show_item",
+//     label: "Item",
+//   },
+//   {
+//     key: "show_description",
+//     label: "Description",
+//   },
+//   {
+//     key: "show_quantity",
+//     label: "Quantity",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_price",
+//     label: "Price",
+//     _style: "width:100px",
+//   },
+//   {
+//     key: "show_total",
+//     label: "Total",
+//   },
+//   {
+//     key: "show_move",
+//     _style: "width:1%",
+//   },
+//   {
+//     key: "show_remove",
+//     _style: "width:1%",
+//   },
+// ];
+
+export default {
+  name: "PurchaseOrder",
+  components: {
+    vSelect,
+    WidgetsReportPurchaseOrder,
+  },
+  data: () => {
+    return {
+      itemPendingNewProduct: null,
+      itemAddNewProduct: {},
+      addPoductFormPopup: false,
+
+      itemAddNewVendor: {},
+      addVendorFormPopup: false,
+
+      previewObj: null,
+      purchaseorderPreviewPopup: false,
+      purchaseorderStatuses: [],
+      issuedDate: Date(),
+      expiryDate: Date(),
+      // PurchaseOrder Itm
+      purchaseOrderItems: purchaseOrderItems.map((item, id) => {
+        return { ...item, id };
+      }),
+
+      purchaseOrderFields : [
   {
     key: "show_index",
     label: "#",
@@ -277,11 +469,12 @@ const purchaseOrderFields = [
     sorter: false,
     filter: false,
   },
-  { key: "position", label: "Position" },
+  // { key: "position", label: "Position" },
   // { key: "productName", label: "Item" },
   {
     key: "show_item",
     label: "Item",
+    _style: "width:100px",
   },
   {
     key: "show_description",
@@ -309,27 +502,7 @@ const purchaseOrderFields = [
     key: "show_remove",
     _style: "width:1%",
   },
-];
-
-export default {
-  name: "PurchaseOrder",
-  components: {
-    vSelect,
-    WidgetsReportPurchaseOrder,
-  },
-  data: () => {
-    return {
-      previewObj: null,
-      purchaseorderPreviewPopup: false,
-      purchaseorderStatuses: [],
-      issuedDate: Date(),
-      expiryDate: Date(),
-      // PurchaseOrder Itm
-      purchaseOrderItems: purchaseOrderItems.map((item, id) => {
-        return { ...item, id };
-      }),
-
-      purchaseOrderFields,
+],
 
       selectedItem: null,
 
@@ -354,6 +527,26 @@ export default {
     self.resetObj();
   },
   computed: {
+    computedPreviewItem() {
+      return {
+        ...this.obj,
+        items: this.computedPurchaseOrderItems,
+        expiryDate: this.expiryDate, // Add this line to include the expiry date
+      };
+    },
+    
+    computeProductItemsWithAddNew() {
+      return [
+        ...this.productItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
+        vendorItemsWithAddNew() {
+      return [
+        ...this.vendorItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -380,6 +573,72 @@ export default {
     },
   },
   methods: {
+    cancel() {
+      this.$router.push({ path: "/tenants/PurchaseOrderList" });
+    },
+
+    onProductPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.productApi
+          .create(this.itemAddNewProduct)
+          .then((response) => {
+            console.log("onProductPopupConfirmation", response);
+            var addedProduct = response.result;
+            this.refreshProduct();
+            this.itemPendingNewProduct.purchaseProduct = addedProduct;
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      else
+      {
+        this.itemPendingNewProduct.purchaseProduct = null;
+      }
+      this.itemAddNewProduct = {};
+    },
+        handleProductSelect(selected, item) {
+      if (selected.id === "add_new") {
+        this.itemPendingNewProduct = item;
+        this.itemAddNewProduct = {};
+        this.addPoductFormPopup = true;
+
+        // // Trigger action to add a new customer
+        // this.addNewProduct();
+        // this.selectedCustomer = null; // Reset selection
+      }
+    },
+        onVendorPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.vendorApi
+          .create(this.itemAddNewVendor)
+          .then((response) => {
+            var addedVendor = response.result;
+            this.refreshVendor();
+            this.selectedVendor = addedVendor;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewVendor = {};
+    },
+
+
+    handleVendorSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewVendor();
+        this.selectedVendor = null; // Reset selection
+      }
+    },
+    addNewVendor() {
+      this.itemAddNewVendor = {};
+      this.addVendorFormPopup = true;
+    },
+
     initializeDefaultDate() {
       const today = new Date();
       this.issuedDate = new Date(
@@ -560,12 +819,32 @@ export default {
             }
 
             self.purchaseOrderItems = self.obj.items;
+
+
+
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
           });
       } else {
         self.obj = self.getEmptyObj();
+
+        let currentDate = new Date();
+        this.issuedDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set issuedDate
+        currentDate.setDate(currentDate.getDate() + 30);
+        this.expiryDate = new Date(
+          currentDate.toISOString().split("T")[0] + "T00:00:00"
+        ); // Set expiry date
+
+        this.api
+          .getNextNumber()
+          .then((response) => {
+            self.obj.orderNumber = response.result;
+          })
+          .catch(({ data }) => {});
+
       }
     },
     onSubmit() {

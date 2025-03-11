@@ -1,5 +1,14 @@
 class PurchaseOrderApi {
     
+    getNextNumber() {
+        var url = apiUrl + 'purchaseorders/next-number';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+
     getPurchaseOrderStatus() {
         var url = apiUrl + 'purchaseorders/states';
         return api.call('get', url)

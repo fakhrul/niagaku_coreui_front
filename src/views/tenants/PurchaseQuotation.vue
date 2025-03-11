@@ -16,7 +16,7 @@
       <CCol sm="12">
         <CCard>
           <CCardHeader>
-            <strong> Purchase Quotation </strong> Information
+            <strong> Supplier Quotation </strong> Information
           </CCardHeader>
           <CCardBody>
             <CForm>
