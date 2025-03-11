@@ -107,7 +107,7 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Purchase Invoice (Bill)',
+            name: 'Supplier Invoice (Bill)',
             to: '/tenants/billList',
             icon: 'cilMoney',
             badge: {

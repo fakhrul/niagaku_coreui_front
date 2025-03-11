@@ -17,7 +17,7 @@
         <CCol>
           <CCard>
             <CCardHeader>
-              <strong>Purchase Invoice (Bill)</strong>
+              <strong>Supplier Invoice (Bill)</strong>
               <a href="" target="_blank" :class="getBadgeClass()">
                 {{ obj.stateDescription }}
               </a>

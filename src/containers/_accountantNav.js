@@ -71,7 +71,7 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Bill/Purchase Invoice',
+            name: 'Bill/Supplier Invoice',
             to: '/tenants/billList',
             icon: 'cilBookmark'
           },
