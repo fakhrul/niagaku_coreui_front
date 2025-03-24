@@ -1066,21 +1066,27 @@ export default {
       this.rentalProductApi
         .getListByCurrentBusiness()
         .then((response) => {
+
+          // console.log("rentalProducts", response.result); 
+
           this.filterRentalProducts = [
             { value: "", label: "ALL" }, // Add default option
             ...response.result.map((p) => ({
               value: p.id,
               label: p.name,
-              color: p.color || "rgba(0, 123, 255, 0.2)",
+              // label: this.getNameAndColor(p.color, p.name),
+              color: p.colorCode || "rgba(0, 123, 255, 0.2)",
             })),
           ];
 
           this.rentalProducts = response.result.map((p) => ({
             value: p.id,
-            label: p.name,
-            color: p.color || "rgba(0, 123, 255, 0.2)",
+            // label: p.name,
+            label: this.getNameAndColor(p),
+            color: p.colorCode || "rgba(0, 123, 255, 0.2)",
           }));
           console.log("this.rentalProducts", this.rentalProducts);
+
           this.selectedProductId = "";
         })
         .catch(({ data }) => {
@@ -1088,6 +1094,37 @@ export default {
           this.loading = false;
         });
     },
+    getNameAndColor(item) {
+      return this.getColorText(item.colorName) +" " +  item.name;
+    },
+    getColorText(colorName) {
+  switch (colorName) {
+    case "Red":
+      return "🔴";
+    case "Blue":
+      return "🔵";
+    case "Green":
+      return "🟢";
+    case "Yellow":
+      return "🟡";
+    case "Purple":
+      return "🟣";
+    case "Black":
+      return "⚫";
+    case "White":
+      return "⚪";
+    case "Orange":
+      return "🟠";
+    case "Brown":
+      return "🟤";
+    case "Cyan":
+      return "🟦";
+    case "Amber":
+      return "🟨";
+    default:
+      return "⬛"; // Default for unknown colors
+  }
+},
     toast(header, message, color) {
       var self = this;
       self.infoList.push({

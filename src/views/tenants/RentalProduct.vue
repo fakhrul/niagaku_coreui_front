@@ -54,14 +54,9 @@
                 />
 
                 <!-- ✅ Color Picker Input -->
-                <!-- <CInput
-                  label="Select Color"
-                  type="color"
-                  v-model="obj.color"
-                  placeholder="Choose a color"
-                /> -->
+
                 <CSelect
-                :value.sync="selectedColorName"
+                  :value.sync="selectedColorName"
                   :options="
                     presetColors.map((color) => ({
                       value: color.name,
@@ -74,7 +69,7 @@
                   label="Select Color"
                   @change="updateSelectedColor"
                 >
-                <!-- <template v-slot:option="{ option }">
+                  <!-- <template v-slot:option="{ option }">
                     <div class="color-option">
                       <span
                         class="color-preview"
@@ -83,7 +78,6 @@
                       {{ option.name }}
                     </div>
                   </template> -->
-
 
                   <template v-slot:option="{ option }">
                     <div class="color-option">
@@ -171,8 +165,10 @@ export default {
 
   methods: {
     updateSelectedColor() {
-      console.log("selectedColorName",this.selectedColorName);
-      const color = this.presetColors.find((c) => c.name === this.selectedColorName);
+      console.log("selectedColorName", this.selectedColorName);
+      const color = this.presetColors.find(
+        (c) => c.name === this.selectedColorName
+      );
       if (color) {
         this.selectedColorName = color.name;
         this.obj.colorName = color.name;
