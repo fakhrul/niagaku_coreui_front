@@ -359,10 +359,10 @@ Malaysia"
               required
               was-validated
             />
-            <CInput label="City" v-model="itemAddNewCustomer.city" />
+            <!-- <CInput label="City" v-model="itemAddNewCustomer.city" />
             <CInput label="Country" v-model="itemAddNewCustomer.country" />
             <CInput label="State" v-model="itemAddNewCustomer.state" />
-            <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" />
+            <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" /> -->
             <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
             <CInput label="Website" v-model="itemAddNewCustomer.website" />
           </CCol>

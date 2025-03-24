@@ -47,19 +47,25 @@ export default [
 
           {
             _name: 'CSidebarNavItem',
-            name: 'Sales Order',
+            name: 'Customer Purchase Order',
             to: '/tenants/salesOrderList',
             icon: 'cilCart'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Sales Invoice',
+            name: 'Delivery Orders',
+            to: '/tenants/deliveryOrderList',
+            icon: 'cilMoney'
+          },
+          {
+            _name: 'CSidebarNavItem',
+            name: 'Invoices',
             to: '/tenants/invoiceList',
             icon: 'cilMoney'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Sales Receipt',
+            name: 'Receipts',
             to: '/tenants/incomeReceiptList',
             icon: 'cilImageBroken'
           }, {

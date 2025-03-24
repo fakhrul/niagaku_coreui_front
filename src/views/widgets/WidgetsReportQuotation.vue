@@ -35,6 +35,12 @@
                 <strong>{{ getCustomerName() }}</strong>
               </p>
               <p v-html="formatAddress(getCustomerAddress())"></p>
+
+              <p> 
+                Attn:
+                <strong>{{ getCustomerContactPersnoName() }}</strong>
+              </p>
+
             </CCol>
             <CCol sm="6" class="text-right">
               <dl class="row">
@@ -198,6 +204,24 @@ export default {
       } catch (error) {
         return "N/A";
       }
+    },
+    getCustomerContactPersnoName()
+    {
+      try {
+        return this.quotation.customer.contactName;
+      } catch (error) {
+        return "N/A";
+      }
+
+    },
+    getCustomerContactPersnoEmail()
+    {
+      try {
+        return this.quotation.customer.contactEmail;
+      } catch (error) {
+        return "N/A";
+      }
+
     },
     getCustomerName() {
       try {
