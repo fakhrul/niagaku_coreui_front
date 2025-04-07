@@ -27,7 +27,11 @@
                   horizontal
                   v-model="obj.documentType"
                 />
-
+                <CInput
+                  label="Certificate Number"
+                  horizontal
+                  v-model="obj.certificateNumber"
+                />
                 <CInput
                   horizontal
                   label="Issued Date"
