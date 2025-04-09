@@ -76,11 +76,7 @@
                     placeholder="Select customer"
                     @input="handleCustomerSelect"
                   />
-                  <div
-                      class="text-muted small mt-1"
-                    >
-                      Custoner
-                    </div>
+                  <div class="text-muted small mt-1">Custoner</div>
                 </CCol>
                 <CCol sm="12" md="12" lg="6"
                   ><CInput
@@ -92,6 +88,21 @@
                     <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
                   </CInput></CCol
                 >
+              </CRow>
+              <CRow>
+                <CCol sm="12" md="12" lg="6"
+                  ><CInput
+                    size="lg"
+                    placeholder=""
+                    v-model="obj.contactName"
+                    description="Attention"
+                  >
+                    <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
+                  </CInput></CCol
+                >
+                <CCol sm="12" md="12" lg="6">
+                </CCol>
+               
               </CRow>
               <CRow>
                 <CCol sm="12" md="8" lg="4">
@@ -187,6 +198,11 @@
                         <CInput v-model="item.quantity" min="1"></CInput>
                       </td>
                     </template>
+                    <template #show_unit="{ item }">
+                      <td>
+                        <CInput v-model="item.unit"></CInput>
+                      </td>
+                    </template>
                     <template #show_price="{ item }">
                       <td>
                         <CInput
@@ -198,7 +214,7 @@
                     </template>
                     <template #show_total="{ item }">
                       <td>
-                        {{ getTotalItemPrice(item) }}
+                        {{ formatCurrency(getTotalItemPrice(item)) }}
                       </td>
                     </template>
                     <template #show_move="{ item, index }">
@@ -240,15 +256,44 @@
                     </template>
 
                     <template #footer>
-                      <td colspan="2">
-                        <CButton color="light" @click="addNewItem()"
-                          >Add Item</CButton
-                        >
-                      </td>
-                      <td colspan="3" class="text-right">
-                        <strong>Grand Total:</strong>
-                      </td>
-                      <td>{{ grandTotal.toFixed(2) }}</td>
+                      <tr>
+                        <td colspan="2">
+                          <CButton color="light" @click="addNewItem()"
+                            >Add Item</CButton
+                          >
+                        </td>
+                        <td colspan="4" class="text-right">
+                          <strong>Total:</strong>
+                        </td>
+                        <td>{{ formatCurrency(grandTotal) }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2"></td>
+                        <td colspan="1" class="text-right">
+                          <strong>Tax:</strong>
+                        </td>
+                        <td colspan="3">
+                          <v-select
+                            class="form-control-lg"
+                            style="width: 100%"
+                            v-model="selectedSalesTax"
+                            :label="'name'"
+                            :options="salesTaxItemsWithAddNew"
+                            placeholder="Select Tax"
+                            @input="handleSalesTaxSelect"
+                          />
+                        </td>
+                        <td>{{ formatCurrency(grandTaxOnly) }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                       
+                        </td>
+                        <td colspan="4" class="text-right">
+                          <strong>Total (with Tax):</strong>
+                        </td>
+                        <td>{{ formatCurrency(grandTotalWitTax) }}</td>
+                      </tr>
                     </template>
                   </CDataTable>
                 </CCol>
@@ -318,6 +363,32 @@
         </CRow>
       </CModal>
     </div>
+
+    <div>
+      <CModal
+        title="Add New Tax"
+        size="xl"
+        :show.sync="addSalesTaxFormPopup"
+        @update:show="onSalesTaxPopupConfirmation"
+      >
+        <CRow form>
+          <CCol>
+            <CInput
+              label="Name"
+              v-model="itemAddNewSalesTax.name"
+              placeholder="SST 8%"
+              required
+              was-validated
+            />
+            <CInput
+              label="Rate (%)"
+              v-model="itemAddNewSalesTax.rateInPercentage"
+            />
+          </CCol>
+        </CRow>
+      </CModal>
+    </div>
+
     <div>
       <CModal
         title="Add New Customer"
@@ -385,7 +456,11 @@ Malaysia"
                 Description
               </CCol>
               <CCol sm="9">
-                <CTextarea placeholder="" rows="5" v-model="itemAddNewProduct.description" />
+                <CTextarea
+                  placeholder=""
+                  rows="5"
+                  v-model="itemAddNewProduct.description"
+                />
               </CCol>
             </CRow>
           </CCol>
@@ -401,6 +476,7 @@ import "shepherd.js/dist/css/shepherd.css"; // Import Shepherd.js default style
 
 import QuotationApi from "@/lib/quotationApi";
 import CustomerApi from "@/lib/customerApi";
+import SalesTaxApi from "@/lib/salesTaxApi";
 import ProductApi from "@/lib/productApi";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
@@ -425,6 +501,9 @@ export default {
 
       itemAddNewCustomer: {},
       addCustomerFormPopup: false,
+
+      itemAddNewSalesTax: {},
+      addSalesTaxFormPopup: false,
 
       previewObj: {
         business: {
@@ -469,6 +548,11 @@ export default {
           _style: "width:100px",
         },
         {
+          key: "show_unit",
+          label: "Unit",
+          _style: "width:100px",
+        },
+        {
           key: "show_price",
           label: "Price",
           _style: "width:100px",
@@ -490,14 +574,18 @@ export default {
       selectedItem: null,
 
       selectedCustomer: null,
+      selectedSalesTax: null,
+
       organizationTypeList: [],
       infoList: [],
       obj: {},
       submitted: false,
       api: new QuotationApi(),
       customerApi: new CustomerApi(),
+      salesTaxApi: new SalesTaxApi(),
       productApi: new ProductApi(),
       customerItems: [],
+      salesTaxItems: [],
       productItems: [],
     };
   },
@@ -506,6 +594,7 @@ export default {
     this.fetchQuotationStatuses();
     self.refreshCustomer();
     self.refreshProduct();
+    self.refreshSalesTax();
     self.resetObj();
   },
   computed: {
@@ -528,6 +617,12 @@ export default {
         { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
       ];
     },
+    salesTaxItemsWithAddNew() {
+      return [
+        ...this.salesTaxItems,
+        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
+      ];
+    },
     computeExpiryDate() {
       return moment(this.expiryDate).format("YYYY-MM-DD");
     },
@@ -544,6 +639,17 @@ export default {
         };
       });
     },
+    grandTotalWitTax()
+    {
+return this.grandTotal + this.grandTaxOnly;
+    },
+    grandTaxOnly() {
+      try {
+        return this.selectedSalesTax.rateInPercentage * this.grandTotal / 100;
+      } catch (error) {
+        return 0;
+      }
+    },
     grandTotal() {
       var total = 0;
       for (var i = 0; i < this.quotationItems.length; i++) {
@@ -554,7 +660,17 @@ export default {
     },
   },
   methods: {
-    createInvoiceByItem(item) {
+    formatCurrency(amount) {
+    try {
+      return amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    } catch {
+      return amount;
+    }
+  },
+      createInvoiceByItem(item) {
       var self = this;
       self.$router.push({
         path: `/tenants/Invoice/${item.id}/convertFromItem`,
@@ -565,6 +681,24 @@ export default {
       self.$router.push({
         path: `/tenants/Invoice/${item.id}/convertFromQuot`,
       });
+    },
+
+    onSalesTaxPopupConfirmation(status, evt, accept) {
+      if (accept) {
+        this.salesTaxApi
+          .create(this.itemAddNewSalesTax)
+          .then((response) => {
+            var addedSalesTax = response.result;
+            this.refreshSalesTax();
+            this.selectedSalesTax = addedSalesTax;
+
+            // self.$router.push({ path: "/tenants/customerList" });
+          })
+          .catch(({ data }) => {
+            self.toast("Error", helper.getErrorMessage(data), "danger");
+          });
+      }
+      this.itemAddNewCustomer = {};
     },
     onCustomerPopupConfirmation(status, evt, accept) {
       if (accept) {
@@ -600,9 +734,7 @@ export default {
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
           });
-      }
-      else
-      {
+      } else {
         this.itemPendingNewProduct.product = null;
       }
       this.itemAddNewProduct = {};
@@ -629,6 +761,18 @@ export default {
     addNewCustomer() {
       this.itemAddNewCustomer = {};
       this.addCustomerFormPopup = true;
+    },
+
+    handleSalesTaxSelect(selected) {
+      if (selected.id === "add_new") {
+        // Trigger action to add a new customer
+        this.addNewSalesTax();
+        this.selectedSalesTax = null; // Reset selection
+      }
+    },
+    addNewSalesTax() {
+      this.itemAddNewSalesTax = {};
+      this.addSalesTaxFormPopup = true;
     },
 
     cancel() {
@@ -882,6 +1026,16 @@ export default {
         })
         .catch(({ data }) => {});
     },
+    refreshSalesTax() {
+      var self = this;
+      self.loading = false;
+      self.salesTaxApi
+        .getListByCurrentBusiness()
+        .then((response) => {
+          self.salesTaxItems = response.result;
+        })
+        .catch(({ data }) => {});
+    },
 
     resetObj() {
       var self = this;
@@ -894,6 +1048,7 @@ export default {
             this.issuedDate = self.obj.issuedDate;
             this.expiryDate = self.obj.dueDate;
             self.selectedCustomer = self.obj.customer;
+            self.selectedSalesTax = self.obj.salesTax;
 
             if (self.obj.items.length > 0) {
               if (self.obj.items[0].position == 0) {
@@ -985,7 +1140,9 @@ export default {
       if (self.selectedCustomer) {
         self.obj.customerId = self.selectedCustomer.id;
       }
-
+      if (self.selectedSalesTax) {
+        self.obj.salesTaxId = self.selectedSalesTax.id;
+      }
       console.log("self.obj", self.obj);
       if (!self.obj.id) {
         this.api

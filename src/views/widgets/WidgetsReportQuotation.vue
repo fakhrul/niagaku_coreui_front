@@ -36,11 +36,10 @@
               </p>
               <p v-html="formatAddress(getCustomerAddress())"></p>
 
-              <p> 
+              <p>
                 Attn:
                 <strong>{{ getCustomerContactPersnoName() }}</strong>
               </p>
-
             </CCol>
             <CCol sm="6" class="text-right">
               <dl class="row">
@@ -67,6 +66,7 @@
                 <th class="index-column">#</th>
                 <th class="item-column">Item & Description</th>
                 <th class="text-center quantity-column">Quantity</th>
+                <th class="text-center unit-column">Unit</th>
                 <th class="text-right price-column">
                   Price ({{ quotation.business.currency }})
                 </th>
@@ -85,21 +85,42 @@
                   <p v-html="formatDescription(item.description)"></p>
                 </td>
                 <td class="text-center quantity-column">{{ item.quantity }}</td>
+                <td class="text-center unit-column">{{ item.unit }}</td>
                 <td class="text-right price-column">
-                  {{ item.price.toFixed(2) }}
+                  {{ formatCurrency(item.price) }}
                 </td>
                 <td class="text-right total-column">
-                  {{ item.totalAmountPerItem.toFixed(2) }}
+                  {{ formatCurrency(item.totalAmountPerItem) }}
                 </td>
               </tr>
 
               <!-- Grand Total Row -->
               <tr>
-                <td colspan="4" class="text-right">
+                <td colspan="5" class="text-right">
                   <strong>Total</strong>
                 </td>
                 <td class="text-right">
-                  <strong>{{ grandTotal }}</strong>
+                  <strong>{{ formatCurrency(grandTotal)  }}</strong>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4" class="text-right">
+                  <strong>Tax</strong>
+                </td>
+                <td class="text-right">
+                  <strong>{{ getTaxName() }}</strong>
+                </td>
+                <td class="text-right">
+                  <strong>{{ formatCurrency(grandTaxOnly)  }}</strong>
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan="5" class="text-right">
+                  <strong>Total (with Tax)</strong>
+                </td>
+                <td class="text-right">
+                  <strong>{{ formatCurrency(grandTotalWitTax)  }}</strong>
                 </td>
               </tr>
             </tbody>
@@ -118,15 +139,10 @@
             {{ quotation.business.phone }}
           </p>
           <p>
-            Powered By 
-            <img
-            
-              src="/logo.png"
-              alt="Niaga-ku Logo"
-              class="footer-logo"
-            />  Niaga-Ku.com
+            Powered By
+            <img src="/logo.png" alt="Niaga-ku Logo" class="footer-logo" />
+            Niaga-Ku.com
           </p>
-        
         </div>
       </CCardBody>
     </CCard>
@@ -154,18 +170,45 @@ export default {
         };
       });
     },
+    grandTotalWitTax() {
+      return this.grandTotal + this.grandTaxOnly;
+    },
+    grandTaxOnly() {
+      try {
+        return (this.quotation.salesTax.rateInPercentage * this.grandTotal) / 100;
+      } catch (error) {
+        return 0;
+      }
+    },
     grandTotal() {
       return this.computedQuotationItems
         .reduce((acc, item) => {
           return acc + item.totalAmountPerItem;
         }, 0)
-        .toFixed(2);
+        ;
     },
   },
   mounted() {
     this.forceA4Size();
   },
   methods: {
+    formatCurrency(amount) {
+    try {
+      return amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    } catch {
+      return amount;
+    }
+  },
+    getTaxName() {
+      try {
+        return this.quotation.salesTax.name;
+      } catch (error) {
+        return "N/A";
+      }
+    },
     formatNote(note) {
       return note.replace(/\n/g, "<br />");
     },
@@ -205,23 +248,19 @@ export default {
         return "N/A";
       }
     },
-    getCustomerContactPersnoName()
-    {
+    getCustomerContactPersnoName() {
       try {
-        return this.quotation.customer.contactName;
+        return this.quotation.contactName;
       } catch (error) {
         return "N/A";
       }
-
     },
-    getCustomerContactPersnoEmail()
-    {
+    getCustomerContactPersnoEmail() {
       try {
         return this.quotation.customer.contactEmail;
       } catch (error) {
         return "N/A";
       }
-
     },
     getCustomerName() {
       try {
@@ -271,15 +310,9 @@ export default {
         document.body.innerHTML = originalContents;
         document.title = originalTitle; // Restore the original title
 
-        // Reattach Vue.js event listeners (important!)
         this.$nextTick(() => {
           this.$forceUpdate();
-          //window.location.reload(); // Refresh the page to reinitialize Vue bindings
-
-          // console.log(originalDate)
-          // console.log(originalSelectedDevice)
-          // this.queryDate = originalDate;
-          // this.selectedDeviceID = originalSelectedDevice.devicecID;
+         
         });
       }, 100); // Delay slightly to allow reflow
     },
@@ -288,7 +321,6 @@ export default {
 </script>
 
 <style scoped>
-
 .report-footer {
   text-align: center;
   margin-top: 20px;
@@ -307,7 +339,6 @@ export default {
   height: auto;
   filter: grayscale(100%);
 }
-
 
 .logo-image {
   max-width: 200px;
@@ -344,6 +375,10 @@ export default {
 }
 
 .quantity-column {
+  width: 85px;
+  text-align: center;
+}
+.unit-column {
   width: 85px;
   text-align: center;
 }

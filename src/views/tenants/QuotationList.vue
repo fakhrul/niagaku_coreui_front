@@ -162,6 +162,7 @@ const fields = [
   },
   { key: "quotationNumber", label: "Quotation No" },
   { key: "customerName", label: "Customer" },
+  { key: "picName", label: "PIC" },
   { key: "displayIssuedDate", label: "Issued" },
   { key: "grandTotal", label: "Amount" },
 
@@ -206,6 +207,7 @@ export default {
           displayIssuedDate: this.getDisplayDate(item.issuedDate),
 
           customerName: this.getCustomerName(item),
+          picName: this.getPicName(item),
           grandTotal: this.getGrandTotal(item),
         };
       });
@@ -215,6 +217,12 @@ export default {
   methods: {
     getDisplayDate(dt) {
       return moment(dt).format("DD/MM/YYYY");
+    },
+    getPicName(item) {
+      if (item.customer) {
+        return item.customer.contactName;
+      }
+      return "N/A";
     },
     getCustomerName(item) {
       if (item.customer) {
