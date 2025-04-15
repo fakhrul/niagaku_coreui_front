@@ -219,8 +219,8 @@ export default {
       return moment(dt).format("DD/MM/YYYY");
     },
     getPicName(item) {
-      if (item.customer) {
-        return item.customer.contactName;
+      if (item.contactName) {
+        return item.contactName;
       }
       return "N/A";
     },

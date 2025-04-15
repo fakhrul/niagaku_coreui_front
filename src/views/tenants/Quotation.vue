@@ -33,6 +33,10 @@
                   <CDropdownItem @click="onConvertToInvoice(obj)"
                     >Convert To Invoice</CDropdownItem
                   >
+                  <CDropdownItem @click="onDuplicate(obj)"
+                        >Duplicate</CDropdownItem
+                      >
+
                   <CDropdownDivider />
                   <CDropdownHeader>Change Status To:</CDropdownHeader>
                   <template v-for="status in quotationStatuses">
@@ -100,9 +104,7 @@
                     <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
                   </CInput></CCol
                 >
-                <CCol sm="12" md="12" lg="6">
-                </CCol>
-               
+                <CCol sm="12" md="12" lg="6"> </CCol>
               </CRow>
               <CRow>
                 <CCol sm="12" md="8" lg="4">
@@ -286,9 +288,7 @@
                         <td>{{ formatCurrency(grandTaxOnly) }}</td>
                       </tr>
                       <tr>
-                        <td colspan="2">
-                       
-                        </td>
+                        <td colspan="2"></td>
                         <td colspan="4" class="text-right">
                           <strong>Total (with Tax):</strong>
                         </td>
@@ -639,13 +639,12 @@ export default {
         };
       });
     },
-    grandTotalWitTax()
-    {
-return this.grandTotal + this.grandTaxOnly;
+    grandTotalWitTax() {
+      return this.grandTotal + this.grandTaxOnly;
     },
     grandTaxOnly() {
       try {
-        return this.selectedSalesTax.rateInPercentage * this.grandTotal / 100;
+        return (this.selectedSalesTax.rateInPercentage * this.grandTotal) / 100;
       } catch (error) {
         return 0;
       }
@@ -660,17 +659,24 @@ return this.grandTotal + this.grandTaxOnly;
     },
   },
   methods: {
-    formatCurrency(amount) {
-    try {
-      return amount.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+    onDuplicate(item) {
+      var self = this;
+      self.$router.push({
+        path: `/tenants/Quotation/${item.id}/duplicate`,
       });
-    } catch {
-      return amount;
-    }
-  },
-      createInvoiceByItem(item) {
+    },
+
+    formatCurrency(amount) {
+      try {
+        return amount.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      } catch {
+        return amount;
+      }
+    },
+    createInvoiceByItem(item) {
       var self = this;
       self.$router.push({
         path: `/tenants/Invoice/${item.id}/convertFromItem`,
