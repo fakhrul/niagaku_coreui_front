@@ -1083,6 +1083,7 @@ export default {
                 .then((response) => {
                   console.log(response.result);
                   self.obj.quotationNumber = response.result;
+                  console.log("self.obj.quotationNumber",self.obj.quotationNumber);
                   console.log(self.obj);
                 })
                 .catch(({ data }) => {});
