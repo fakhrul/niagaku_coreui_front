@@ -18,9 +18,7 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader>
-              <strong> Chart of Account </strong> List
-            </CCardHeader>
+            <CCardHeader> <strong> Transaction </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="items"
@@ -38,7 +36,6 @@
                     {{ index + 1 }}
                   </td>
                 </template>
-
                 <template #show_details="{ item, index }">
                   <td class="py-2">
                     <CButton
@@ -80,11 +77,8 @@
               </CDataTable>
             </CCardBody>
             <CCardFooter>
-              <CButton type="submit" color="primary" @click="addNew"
-                >Add New</CButton
-              >
-              <CButton  @click="createDefault"
-                >Default</CButton
+              <CButton type="submit" size="sm" color="primary" @click="addNew"
+                ><CIcon name="cil-check-circle" /> Add New</CButton
               >
             </CCardFooter>
           </CCard>
@@ -103,31 +97,31 @@
 </template>
 
 <script>
-import ChartOfAccountApi from "@/lib/chartOfAccountApi";
+import TransactionApi from "@/lib/transactionApi";
 
 const items = [];
-const fields = [
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  { key: "accountNo" },
-  { key: "category" },
-  { key: "name" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-];
+// const fields = [
+//   // { key: "accountNo"},
+//   {
+//     key: "show_index",
+//     label: "#",
+//     _style: "width:1%",
+//     sorter: false,
+//     filter: false,
+//   },
+//   { key: "name" },
+//   { key: "contactName" },
+//   {
+//     key: "show_details",
+//     label: "",
+//     _style: "width:2%",
+//     sorter: false,
+//     filter: false,
+//   },
+// ];
 
 export default {
-  name: "ChartOfAccountList",
+  name: "TransactionList",
   data() {
     return {
       loading: true,
@@ -135,10 +129,33 @@ export default {
         return { ...item, id };
       }),
       infoList: [],
-      fields,
+      fields:[
+  // { key: "accountNo"},
+  {
+    key: "show_index",
+    label: "#",
+    _style: "width:1%",
+    sorter: false,
+    filter: false,
+  },
+  { key: "dateDisplay" },
+  { key: "description" },
+  { key: "name" },
+  { key: "transactionType" },
+  { key: "amount" },
+  { key: "categoryDisplay" },
+  { key: "transactionMatchDisplay" },
+  {
+    key: "show_details",
+    label: "",
+    _style: "width:2%",
+    sorter: false,
+    filter: false,
+  },
+],
       details: [],
       collapseDuration: 0,
-      api: new ChartOfAccountApi(),
+      api: new TransactionApi(),
       warningModal: false,
       itemToDelete: {},
     };
@@ -148,6 +165,7 @@ export default {
     self.refreshTable();
   },
   methods: {
+    setDefault(item) {},
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -157,7 +175,7 @@ export default {
       });
     },
     toggleDetails(item, index) {
-      this.$set(item, "_toggled", !item._toggled);
+      this.$set(this.items[index], "_toggled", !item._toggled);
       this.collapseDuration = 300;
       this.$nextTick(() => {
         this.collapseDuration = 0;
@@ -170,7 +188,6 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
-          console.log(self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -180,7 +197,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/ChartOfAccount/${item.id}`,
+        path: `/tenants/Transaction/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -202,19 +219,8 @@ export default {
       self.itemToDelete = item;
       self.warningModal = true;
     },
-    createDefault()
-    {
-      this.api
-        .createDefaultData()
-        .then((response) => {
-          this.refreshTable();
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
-    },
     addNew() {
-      this.$router.push({ path: "/tenants/ChartOfAccount" });
+      this.$router.push({ path: "/tenants/Transaction" });
     },
     toast(header, message, color) {
       var self = this;

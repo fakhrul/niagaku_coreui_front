@@ -1,68 +1,63 @@
-class ChartOfAccountApi {
-    createDefaultData()
-    {
-        var url = apiUrl + 'chartAccounts/createDefaultData/';
-        return api.call('post', url)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-
-    getListByCurrentBusiness()
-    {
-        var url = apiUrl + 'chartAccounts/currentBusiness/';
+class TransactionApi {
+    
+    getTransactionMatchTypes() {
+        var url = apiUrl + 'transactions/transactionMatchTypes';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
+    }
 
+    getTransactionSourceTypes() {
+        var url = apiUrl + 'transactions/transactionSourceTypes';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    getTransactionTypes() {
+        var url = apiUrl + 'transactions/transactionTypes';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    getListByCurrentBusiness(){
+        var url = apiUrl + 'transactions/currentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    getListByCurrentTenant(){
+        var url = apiUrl + 'transactions/currentUser/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
     }
 
     getList() {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'transactions';
         return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
     }
 
-    suggestChartOfAccount(data) {
-        var url = apiUrl + 'chartAccounts/suggest-account';
-        return api.call('post', url, data)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
 
     get(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'transactions/';
         return api.call('get', url + id)
             .then(({ data }) => {
                 return data
             });
     }
-    getNext(id) {
-        var url = apiUrl + 'chartAccounts/nextTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-    
-    getPrev(id) {
-        var url = apiUrl + 'chartAccounts/prevTo/';
-        return api.call('get', url + id)
-            .then(({ data }) => {
-                return data
-            });
-
-    }
-
     create(data) {
-        var url = apiUrl + 'chartAccounts';
+        var url = apiUrl + 'transactions';
         return api.call('post', url, data)
             .then(({ data }) => {
                 return data
@@ -70,14 +65,14 @@ class ChartOfAccountApi {
 
     }
     update(data) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'transactions/';
         return api.call('put', url + data.id, data)
             .then(({ data }) => {
                 return data
             });
     }
     delete(id) {
-        var url = apiUrl + 'chartAccounts/';
+        var url = apiUrl + 'transactions/';
         return api.call('delete', url + id)
             .then(({ data }) => {
                 return data
@@ -86,4 +81,4 @@ class ChartOfAccountApi {
 
 }
 
-export default ChartOfAccountApi;
+export default TransactionApi;

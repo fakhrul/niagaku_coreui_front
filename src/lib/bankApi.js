@@ -7,7 +7,23 @@ class BankApi {
             });
     }
 
-    updateBankStatementDocuments(id, data) {
+    // addArrivalItem(id, data) {
+    //     var url = apiUrl + 'stocks/AddArrivalCheckLisItem/';
+    //     return api.call('put', url + id, data)
+    //         .then(({ data }) => {
+    //             return data
+    //         });
+    // }
+
+    updateStatement(id, data) {
+        var url = apiUrl + 'banks/updateDocuments/';
+        return api.call('put', url + id, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    addStatement(id, data) {
         var url = apiUrl + 'banks/addDocuments/';
         return api.call('put', url + id, data)
             .then(({ data }) => {

@@ -27,7 +27,7 @@
               <CRow>
                 <CCol sm="4">
                   <CSelect
-                  :value.sync="filterCriteria.rentalProductId"
+                    v-model="filterCriteria.rentalProductId"
                     :options="filterRentalProducts"
                     label="Rental Product"
                   />
@@ -48,7 +48,7 @@
                 </CCol>
                 <CCol sm="4">
                   <CSelect
-                    :value.sync="filterCriteria.cleaningIsPaid"
+                  :value.sync="filterCriteria.cleaningIsPaid"
                     :options="[
                       { value: '', label: 'All' },
                       { value: 'true', label: 'Paid' },
@@ -161,19 +161,18 @@
             <CCardHeader> Reservation Date </CCardHeader>
             <CCardBody>
               <CDataTable :items="computedItems" :fields="fields">
-                <template #show_select-header="{ item }">
-                  <CInputCheckbox
-                    :checked="isAllSelected"
-                    @change="toggleSelectAll"
-                  />
-                </template>
-
                 <template #show_select="{ item }">
                   <td class="py-2">
                     <CInputCheckbox
                       :checked="selectedReservations.includes(item.id)"
                       @change="toggleSelection(item.id)"
                     />
+
+                    <!-- <CInput
+                      type="checkbox"
+                      v-model="selectedReservations"
+                      :value="item.id"
+                    /> -->
                   </td>
                 </template>
 
@@ -241,9 +240,6 @@
                   </CButton>
                   <CButton color="primary" @click="exportTableAsImage"
                     >Export as Image</CButton
-                  >
-                  <CButton color="primary" @click="importFromICal"
-                    >Import (ICAL)</CButton
                   >
                   <!-- <CButton
                     color="danger"
@@ -476,83 +472,6 @@
           </CButton>
         </template>
       </CModal>
-
-      <CModal
-        title="Import From ICAL"
-        size="lg"
-        :show.sync="importFromICalPopup"
-        :no-close-on-backdrop="true"
-      >
-        <CForm>
-          <CRow form class="form-group">
-            <CCol tag="label" sm="3" class="col-form-label">
-              Upload ICAL File
-            </CCol>
-            <CCol sm="9">
-              <input
-              ref="icalFileInput" 
-                type="file"
-                accept=".ics"
-                @change="handleICalUpload"
-                class="form-control mb-3"
-              />
-            </CCol>
-          </CRow>
-
-          <CSelect
-            :value.sync="selectedIcalRentalProductId"
-            :options="rentalProducts"
-            label="Rental Product"
-            horizontal
-          />
-          <CDataTable
-            :items="icalCalendarEvents"
-            :fields="icalCalendarEventFields"
-            items-per-page-select
-            :items-per-page="itemsPerPage"
-            hover
-            striped
-            small
-            bordered
-            pagination
-            @page-change="onPageChange"
-          >
-            <template #show_select-header="{ item }">
-              <CInputCheckbox
-                :checked="isIcalAllSelected"
-                @change="toggleIcalSelectAll"
-              />
-            </template>
-
-            <template #show_select="{ item }">
-              <td class="py-2">
-                <CInputCheckbox
-                  :checked="selectedIcalItems.includes(item.id)"
-                  @change="toggleSelectionICalItem(item.id)"
-                />
-              </td>
-            </template>
-          </CDataTable>
-        </CForm>
-
-        <!-- Modal Footer -->
-        <template #footer>
-          <CButton color="secondary" @click="importFromICalPopup = false">
-            Cancel
-          </CButton>
-          <CButton color="primary" @click="saveIcalEvent">
-            Save Changes
-          </CButton>
-        </template>
-      </CModal>
-      <CModal
-            title="Confirm Delete"
-            color="warning"
-            :show.sync="warningModal"
-            @update:show="onDeleteConfirmation"
-          >
-            Are you sure you want to delete this {{ itemToDelete.customerName }} ?
-          </CModal>
     </div>
   </div>
 </template>
@@ -610,20 +529,6 @@ export default {
     );
 
     return {
-      icalCalendarEventFields: [
-        {
-          key: "show_select",
-          label: "",
-          _style: "width:1%",
-          sorter: false,
-          filter: false,
-        },
-        "customerName",
-        "startDate",
-        "endDate",
-      ],
-      icalCalendarEvents: [], // Store parsed events here
-      importFromICalPopup: false, // Controls the modal visibility
       batchEditPopup: false, // Controls the modal visibility
       batchEditData: {
         editCleaningIsPaid: false,
@@ -636,10 +541,6 @@ export default {
         editLaundryCost: false,
         laundryCost: 0, // Default value
       },
-      selectedIcalItems: [],
-      currentPage: 1,
-      itemsPerPage: 10,
-
       selectedReservations: [],
       filterCriteria: {
         rentalProductId: "",
@@ -649,7 +550,6 @@ export default {
         cleaningIsPaid: "", // ✅ New filter for cleaning payment status
         minDaysFilter: false, // false = exact match, true = minimum days filter
       },
-      selectedIcalRentalProductId: "",
       fields: [
         {
           key: "show_select",
@@ -711,8 +611,6 @@ export default {
       // useHolidayTheme: true,
       api: new RentalReservationApi(),
       rentalProductApi: new RentalProductApi(),
-      warningModal: false,
-      itemToDelete: {},
     };
   },
   mounted() {
@@ -724,24 +622,6 @@ export default {
     // console.log("CalendarView.props", CalendarView.props);
   },
   computed: {
-    visibleIcalItems() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      return this.icalCalendarEvents.slice(start, start + this.itemsPerPage);
-    },
-    isIcalAllSelected() {
-      return (
-        this.visibleIcalItems.length > 0 &&
-        this.visibleIcalItems.every((item) =>
-          this.selectedIcalItems.includes(item.id)
-        )
-      );
-    },
-    isAllSelected() {
-      if (this.selectedReservations.length === 0) {
-        return false; // No items selected
-      }
-      return this.computedItems.length === this.selectedReservations.length;
-    },
     totalDays() {
       return this.computedItems.reduce((sum, item) => {
         return sum + (item.totalDays || 0);
@@ -792,95 +672,6 @@ export default {
     },
   },
   methods: {
-    onDeleteConfirmation(status, evt, accept) {
-      var self = this;
-      if (accept) {
-        this.api
-          .delete(self.itemToDelete.id)
-          .then((response) => {
-            self.refreshTable();
-          })
-          .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
-          });
-      }
-      self.itemToDelete = {};
-    },
-    showDeleteConfirmation(item) {
-      var self = this;
-      self.itemToDelete = item;
-      self.warningModal = true;
-    },
-    onPageChange(page) {
-      this.currentPage = page;
-    },
-    async handleICalUpload(event) {
-      this.icalCalendarEvents = [];
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const text = await file.text();
-      this.parseICal(text);
-    },
-    parseICal(icalText) {
-  const events = [];
-  const eventBlocks = icalText.split("BEGIN:VEVENT").slice(1);
-
-  eventBlocks.forEach((block) => {
-    const summaryMatch = block.match(/SUMMARY:(.*)/);
-    const startMatch = block.match(/DTSTART(?:;[^:]+)?:([^\n\r]+)/);
-    const endMatch = block.match(/DTEND(?:;[^:]+)?:([^\n\r]+)/);
-    const uidMatch = block.match(/UID:([^\n\r]+)/); // Extract UID for unique ID
-
-    // Function to detect if VALUE=DATE is present (means all-day event)
-    const isAllDay = (field) => field && field.includes("VALUE=DATE");
-
-    // Function to convert date string to Date object
-    const formatDate = (dateStr) => {
-      if (!dateStr) return null;
-      const year = dateStr.substr(0, 4);
-      const month = dateStr.substr(4, 2);
-      const day = dateStr.substr(6, 2);
-      return new Date(`${year}-${month}-${day}T00:00:00Z`);
-    };
-
-    const isAllDayStart = block.includes("DTSTART;VALUE=DATE");
-    const isAllDayEnd = block.includes("DTEND;VALUE=DATE");
-
-    let startDate = startMatch ? formatDate(startMatch[1].trim()) : null;
-    let endDate = endMatch ? formatDate(endMatch[1].trim()) : null;
-
-    // If all-day event, DTEND is exclusive → minus 1 day
-    if (isAllDayEnd && endDate) {
-      endDate.setDate(endDate.getDate() - 1);
-    }
-
-    events.push({
-      id: uidMatch ? uidMatch[1].trim() : "", // Use UID as id
-      customerName: summaryMatch ? summaryMatch[1].trim() : "",
-      startDate: startDate,
-      endDate: endDate,
-    });
-  });
-
-  // Sort events by start date ascending (oldest first)
-  // this.icalCalendarEvents = events.sort((a, b) => {
-  //   return new Date(a.startDate) - new Date(b.startDate);
-  // });
-  this.icalCalendarEvents = events.sort((a, b) => {
-    return new Date(b.startDate) - new Date(a.startDate);
-  });
-},
-    importFromICal() {
-      this.selectedIcalItems = []; // Reset selected items
-      this.icalCalendarEvents = []; // Reset events
-      // Clear the file input
-  if (this.$refs.icalFileInput) {
-    this.$refs.icalFileInput.value = '';
-  }
-
-      this.importFromICalPopup = true;
-    },
     exportTableAsImage() {
       // const tableElement = document.querySelector(".c-data-table"); // Adjust the selector if needed
       const tableElement = document.querySelector("table"); // Adjust selector
@@ -898,57 +689,6 @@ export default {
         link.download = "Rental_Reservations.png"; // Set the file name
         link.click();
       });
-    },
-
-    saveIcalEvent() {
-      if (this.selectedIcalItems.length === 0) {
-        this.toast(
-          "Error",
-          "Please select at least one event to save.",
-          "danger"
-        );
-        return;
-      }
-
-      const selectedEvents = this.icalCalendarEvents.filter((event) =>
-        this.selectedIcalItems.includes(event.id)
-      );
-
-      // 2) map to plain-object DTOs
-      const payload = selectedEvents.map((ev) => ({
-        rentalProductId: this.selectedIcalRentalProductId, // must not be ""
-        customerName: ev.customerName, // or whatever field your API needs
-        startDate: ev.startDate instanceof Date ? ev.startDate.toISOString() : ev.startDate, // convert Date→string
-        endDate: ev.endDate instanceof Date ? ev.endDate.toISOString() : ev.endDate, // convert Date→string
-      }));
-
-      console.log("Batch payload:", payload);
-
-      // let newICallEvents = selectedEvents.map((item) => {
-      //   delete item.id; // Remove the id property
-      //   return {
-      //     ...item,
-      //     rentalProductId: this.selectedIcalRentalProductId,
-      //   };
-      // });
-
-      // console.log("Selected ICAL Events to save:", newICallEvents);
-
-      this.api
-        .addBatch(payload)
-        .then((response) => {
-          this.refreshTable();
-          // this.deselectAll();
-          this.infoList.push({
-            header: "Success",
-            message: "Reservation update",
-            color: "success",
-          });
-          // this.batchEditPopup = false;
-        })
-        .catch(({ data }) => {
-          self.toast("Error", helper.getErrorMessage(data), "danger");
-        });
     },
 
     saveBatchEdit() {
@@ -1025,35 +765,6 @@ export default {
 
       this.batchEditPopup = true; // Show modal
     },
-    toggleSelectionICalItem(id) {
-      const index = this.selectedIcalItems.indexOf(id);
-      if (index === -1) {
-        // Add to selection
-        this.selectedIcalItems.push(id);
-      } else {
-        // Remove from selection
-        this.selectedIcalItems.splice(index, 1);
-      }
-
-      console.log("this.selectedIcalItems", this.selectedIcalItems);
-    },
-    toggleIcalSelectAll() {
-      const visibleIds = this.visibleIcalItems.map((i) => i.id);
-      if (this.isIcalAllSelected) {
-        // deselect them
-        this.selectedIcalItems = this.selectedIcalItems.filter(
-          (id) => !visibleIds.includes(id)
-        );
-      } else {
-        // add any missing IDs
-        this.selectedIcalItems = Array.from(
-          new Set([...this.selectedIcalItems, ...visibleIds])
-        );
-      }
-    },
-    updateICalCurrentPageItems(newPageItems) {
-      this.currentIcalPageItems = newPageItems;
-    },
     toggleSelection(id) {
       const index = this.selectedReservations.indexOf(id);
       if (index === -1) {
@@ -1068,16 +779,6 @@ export default {
     deselectAll() {
       this.selectedReservations = [];
       console.log("Deselected all reservations");
-    },
-    toggleSelectAll() {
-      console.log("toggleSelectAll", this.isAllSelected);
-      if (this.isAllSelected) {
-        this.selectedReservations = []; // Deselect all items
-      } else {
-        this.$nextTick(() => {
-          this.selectedReservations = this.computedItems.map((item) => item.id);
-        });
-      }
     },
     selectAllFiltered() {
       this.selectedReservations = []; // Reset first to force reactivity
@@ -1280,6 +981,7 @@ export default {
     refreshTable() {
       var self = this;
       self.loading = true;
+      // console.log("refreshTable");
 
       const params = {
         rentalProductId: this.filterCriteria.rentalProductId,
@@ -1290,7 +992,7 @@ export default {
         minDaysFilter: this.filterCriteria.minDaysFilter,
       };
 
-      console.log("refreshTable", params);
+      console.log("params", params);
       self.api
         .getList(params)
         .then((response) => {
@@ -1321,11 +1023,51 @@ export default {
         });
     },
 
+    // saveReservation() {
+    //   if (!this.selectedProductId) {
+    //     alert("Please select a rental product");
+    //     return;
+    //   }
+
+    //   try {
+    //     const data = {
+    //       rentalProductId: this.selectedProductId,
+    //       startDateTime: this.availability.startDate,
+    //       endDateTime: this.availability.endDate,
+    //       price: this.availability.price,
+    //       status: this.availability.status,
+    //     };
+    //     console.log("data", data);
+    //     this.api
+    //       .create(data)
+    //       .then((response) => {
+    //         self.obj = response.result;
+
+    //         this.refreshTable();
+    //         this.infoList.push({
+    //           header: "Success",
+    //           message: "Reservation saved",
+    //           color: "success",
+    //         });
+    //       })
+    //       .catch(({ data }) => {
+    //         self.toast("Error", helper.getErrorMessage(data), "danger");
+    //       });
+    //   } catch (error) {
+    //     console.error("Failed to save availability", error);
+    //     this.infoList.push({
+    //       header: "Error",
+    //       message: "Failed to save",
+    //       color: "danger",
+    //     });
+    //   }
+    // },
     loadRentalProducts() {
       this.rentalProductApi
         .getListByCurrentBusiness()
         .then((response) => {
-          // console.log("rentalProducts", response.result);
+
+          // console.log("rentalProducts", response.result); 
 
           this.filterRentalProducts = [
             { value: "", label: "ALL" }, // Add default option
@@ -1345,8 +1087,7 @@ export default {
           }));
           console.log("this.rentalProducts", this.rentalProducts);
 
-          this.selectedIcalRentalProductId = this.rentalProducts[0].value;
-          // this.selectedProductId = "";
+          this.selectedProductId = "";
         })
         .catch(({ data }) => {
           this.toast("Error", helper.getErrorMessage(data), "danger");
@@ -1354,36 +1095,36 @@ export default {
         });
     },
     getNameAndColor(item) {
-      return this.getColorText(item.colorName) + " " + item.name;
+      return this.getColorText(item.colorName) +" " +  item.name;
     },
     getColorText(colorName) {
-      switch (colorName) {
-        case "Red":
-          return "🔴";
-        case "Blue":
-          return "🔵";
-        case "Green":
-          return "🟢";
-        case "Yellow":
-          return "🟡";
-        case "Purple":
-          return "🟣";
-        case "Black":
-          return "⚫";
-        case "White":
-          return "⚪";
-        case "Orange":
-          return "🟠";
-        case "Brown":
-          return "🟤";
-        case "Cyan":
-          return "🟦";
-        case "Amber":
-          return "🟨";
-        default:
-          return "⬛"; // Default for unknown colors
-      }
-    },
+  switch (colorName) {
+    case "Red":
+      return "🔴";
+    case "Blue":
+      return "🔵";
+    case "Green":
+      return "🟢";
+    case "Yellow":
+      return "🟡";
+    case "Purple":
+      return "🟣";
+    case "Black":
+      return "⚫";
+    case "White":
+      return "⚪";
+    case "Orange":
+      return "🟠";
+    case "Brown":
+      return "🟤";
+    case "Cyan":
+      return "🟦";
+    case "Amber":
+      return "🟨";
+    default:
+      return "⬛"; // Default for unknown colors
+  }
+},
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -1536,12 +1277,14 @@ export default {
   background-color: #ff5733;
   border-color: lighten(#ff5733, 5%);
   color: white !important;
+
 }
 
 .theme-default .cv-event.blue {
   background-color: #007bff;
   border-color: lighten(#007bff, 5%);
   color: white !important;
+
 }
 
 .theme-default .cv-event.green {
@@ -1563,6 +1306,7 @@ export default {
 .theme-default .cv-event.black {
   background-color: #343a40;
   border-color: lighten(#343a40, 5%);
+
 }
 
 .theme-default .cv-event.white {
@@ -1624,6 +1368,7 @@ export default {
 .theme-default .cv-day.draghover {
   box-shadow: inset 0 0 0.2em 0.2em #321fdb;
 }
+
 
 // .cv-header-day:first-child {
 //   order: 6; /* Move Sunday to the last position */

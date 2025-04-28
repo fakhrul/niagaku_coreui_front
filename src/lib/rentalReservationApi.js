@@ -98,6 +98,15 @@ class RentalReservationApi {
             });
 
     }
+    addBatch(data) {
+        console.log('addBatch', data)
+        var url = apiUrl + 'rentalreservations/addBatch/';
+        return api.call('post', url, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     updateBatch(data) {
         var url = apiUrl + 'rentalreservations/batch/';
         return api.call('put', url, data)

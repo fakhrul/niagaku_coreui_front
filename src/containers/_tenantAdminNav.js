@@ -173,7 +173,7 @@ export default [
           {
             _name: 'CSidebarNavItem',
             name: 'Transactions',
-            to: '/tenants/expenseList',
+            to: '/tenants/transactionList',
             icon: 'cilListRich',
             badge: {
               color: 'danger',
