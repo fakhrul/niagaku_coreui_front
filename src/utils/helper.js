@@ -1,8 +1,13 @@
 
+import moment from "moment";
+
 class Helper {
     constructor() {
 
     }
+    getDisplayDate(dt) {
+        return moment(dt).format("DD/MM/YYYY");
+      }
 
     removeObjFromArray(array, obj) {
         let loc = this.getArrayIndexByValue(array, obj);

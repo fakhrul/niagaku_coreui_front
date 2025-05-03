@@ -18,7 +18,22 @@
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader> <strong> Product </strong> List </CCardHeader>
+            <CCardHeader>
+              <strong> JournalEntry </strong>
+              <div class="card-header-actions">
+                <CDropdown
+                  placement="bottom-end"
+                  toggler-text="More Action"
+                  color="light"
+                  class="m-2 d-inline-block tour-cdropdown"
+                  size="sm"
+                >
+                  <CDropdownItem @click="importFromBankStatement()"
+                    >Import from Bank Statement</CDropdownItem
+                  >
+                </CDropdown>
+              </div>
+            </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -55,6 +70,45 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
+                      <CDataTable 
+                      :items="item.items" 
+                      :fields="journalFields"
+                      border
+                      small
+                      hover
+          striped
+          bordered
+
+                      >
+                        <template #show_index="{ index }">
+                          <td class="py-2">
+                            {{ index + 1 }}
+                          </td>
+                        </template>
+                        <template #show_chartaccount="{ item }">
+                          <td class="py-2">
+{{ item.chartAccount.itemDisplay }}
+                          </td>
+                        </template>
+
+                        <!-- <template #footer>
+                      <tr>
+                        <td colspan="2">
+                          <CButton color="light" @click="addNewItem()"
+                            >Add Item</CButton
+                          >
+                        </td>
+                        <td>Total</td>
+                        <td>
+                          {{ formatCurrency(totalDebit) }}
+                        </td>
+                        <td>
+                          {{ formatCurrency(totalCredit) }}
+                        </td>
+                      </tr>
+                    </template> -->
+                      </CDataTable>
+
                       <CButton
                         size="sm"
                         color="info"
@@ -92,88 +146,111 @@
           </CModal>
         </CCol>
       </CRow>
-      <WidgetEditProductModal
-        :show.sync="showProductModal"
-        :obj="selectedProduct"
-        @save="handleProductSave"
-        @error="handleProductError"
-      />
     </div>
+   
+
+    
   </div>
 </template>
 
 <script>
-import ProductApi from "@/lib/productApi";
-import WidgetEditProductModal from "../widgets/WidgetEditProductModal.vue";
-
-const items = [];
-const fields = [
-  // { key: "accountNo"},
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  { key: "name" },
-  { key: "description" },
-  { key: "chartOfAccountName" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:2%",
-    sorter: false,
-    filter: false,
-  },
-];
+import JournalEntryApi from "@/lib/journalEntryApi";
 
 export default {
-  name: "ProductList",
-  components: {
-    WidgetEditProductModal,
-  },
+  name: "JournalEntryList",
   data() {
     return {
-      showProductModal: false,
-      selectedProduct: {}, // Empty = new product. Can pre-fill if editing
-  
+      journalFields: [
+        // {key: "id"},
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        {
+          key: "description",
+          label: "Description",
+        },
+        {
+          key: "show_chartaccount",
+          label: "Account",
+        },
+
+        {
+          key: "debit",
+          label: "Debit",
+          _style: "width:100px",
+        },
+        {
+          key: "credit",
+          label: "Credit",
+          _style: "width:100px",
+        },
+
+       
+      ],
+
+      currentPage: 1,
+      itemsPerPage: 10,
       loading: true,
-      items: items.map((item, id) => {
-        return { ...item, id };
-      }),
+      items: [],
       infoList: [],
-      fields,
+      fields: [
+        // { key: "accountNo"},
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        { key: "dateDisplay", label: "Date" },
+        { key: "description" },
+        // { key: "accountDisplay", label: "Account" },
+        { key: "totalDebit" },
+        { key: "totalCredit" },
+        // { key: "remarks" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:2%",
+          sorter: false,
+          filter: false,
+        },
+      ],
       details: [],
       collapseDuration: 0,
-      api: new ProductApi(),
+      api: new JournalEntryApi(),
       warningModal: false,
       itemToDelete: {},
     };
-  },
-  mounted() {
-    var self = this;
-    self.refreshTable();
   },
   computed: {
     computedItems() {
       return this.items.map((item) => {
         return {
           ...item,
-          chartOfAccountName: this.getChartOfAccountName(item),
+          dateDisplay: helper.getDisplayDate(item.date),
+          // accountDisplay: this.getChartAccountInfo(item),
         };
       });
     },
   },
-
+  mounted() {
+    var self = this;
+    self.refreshTable();
+  },
   methods: {
-    getChartOfAccountName(item) {
+    getChartAccountInfo(item) {
       try {
-        return item.chartAccount.name;
+        return item.chartAccount.itemDisplay;
       } catch (error) {
-        return "N/A";
+        return "";
       }
     },
+
     toast(header, message, color) {
       var self = this;
       self.infoList.push({
@@ -196,6 +273,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
+          console.log("items", self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -203,12 +281,10 @@ export default {
         });
     },
     onEdit(item) {
-      this.selectedProduct = item;
-      this.showProductModal = true
-      // var self = this;
-      // self.$router.push({
-      //   path: `/tenants/Product/${item.id}`,
-      // });
+      var self = this;
+      self.$router.push({
+        path: `/tenants/JournalEntry/${item.id}`,
+      });
     },
     onDeleteConfirmation(status, evt, accept) {
       var self = this;
@@ -230,18 +306,8 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.showProductModal = true
-      // this.$router.push({ path: "/tenants/Product" });
+      this.$router.push({ path: "/tenants/JournalEntry" });
     },
-    handleProductSave(newProduct) {
-      this.showProductModal = false;
-      this.toast("Success", "Added", "success");
-      this.refreshTable();
-    },
-    handleProductError(message) {
-      this.toast("Error", message || "Error saving product.", "danger");
-    },
-
     toast(header, message, color) {
       var self = this;
       self.infoList.push({

@@ -83,9 +83,7 @@
               <CButton type="submit" color="primary" @click="addNew"
                 >Add New</CButton
               >
-              <CButton  @click="createDefault"
-                >Default</CButton
-              >
+              <CButton @click="createDefault">Default</CButton>
             </CCardFooter>
           </CCard>
           <CModal
@@ -105,37 +103,33 @@
 <script>
 import ChartOfAccountApi from "@/lib/chartOfAccountApi";
 
-const items = [];
-const fields = [
-  {
-    key: "show_index",
-    label: "#",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-  { key: "accountNo" },
-  { key: "category" },
-  { key: "name" },
-  {
-    key: "show_details",
-    label: "",
-    _style: "width:1%",
-    sorter: false,
-    filter: false,
-  },
-];
-
 export default {
   name: "ChartOfAccountList",
   data() {
     return {
+      items: [],
+      fields: [
+        {
+          key: "show_index",
+          label: "#",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+        { key: "accountTypeDescription" },
+        { key: "accountNo" },
+        { key: "category" },
+        { key: "name" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+      ],
       loading: true,
-      items: items.map((item, id) => {
-        return { ...item, id };
-      }),
       infoList: [],
-      fields,
       details: [],
       collapseDuration: 0,
       api: new ChartOfAccountApi(),
@@ -170,7 +164,7 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.items = response.result;
-          console.log(self.items);
+          console.log("self.items", self.items);
           self.loading = false;
         })
         .catch(({ data }) => {
@@ -202,8 +196,7 @@ export default {
       self.itemToDelete = item;
       self.warningModal = true;
     },
-    createDefault()
-    {
+    createDefault() {
       this.api
         .createDefaultData()
         .then((response) => {

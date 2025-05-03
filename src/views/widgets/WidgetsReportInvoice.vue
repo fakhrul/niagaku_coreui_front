@@ -1,6 +1,6 @@
 <template>
   <div ref="pdfContent" class="pdf-content">
-    <CCard >
+    <CCard>
       <CCardHeader class="no-print">
         <div class="float-right no-print">
           <a href="#" class="btn btn-sm btn-info ml-1" @click="printContent">
@@ -27,21 +27,6 @@
           </CCol>
         </CRow>
 
-        <!-- <CRow class="justify-content-between align-items-center">
-          <CCol xs="4" sm="3" md="2">
-            <img
-              :src="getImageUrl()"
-              alt="Logo Syarikat"
-              class="img-fluid logo-image"
-            />
-          </CCol>
-          <CCol>
-            <h1>{{ invoice.business.name }}</h1>
-            <p>{{ "(" + invoice.business.regNo + ")" }}</p>
-            <p v-html="formatAddress(invoice.business.address)"></p>
-            <p>Tel: {{ invoice.business.phone }}</p>
-          </CCol>
-        </CRow> -->
         <hr class="thick-hr" />
         <div class="invoice-details">
           <CRow>
@@ -69,9 +54,9 @@
           </CRow>
         </div>
         <div class="table-wrapper">
-        <table class="table table-striped">
-          <thead>
-            <tr>
+          <table class="table table-striped">
+            <thead>
+              <tr>
                 <th class="index-column">#</th>
                 <th class="item-column">Item & Description</th>
                 <th class="text-center quantity-column">Quantity</th>
@@ -82,10 +67,10 @@
                   Total ({{ invoice.business.currency }})
                 </th>
               </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in computedInvoiceItems" :key="item.name">
-              <td class="index-column">{{ item.position }}</td>
+            </thead>
+            <tbody>
+              <tr v-for="item in computedInvoiceItems" :key="item.name">
+                <td class="index-column">{{ item.position }}</td>
                 <td class="item-column">
                   <p>
                     <strong>{{ item.product.name }}</strong>
@@ -94,30 +79,30 @@
                 </td>
                 <td class="text-center quantity-column">{{ item.quantity }}</td>
                 <td class="text-right price-column">
-                  {{ item.price.toFixed(2) }}
+                  {{ formatCurrency(item.price) }}
                 </td>
                 <td class="text-right total-column">
-                  {{ item.totalAmountPerItem.toFixed(2) }}
+                  {{ formatCurrency(item.totalAmountPerItem) }}
                 </td>
-            </tr>
+              </tr>
 
-            <!-- <tr>
+              <!-- <tr>
               <td><strong>Total Amount Due</strong></td>
               <td>
                 <strong>{{ getTotalAmountDue() }}</strong>
               </td>
             </tr> -->
 
-            <!-- Grand Total Row -->
-            <tr>
-              <td colspan="4" class="text-right">
-                <strong>Total</strong>
-              </td>
-              <td class="text-right">
-                <strong>{{ grandTotal }}</strong>
-              </td>
-            </tr>
-            <!-- <tr>
+              <!-- Grand Total Row -->
+              <tr>
+                <td colspan="4" class="text-right">
+                  <strong>Total</strong>
+                </td>
+                <td class="text-right">
+                  <strong>{{ formatCurrency(grandTotal) }}</strong>
+                </td>
+              </tr>
+              <!-- <tr>
               <td>
                 <strong>Total Amount </strong>
                 {{ stock.sale.loan.bank.name }}
@@ -126,9 +111,9 @@
                 <strong>{{ getNetAmountDue() }}</strong>
               </td>
             </tr>  -->
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
         <!-- Terms and Conditions Section -->
         <div v-if="invoice.note" class="terms-and-conditions mt-4">
           <p><strong>Terms and Conditions</strong></p>
@@ -141,17 +126,11 @@
             {{ invoice.business.phone }}
           </p>
           <p>
-            Powered By 
-            <img
-            
-              src="/logo.png"
-              alt="Niaga-ku Logo"
-              class="footer-logo"
-            />  Niaga-Ku.com
+            Powered By
+            <img src="/logo.png" alt="Niaga-ku Logo" class="footer-logo" />
+            Niaga-Ku.com
           </p>
-        
         </div>
-      
       </CCardBody>
     </CCard>
   </div>
@@ -189,6 +168,16 @@ export default {
     },
   },
   methods: {
+    formatCurrency(amount) {
+      try {
+        return amount.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      } catch {
+        return amount;
+      }
+    },
     formatNote(note) {
       return note.replace(/\n/g, "<br />");
     },
@@ -206,7 +195,6 @@ export default {
         })
         .join(""); //join into single html string and pass to <p>
     },
-
 
     getTotalItemPrice(item) {
       try {
@@ -319,6 +307,10 @@ export default {
       return url;
     },
     getImageUrl() {
+      if (!this.invoice || !this.invoice.business || !this.invoice.business.logoUrl) {
+    return ""; // or return a default placeholder image URL
+  }
+
       var url =
         this.removeTrailingSlash(apiUrl) + this.invoice.business.logoUrl;
       return url;
@@ -339,9 +331,7 @@ export default {
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
         document.title =
-          this.invoice.business.shortName +
-          "_" +
-          this.invoice.invoiceNumber; // Set the desired filename
+          this.invoice.business.shortName + "_" + this.invoice.invoiceNumber; // Set the desired filename
 
         const printContents = this.$refs.pdfContent.innerHTML;
         const originalContents = document.body.innerHTML;
@@ -367,7 +357,6 @@ export default {
 };
 </script>
 <style scoped>
-
 .report-footer {
   text-align: center;
   margin-top: 20px;
@@ -386,7 +375,6 @@ export default {
   height: auto;
   filter: grayscale(100%);
 }
-
 
 .logo-image {
   max-width: 200px;

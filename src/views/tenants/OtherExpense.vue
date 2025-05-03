@@ -35,7 +35,7 @@
                   >
                   <CDropdownDivider />
                   <CDropdownHeader>Change Status To:</CDropdownHeader>
-                  <template v-for="status in expenseStatuses">
+                  <template v-for="status in computedExpenseStatuses">
                     <CDropdownItem @click="changeState(status)">{{
                       status.name
                     }}</CDropdownItem>
@@ -108,7 +108,7 @@
                   </CCol>
                 </CRow> -->
                 <CInput label="Total Amount" v-model="obj.totalAmount" />
-                <CRow form class="form-group">
+                <!-- <CRow form class="form-group">
                   <CCol tag="label" sm="3" class="col-form-label">
                     Is Paid?
                   </CCol>
@@ -129,7 +129,7 @@
                       Only can change when status is <strong>Approve</strong>.
                     </div>
                   </CCol>
-                </CRow>
+                </CRow> -->
                 <CInput
                   label="Date"
                   type="date"
@@ -414,6 +414,41 @@ Malaysia"
           </CCol>
         </CRow>
       </CModal>
+      <CModal
+        title="Select Chart of Account"
+        size="lg"
+        :show.sync="chooseAccountPopup"
+        @update:show="onAccountPopupConfirmation"
+      >
+        <CRow form>
+          <CCol md="12">
+            <CFormGroup>
+              <template #input>
+                <v-select
+                  style="width: 100%"
+                  v-model="selectedChartAccount"
+                  :label="`itemDisplay`"
+                  :options="filteredChartAccounts"
+                  placeholder="Select COA"
+                />
+              </template>
+            </CFormGroup>
+          </CCol>
+        </CRow>
+
+        <template #footer>
+          <CButton color="secondary" @click="chooseAccountPopup = false"
+            >Cancel</CButton
+          >
+          <CButton
+            color="primary"
+            :disabled="!selectedChartAccount"
+            @click="confirmAccountSelection"
+          >
+            Confirm
+          </CButton>
+        </template>
+      </CModal>
     </div>
   </div>
 </template>
@@ -438,6 +473,12 @@ export default {
   },
   data: () => {
     return {
+      chooseAccountPopup: false,
+      selectedChartAccount: null,
+      pendingStatusChange: null,
+      filteredChartAccounts: [],
+      // chartOfAccountItems: [],
+
       expenseStatuses: [],
       itemAddNewVendor: {},
       addVendorFormPopup: false,
@@ -485,6 +526,20 @@ export default {
     );
   },
   computed: {
+    computedExpenseStatuses() {
+      let statuses = this.expenseStatuses.filter(
+        (status) => status.name != this.obj.expenseStateDescription
+      );
+
+      if (this.obj.expenseStateDescription === "Draft")
+        return statuses.filter((status) => status.name == "Approve");
+      if (this.obj.expenseStateDescription === "Approve")
+        return statuses.filter(
+          (status) => status.name == "Paid" || status.name == "Cancelled"
+        );
+      else return [];
+    },
+
     vendorItemsWithAddNew() {
       return [
         ...this.vendorItems,
@@ -521,20 +576,98 @@ export default {
         path: `/tenants/Vendor/${this.selectedVendor.id}`,
       });
     },
+    // changeState(item) {
+    //   var self = this;
+    //   self.obj.expenseState = item.id;
+    //   if (self.obj.id) {
+    //     this.api
+    //       .updateState(self.obj)
+    //       .then((response) => {
+    //         self.resetObj();
+    //       })
+    //       .catch(({ data }) => {
+    //         self.toast("Error", helper.getErrorMessage(data), "danger");
+    //       });
+    //   }
+    // },
     changeState(item) {
+      this.pendingStatusChange = item;
+      this.selectedChartAccount = null; // Reset selected chart account
+      if (item.name === "Approve") {
+        this.filteredChartAccounts = this.chartOfAccountItems.filter(
+          (a) => a.accountTypeDescription === "Expense"
+        );
+
+        // 🔍 Check historical expense data for this vendor
+        this.api
+          .getRecommendedChartAccount(this.obj.vendorId, item.name)
+          .then((response) => {
+            const recommended = this.filteredChartAccounts.find(
+              (a) => a.id === response.result
+            );
+            if (recommended) {
+              this.selectedChartAccount = recommended;
+            }
+          })
+          .finally(() => {
+            this.chooseAccountPopup = true;
+          });
+
+        // this.chooseAccountPopup = true;
+      } else if (item.name === "Paid") {
+        this.filteredChartAccounts = this.chartOfAccountItems.filter(
+          (a) => a.accountTypeDescription === "Asset"
+        );
+        // 🔍 Check historical expense data for this vendor
+        this.api
+          .getRecommendedChartAccount(this.obj.vendorId, item.name)
+          .then((response) => {
+            const recommended = this.filteredChartAccounts.find(
+              (a) => a.id === response.result
+            );
+            if (recommended) {
+              this.selectedChartAccount = recommended;
+            }
+          })
+          .finally(() => {
+            this.chooseAccountPopup = true;
+          });
+        // this.chooseAccountPopup = true;
+      } else {
+        this.proceedChangeState(null); // Auto for Approve, etc.
+      }
+    },
+    onAccountPopupConfirmation(visible) {
+      this.chooseAccountPopup = visible;
+    },
+
+    confirmAccountSelection() {
+      this.proceedChangeState(this.selectedChartAccount);
+      this.selectedChartAccountId = null;
+    },
+
+    proceedChangeState(account) {
       var self = this;
-      self.obj.expenseState = item.id;
+      self.obj.expenseState = self.pendingStatusChange.id;
+      let accountId = null;
+      if (account != null) accountId = account.id;
+
       if (self.obj.id) {
         this.api
-          .updateState(self.obj)
+          .updateState(self.obj, accountId)
           .then((response) => {
             self.resetObj();
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
+          })
+          .finally(() => {
+            this.chooseAccountPopup = false;
+            this.pendingStatusChange = null;
           });
       }
     },
+
     fetchStatuses() {
       var self = this;
       self.api
@@ -1026,7 +1159,7 @@ export default {
       };
     },
     analyze() {},
-  
+
     previous() {
       var self = this;
       this.api

@@ -1,5 +1,14 @@
 class TransactionApi {
     
+    addBatch(data) {
+        console.log('addBatch', data)
+        var url = apiUrl + 'transactions/addBatch/';
+        return api.call('post', url, data)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
     getTransactionMatchTypes() {
         var url = apiUrl + 'transactions/transactionMatchTypes';
         return api.call('get', url)

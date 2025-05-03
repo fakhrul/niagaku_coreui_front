@@ -1,6 +1,12 @@
 class ChartOfAccountApi {
-    createDefaultData()
-    {
+    getAccountTypes() {
+        var url = apiUrl + 'chartAccounts/accountTypes';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+    createDefaultData() {
         var url = apiUrl + 'chartAccounts/createDefaultData/';
         return api.call('post', url)
             .then(({ data }) => {
@@ -9,8 +15,16 @@ class ChartOfAccountApi {
 
     }
 
-    getListByCurrentBusiness()
-    {
+    getCategoryListByCurrentBusiness() {
+        var url = apiUrl + 'chartAccounts/categoryBycurrentBusiness/';
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+
+    }
+
+    getListByCurrentBusiness() {
         var url = apiUrl + 'chartAccounts/currentBusiness/';
         return api.call('get', url)
             .then(({ data }) => {
@@ -51,7 +65,7 @@ class ChartOfAccountApi {
             });
 
     }
-    
+
     getPrev(id) {
         var url = apiUrl + 'chartAccounts/prevTo/';
         return api.call('get', url + id)

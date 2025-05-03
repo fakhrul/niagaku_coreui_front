@@ -1,12 +1,29 @@
+import { vendor } from "postcss";
+
 class ExpensesApi {
 
-    updateState(data) {
-        var url = apiUrl + 'expenses/state/';
-        return api.call('put', url + data.id, data)
+    // updateState(data) {
+    //     var url = apiUrl + 'expenses/state/';
+    //     return api.call('put', url + data.id, data)
+    //         .then(({ data }) => {
+    //             return data
+    //         });
+    // }
+    
+    getRecommendedChartAccount(vendorId, state) {
+        var url = apiUrl + `expenses/vendors/${vendorId}/recommended-account?type=${state}`;
+        return api.call('get', url)
             .then(({ data }) => {
                 return data
             });
     }
+
+    updateState(data, accountId) {
+        const url = apiUrl + `expenses/state/${data.id}?accountId=${accountId || ''}`;
+        return api.call('put', url, data)
+          .then(({ data }) => data);
+      }
+
     getStatusTypes() {
         var url = apiUrl + 'expenses/states';
         return api.call('get', url)

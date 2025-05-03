@@ -27,7 +27,7 @@
               <CRow>
                 <CCol sm="4">
                   <CSelect
-                  :value.sync="filterCriteria.rentalProductId"
+                    :value.sync="filterCriteria.rentalProductId"
                     :options="filterRentalProducts"
                     label="Rental Product"
                   />
@@ -490,7 +490,7 @@
             </CCol>
             <CCol sm="9">
               <input
-              ref="icalFileInput" 
+                ref="icalFileInput"
                 type="file"
                 accept=".ics"
                 @change="handleICalUpload"
@@ -546,13 +546,13 @@
         </template>
       </CModal>
       <CModal
-            title="Confirm Delete"
-            color="warning"
-            :show.sync="warningModal"
-            @update:show="onDeleteConfirmation"
-          >
-            Are you sure you want to delete this {{ itemToDelete.customerName }} ?
-          </CModal>
+        title="Confirm Delete"
+        color="warning"
+        :show.sync="warningModal"
+        @update:show="onDeleteConfirmation"
+      >
+        Are you sure you want to delete this {{ itemToDelete.customerName }} ?
+      </CModal>
     </div>
   </div>
 </template>
@@ -823,61 +823,61 @@ export default {
       this.parseICal(text);
     },
     parseICal(icalText) {
-  const events = [];
-  const eventBlocks = icalText.split("BEGIN:VEVENT").slice(1);
+      const events = [];
+      const eventBlocks = icalText.split("BEGIN:VEVENT").slice(1);
 
-  eventBlocks.forEach((block) => {
-    const summaryMatch = block.match(/SUMMARY:(.*)/);
-    const startMatch = block.match(/DTSTART(?:;[^:]+)?:([^\n\r]+)/);
-    const endMatch = block.match(/DTEND(?:;[^:]+)?:([^\n\r]+)/);
-    const uidMatch = block.match(/UID:([^\n\r]+)/); // Extract UID for unique ID
+      eventBlocks.forEach((block) => {
+        const summaryMatch = block.match(/SUMMARY:(.*)/);
+        const startMatch = block.match(/DTSTART(?:;[^:]+)?:([^\n\r]+)/);
+        const endMatch = block.match(/DTEND(?:;[^:]+)?:([^\n\r]+)/);
+        const uidMatch = block.match(/UID:([^\n\r]+)/); // Extract UID for unique ID
 
-    // Function to detect if VALUE=DATE is present (means all-day event)
-    const isAllDay = (field) => field && field.includes("VALUE=DATE");
+        // Function to detect if VALUE=DATE is present (means all-day event)
+        const isAllDay = (field) => field && field.includes("VALUE=DATE");
 
-    // Function to convert date string to Date object
-    const formatDate = (dateStr) => {
-      if (!dateStr) return null;
-      const year = dateStr.substr(0, 4);
-      const month = dateStr.substr(4, 2);
-      const day = dateStr.substr(6, 2);
-      return new Date(`${year}-${month}-${day}T00:00:00Z`);
-    };
+        // Function to convert date string to Date object
+        const formatDate = (dateStr) => {
+          if (!dateStr) return null;
+          const year = dateStr.substr(0, 4);
+          const month = dateStr.substr(4, 2);
+          const day = dateStr.substr(6, 2);
+          return new Date(`${year}-${month}-${day}T00:00:00Z`);
+        };
 
-    const isAllDayStart = block.includes("DTSTART;VALUE=DATE");
-    const isAllDayEnd = block.includes("DTEND;VALUE=DATE");
+        const isAllDayStart = block.includes("DTSTART;VALUE=DATE");
+        const isAllDayEnd = block.includes("DTEND;VALUE=DATE");
 
-    let startDate = startMatch ? formatDate(startMatch[1].trim()) : null;
-    let endDate = endMatch ? formatDate(endMatch[1].trim()) : null;
+        let startDate = startMatch ? formatDate(startMatch[1].trim()) : null;
+        let endDate = endMatch ? formatDate(endMatch[1].trim()) : null;
 
-    // If all-day event, DTEND is exclusive → minus 1 day
-    if (isAllDayEnd && endDate) {
-      endDate.setDate(endDate.getDate() - 1);
-    }
+        // If all-day event, DTEND is exclusive → minus 1 day
+        if (isAllDayEnd && endDate) {
+          endDate.setDate(endDate.getDate() - 1);
+        }
 
-    events.push({
-      id: uidMatch ? uidMatch[1].trim() : "", // Use UID as id
-      customerName: summaryMatch ? summaryMatch[1].trim() : "",
-      startDate: startDate,
-      endDate: endDate,
-    });
-  });
+        events.push({
+          id: uidMatch ? uidMatch[1].trim() : "", // Use UID as id
+          customerName: summaryMatch ? summaryMatch[1].trim() : "",
+          startDate: startDate,
+          endDate: endDate,
+        });
+      });
 
-  // Sort events by start date ascending (oldest first)
-  // this.icalCalendarEvents = events.sort((a, b) => {
-  //   return new Date(a.startDate) - new Date(b.startDate);
-  // });
-  this.icalCalendarEvents = events.sort((a, b) => {
-    return new Date(b.startDate) - new Date(a.startDate);
-  });
-},
+      // Sort events by start date ascending (oldest first)
+      // this.icalCalendarEvents = events.sort((a, b) => {
+      //   return new Date(a.startDate) - new Date(b.startDate);
+      // });
+      this.icalCalendarEvents = events.sort((a, b) => {
+        return new Date(b.startDate) - new Date(a.startDate);
+      });
+    },
     importFromICal() {
       this.selectedIcalItems = []; // Reset selected items
       this.icalCalendarEvents = []; // Reset events
       // Clear the file input
-  if (this.$refs.icalFileInput) {
-    this.$refs.icalFileInput.value = '';
-  }
+      if (this.$refs.icalFileInput) {
+        this.$refs.icalFileInput.value = "";
+      }
 
       this.importFromICalPopup = true;
     },
@@ -918,8 +918,12 @@ export default {
       const payload = selectedEvents.map((ev) => ({
         rentalProductId: this.selectedIcalRentalProductId, // must not be ""
         customerName: ev.customerName, // or whatever field your API needs
-        startDate: ev.startDate instanceof Date ? ev.startDate.toISOString() : ev.startDate, // convert Date→string
-        endDate: ev.endDate instanceof Date ? ev.endDate.toISOString() : ev.endDate, // convert Date→string
+        startDate:
+          ev.startDate instanceof Date
+            ? ev.startDate.toISOString()
+            : ev.startDate, // convert Date→string
+        endDate:
+          ev.endDate instanceof Date ? ev.endDate.toISOString() : ev.endDate, // convert Date→string
       }));
 
       console.log("Batch payload:", payload);

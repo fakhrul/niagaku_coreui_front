@@ -34,8 +34,8 @@
                     >Convert To Invoice</CDropdownItem
                   >
                   <CDropdownItem @click="onDuplicate(obj)"
-                        >Duplicate</CDropdownItem
-                      >
+                    >Duplicate</CDropdownItem
+                  >
 
                   <CDropdownDivider />
                   <CDropdownHeader>Change Status To:</CDropdownHeader>
@@ -71,7 +71,23 @@
             <CCardBody>
               <CRow>
                 <CCol sm="12" md="12" lg="6">
-                  <v-select
+                  <CFormGroup wrapperClasses="input-group pt-2">
+                    <template #label>Customer </template>
+                    <template #input>
+                      <v-select
+                      style="width: 100%"
+                        v-model="selectedCustomer"
+                        :label="'name'"
+                        :options="customerItemsWithAddNew"
+                        placeholder="Select customer"
+                        @input="handleCustomerSelect"
+                      >
+                        <span slot="no-options" @click="addNewCustomer"> No More Options. Click to add New.</span>
+                      </v-select>
+                    </template>
+                  </CFormGroup>
+
+                  <!-- <v-select
                     class="form-control-lg"
                     style="width: 100%"
                     v-model="selectedCustomer"
@@ -79,15 +95,14 @@
                     :options="customerItemsWithAddNew"
                     placeholder="Select customer"
                     @input="handleCustomerSelect"
-                  />
-                  <div class="text-muted small mt-1">Custoner</div>
+                  /> -->
+                  <!-- <div class="text-muted small mt-1">Custoner</div> -->
                 </CCol>
                 <CCol sm="12" md="12" lg="6"
                   ><CInput
-                    size="lg"
                     placeholder="Quot No"
                     v-model="obj.quotationNumber"
-                    description="Quotation No"
+                    label="Quotation No"
                   >
                     <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
                   </CInput></CCol
@@ -96,10 +111,9 @@
               <CRow>
                 <CCol sm="12" md="12" lg="6"
                   ><CInput
-                    size="lg"
                     placeholder=""
                     v-model="obj.contactName"
-                    description="Attention"
+                    label="Attn"
                   >
                     <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
                   </CInput></CCol
@@ -110,10 +124,9 @@
                 <CCol sm="12" md="8" lg="4">
                   <CInput
                     type="date"
-                    size="lg"
                     :value="computeIssuedDate"
                     @change="setIssuedDate"
-                    description="Issue Date"
+                    label="Issue Date"
                   />
 
                   <!-- <input
@@ -125,16 +138,14 @@
                 </CCol>
                 <CCol sm="12" md="8" lg="4">
                   <CInput
-                    size="lg"
-                    description="Expriry Date"
+                    label="Expriry Date"
                     type="date"
                     :value="computeExpiryDate"
                     @change="setExpiryDate"
                 /></CCol>
                 <CCol sm="12" md="8" lg="4">
                   <CInput
-                    size="lg"
-                    description="Reference"
+                    label="Reference"
                     v-model="obj.reference"
                 /></CCol>
               </CRow>
@@ -158,12 +169,6 @@
                     :items="computedQuotationItems"
                     :fields="quotationFields"
                   >
-                    <!-- <template #show_drag="{ item, index }">
-                      <td>
-                        <i class="cil-cursor-move">Move</i>
-                      </td>
-                    </template> -->
-
                     <template #show_index="{ index }">
                       <td class="py-2">
                         {{ index + 1 }}
@@ -987,8 +992,10 @@ export default {
           id: this.generateGUID(),
           product: this.productItems[0],
           price: 0,
-          quantity: 0,
+          quantity: 1,
+          unit: "L.S.",
           description: "",
+
           position: 1,
         });
       } else {
@@ -1083,7 +1090,10 @@ export default {
                 .then((response) => {
                   console.log(response.result);
                   self.obj.quotationNumber = response.result;
-                  console.log("self.obj.quotationNumber",self.obj.quotationNumber);
+                  console.log(
+                    "self.obj.quotationNumber",
+                    self.obj.quotationNumber
+                  );
                   console.log(self.obj);
                 })
                 .catch(({ data }) => {});

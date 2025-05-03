@@ -182,6 +182,16 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
+            name: 'Journal Entries',
+            to: '/tenants/journalEntryList',
+            icon: 'cilListRich',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'Banks',
             to: '/tenants/bankList',
             icon: 'cilBank',

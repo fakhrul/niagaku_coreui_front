@@ -33,7 +33,7 @@
                 </CCol>
               </CRow>
 
-              <CRow form class="form-group">
+              <!-- <CRow form class="form-group">
                 <CCol tag="label" sm="3" class="col-form-label">
                   Chart of Account
                 </CCol>
@@ -46,7 +46,7 @@
                     placeholder="Select COA"
                   />
                 </CCol>
-              </CRow>
+              </CRow> -->
             </CForm>
           </CCardBody>
           <CCardFooter>

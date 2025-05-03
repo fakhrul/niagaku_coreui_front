@@ -20,9 +20,27 @@
           </CCardHeader>
           <CCardBody>
             <CForm>
-              <CInput label="Category" horizontal v-model="obj.category" />
-              <CInput label="Account No" horizontal v-model="obj.accountNo" />
               <CInput label="Name" horizontal v-model="obj.name" />
+              <CInput
+                label="Category"
+                horizontal
+                readonly
+                :value.sync="selectedCategory.name"
+              >
+                <template #append>
+                  <CButton color="primary" @click="onSearchCategory()">
+                    Search
+                  </CButton>
+                </template>
+              </CInput>
+              <CSelect
+                horizontal
+                :value.sync="selectedAccountType"
+                :options="accountTypes"
+                label="Account Type"
+              />
+
+              <CInput label="Account No" horizontal v-model="obj.accountNo" />
             </CForm>
           </CCardBody>
           <CCardFooter>
@@ -117,6 +135,35 @@
         </CModal>
       </CCol>
     </CRow>
+    <CModal
+      title="Search for Category"
+      :show.sync="categorySearchPopup"
+      size="xl"
+      centered
+    >
+      <CDataTable
+        :items="categoryList"
+        :fields="categoryFieldList"
+        column-filter
+        sorter
+        pagination
+        :loading="loading"
+      >
+        <template #show_details="{ item }">
+          <td class="py-2">
+            <CButton
+              color="primary"
+              variant="outline"
+              square
+              size="sm"
+              @click="onCategorySelected(item)"
+            >
+              Select
+            </CButton>
+          </td>
+        </template>
+      </CDataTable>
+    </CModal>
   </div>
 </template>
 
@@ -141,6 +188,24 @@ export default {
   name: "ChartOfAccount",
   data: () => {
     return {
+      categorySearchPopup: false,
+      categoryList: [],
+      categoryFieldList: [
+        { key: "name" },
+        {
+          key: "show_details",
+          label: "",
+          _style: "width:1%",
+          sorter: false,
+          filter: false,
+        },
+      ],
+      selectedCategory: {
+        name: "",
+      },
+      accountTypes: [],
+      selectedAccountType: null,
+
       editMerchantModal: false,
       merchant: {},
       warningModal: false,
@@ -167,10 +232,55 @@ export default {
   },
   mounted() {
     var self = this;
+    this.fetchAccountTypes();
     self.resetObj();
   },
   computed: {},
   methods: {
+    onCategorySelected(item) {
+      var self = this;
+      self.selectedCategory = item;
+      self.obj.chartAccountGroupId = item.id;
+      self.categorySearchPopup = false;
+    },
+
+    onSearchCategory() {
+      this.refreshTableCategory();
+      this.categorySearchPopup = true;
+    },
+    refreshTableCategory() {
+      var self = this;
+      self.loading = true;
+      self.api
+        .getCategoryListByCurrentBusiness()
+        .then((response) => {
+          self.categoryList = response.result;
+          console.log("categoryList", self.matchList);
+          self.loading = false;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
+    cancel() {
+      this.$router.push({ path: "/tenants/chartOfAccountList" });
+    },
+    fetchAccountTypes() {
+      this.api
+        .getAccountTypes()
+        .then((response) => {
+          var obj = response.result;
+          this.accountTypes = obj.map((state) => ({
+            value: state.id,
+            label: state.name,
+          }));
+          self.selectedAccountType = 0;
+        })
+        .catch(({ data }) => {
+          self.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
     updateMerchant() {
       this.merchant.businessId = this.obj.businessId;
       this.merchant.chartAccountId = this.obj.id;
@@ -249,7 +359,10 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            console.log(self.obj);
+            console.log("self.obj", self.obj);
+            self.selectedAccountType = self.obj.accountType;
+            self.selectedCategory = self.obj.chartAccountGroup;
+
             self.refreshMerchants();
           })
           .catch(({ data }) => {
@@ -261,6 +374,8 @@ export default {
     },
     onSubmit() {
       var self = this;
+
+      self.obj.accountType = self.selectedAccountType;
       if (!self.obj.id) {
         this.api
           .create(self.obj)

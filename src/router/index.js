@@ -55,6 +55,10 @@ const BankStatement = () => import('@/views/tenants/BankStatement')
 
 const Transaction = () => import('@/views/tenants/Transaction') 
 const TransactionList = () => import('@/views/tenants/TransactionList') 
+
+const JournalEntry = () => import('@/views/tenants/JournalEntry') 
+const JournalEntryList = () => import('@/views/tenants/JournalEntryList') 
+
 const CustomerList = () => import('@/views/tenants/CustomerList')
 const Customer = () => import('@/views/tenants/Customer')
 
@@ -494,6 +498,22 @@ function configRoutes() {
               path: '/tenants/TransactionList',
               name: 'TransactionList',
               component: TransactionList
+            },
+
+            {
+              path: '/tenants/JournalEntry',
+              name: 'JournalEntry',
+              component: JournalEntry
+            },
+            {
+              path: '/tenants/JournalEntry/:id',
+              name: 'JournalEntryById',
+              component: JournalEntry
+            },
+            {
+              path: '/tenants/JournalEntryList',
+              name: 'JournalEntryList',
+              component: JournalEntryList
             },
 
             {

@@ -40,26 +40,7 @@
                     }}</CDropdownItem>
                   </template>
                 </CDropdown>
-                <!-- Start Tour Button -->
-                <!-- <CButton size="sm" color="info" @click="startTour">
-                  Guide
-                </CButton> -->
-
-                <!-- <CDropdown
-                  size="sm"
-                  toggler-text="Help"
-                  color="link"
-                  class="m-0 d-inline-block"
-                >
-                  <CDropdownItem @click="startTour"
-                    >Onboarding Tour</CDropdownItem
-                  >
-                  <CDropdownItem disabled>Quick Info</CDropdownItem>
-                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
-                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
-                  <CDropdownItem disabled>Live Chat</CDropdownItem>
-                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
-                </CDropdown> -->
+               
               </div>
             </CCardHeader>
             <CCardBody>
