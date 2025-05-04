@@ -11,8 +11,9 @@ class ProfileApi {
             });
     }
 
-    getListByCurrentBusiness() {
-        var url = apiUrl + 'profiles/currentBusiness/';
+    getListByCurrentBusiness(isIncludeAdmin) {
+        const include = isIncludeAdmin === true ? 'true' : 'false';
+        const url = apiUrl + 'profiles/currentBusiness?isIncludeAdmin=' + include;
         return api.call('get', url)
             .then(({ data }) => {
                 return data

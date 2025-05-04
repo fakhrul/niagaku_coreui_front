@@ -101,6 +101,8 @@ const TenantPaySlipList = () => import('@/views/tenants/PaySlipList')
 const TenantPaySlip = () => import('@/views/tenants/PaySlip')
 const TenantClaimList = () => import('@/views/tenants/ClaimList')
 const TenantClaim = () => import('@/views/tenants/Claim')
+const TenantPayrollList = () => import('@/views/tenants/PayrollList')
+const TenantPayroll = () => import('@/views/tenants/Payroll')
 
 const EmployeeList = () => import('@/views/tenants/EmployeeList')
 const Employee = () => import('@/views/tenants/Employee')
@@ -702,6 +704,22 @@ function configRoutes() {
               path: '/tenants/paySlip',
               name: 'TenantPaySlip',
               component: TenantPaySlip
+            },
+            //
+            {
+              path: '/tenants/payrollList',
+              name: 'TenantPayrollList',
+              component: TenantPayrollList
+            },
+            {
+              path: '/tenants/payroll/:id',
+              name: 'TenantPayrollById',
+              component: TenantPayroll
+            },
+            {
+              path: '/tenants/payroll',
+              name: 'TenantPayroll',
+              component: TenantPayroll
             },
             //
             {

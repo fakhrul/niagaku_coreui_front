@@ -250,6 +250,16 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
+            name: 'Payroll',
+            to: '/tenants/payrollList',
+            icon: 'cilCalendarCheck',
+            badge: {
+              color: 'danger',
+              text: 'PRO'
+            }
+          },
+          {
+            _name: 'CSidebarNavItem',
             name: 'Claims',
             to: '/tenants/claimList',
             icon: 'cilRestaurant',
