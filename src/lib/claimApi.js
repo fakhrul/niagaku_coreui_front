@@ -1,4 +1,26 @@
 class ClaimApi {
+
+    updateState(data, accountId) {
+        const url = apiUrl + `claims/state/${data.id}?accountId=${accountId || ''}`;
+        return api.call('put', url, data)
+          .then(({ data }) => data);
+      }
+
+      getRecommendedChartAccount(profileId, state) {
+        var url = apiUrl + `claims/profile/${profileId}/recommended-account?type=${state}`;
+        return api.call('get', url)
+            .then(({ data }) => {
+                return data
+            });
+    }
+
+    // updateState(data, accountId) {
+    //     const url = apiUrl + `expenses/state/${data.id}?accountId=${accountId || ''}`;
+    //     return api.call('put', url, data)
+    //       .then(({ data }) => data);
+    //   }
+
+      
     getNextReferenceNumber() {
         var url = apiUrl + 'claims/nextclaimno';
         return api.call('get', url)

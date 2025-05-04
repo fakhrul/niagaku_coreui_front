@@ -215,7 +215,7 @@ export default {
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/employee/Claim/${item.id}`,
+        path: `/tenants/Claim/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {

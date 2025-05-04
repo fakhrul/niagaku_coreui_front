@@ -5,6 +5,49 @@ class Helper {
     constructor() {
 
     }
+    isPdf(document) {
+      try {
+        if (document.contentType == "application/pdf") return true;
+        return false;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    getDocumentUrl(document) {
+      try {
+        return apiUrl + "documents/file/" + document.id;
+      } catch (error) {
+        return "";
+      }
+    }
+    
+    formatCurrency(amount) {
+        try {
+          return amount.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        } catch {
+          return amount;
+        }
+      }
+    getBadgeClass(statusDescription) {
+        if (statusDescription == "Draft") {
+          return "badge badge-secondary ml-1";
+        } else if (statusDescription == "Accepted") {
+          return "badge badge-primary ml-1";
+        } else if (statusDescription == "Sent") {
+          return "badge badge-success ml-1";
+        } else if (statusDescription == "Rejected") {
+          return "badge badge-warning ml-1";
+        } else if (this.statusDescription == "Cancelled") {
+          return "badge badge-danger ml-1";
+        } else {
+          return "badge badge-secondary ml-1";
+        }
+      }
+
     getDisplayDate(dt) {
         return moment(dt).format("DD/MM/YYYY");
       }

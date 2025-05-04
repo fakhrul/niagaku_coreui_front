@@ -160,8 +160,6 @@ import moment from "moment";
 import ChartOfAccountApi from "../../lib/chartOfAccountApi";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import InvoiceApi from "@/lib/invoiceApi";
-import ExpenseApi from "@/lib/expenseApi";
 
 export default {
   name: "JournalEntry",
@@ -212,7 +210,7 @@ export default {
       ],
 
       loading: false,
-      selectedChartOfAccount: null,
+      // selectedChartOfAccount: null,
       chartOfAccountItems: [],
       chartOfAccountApi: new ChartOfAccountApi(),
       infoList: [],
