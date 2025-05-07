@@ -154,6 +154,8 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Sales", "Invoices"]);
+
     var self = this;
     self.refreshTable();
   },

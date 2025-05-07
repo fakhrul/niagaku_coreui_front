@@ -1,97 +1,99 @@
 <template>
-  <div class="wrapper">
-    <div>
-      <CToaster :autohide="3000">
-        <template v-for="info in infoList">
-          <CToast
-            :key="info.message"
-            :show="true"
-            :header="info.header"
-            :color="info.color"
-          >
-            {{ info.message }}.
-          </CToast>
-        </template>
-      </CToaster>
-    </div>
-    <div>
-      <CRow>
-        <CCol sm="12">
-          <CCard>
-            <CCardHeader> <strong> Customer </strong> List </CCardHeader>
-            <CCardBody>
-              <CDataTable
-                :items="items"
-                :fields="fields"
-                column-filter
-                items-per-page-select
-                :items-per-page="10"
-                hover
-                sorter
-                pagination
-                :loading="loading"
-              >
-                <template #show_index="{ index }">
-                  <td class="py-2">
-                    {{ index + 1 }}
-                  </td>
-                </template>
-                <template #show_details="{ item, index }">
-                  <td class="py-2">
-                    <CButton
-                      color="primary"
-                      variant="outline"
-                      square
-                      size="sm"
-                      @click="toggleDetails(item, index)"
+  <div>
+    <div class="wrapper">
+      <div>
+        <CToaster :autohide="3000">
+          <template v-for="info in infoList">
+            <CToast
+              :key="info.message"
+              :show="true"
+              :header="info.header"
+              :color="info.color"
+            >
+              {{ info.message }}.
+            </CToast>
+          </template>
+        </CToaster>
+      </div>
+      <div>
+        <CRow>
+          <CCol sm="12">
+            <CCard>
+              <CCardHeader> <strong> Customer </strong> List </CCardHeader>
+              <CCardBody>
+                <CDataTable
+                  :items="items"
+                  :fields="fields"
+                  column-filter
+                  items-per-page-select
+                  :items-per-page="10"
+                  hover
+                  sorter
+                  pagination
+                  :loading="loading"
+                >
+                  <template #show_index="{ index }">
+                    <td class="py-2">
+                      {{ index + 1 }}
+                    </td>
+                  </template>
+                  <template #show_details="{ item, index }">
+                    <td class="py-2">
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                        square
+                        size="sm"
+                        @click="toggleDetails(item, index)"
+                      >
+                        {{ Boolean(item._toggled) ? "Hide" : "Show" }}
+                      </CButton>
+                    </td>
+                  </template>
+                  <template #details="{ item }">
+                    <CCollapse
+                      :show="Boolean(item._toggled)"
+                      :duration="collapseDuration"
                     >
-                      {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton>
-                  </td>
-                </template>
-                <template #details="{ item }">
-                  <CCollapse
-                    :show="Boolean(item._toggled)"
-                    :duration="collapseDuration"
-                  >
-                    <CCardBody>
-                      <CButton
-                        size="sm"
-                        color="info"
-                        class="ml-1"
-                        @click="onEdit(item)"
-                      >
-                        Edit
-                      </CButton>
-                      <CButton
-                        size="sm"
-                        color="danger"
-                        class="ml-1"
-                        @click="showDeleteConfirmation(item)"
-                      >
-                        Delete
-                      </CButton>
-                    </CCardBody>
-                  </CCollapse>
-                </template>
-              </CDataTable>
-            </CCardBody>
-            <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="addNew"
-                ><CIcon name="cil-check-circle" /> Add New</CButton
-              >
-            </CCardFooter>
-          </CCard>
-          <CModal
-            title="Confirm Delete"
-            color="warning"
-            :show.sync="warningModal"
-            @update:show="onDeleteConfirmation"
-          >
-            Are you sure you want to delete this {{ itemToDelete.code }} ?
-          </CModal>
-        </CCol>
-      </CRow>
+                      <CCardBody>
+                        <CButton
+                          size="sm"
+                          color="info"
+                          class="ml-1"
+                          @click="onEdit(item)"
+                        >
+                          Edit
+                        </CButton>
+                        <CButton
+                          size="sm"
+                          color="danger"
+                          class="ml-1"
+                          @click="showDeleteConfirmation(item)"
+                        >
+                          Delete
+                        </CButton>
+                      </CCardBody>
+                    </CCollapse>
+                  </template>
+                </CDataTable>
+              </CCardBody>
+              <CCardFooter>
+                <CButton type="submit" size="sm" color="primary" @click="addNew"
+                  ><CIcon name="cil-check-circle" /> Add New</CButton
+                >
+              </CCardFooter>
+            </CCard>
+            <CModal
+              title="Confirm Delete"
+              color="warning"
+              :show.sync="warningModal"
+              @update:show="onDeleteConfirmation"
+            >
+              Are you sure you want to delete this {{ itemToDelete.code }} ?
+            </CModal>
+          </CCol>
+        </CRow>
+      </div>
     </div>
   </div>
 </template>
@@ -139,9 +141,18 @@ export default {
   },
   mounted() {
     var self = this;
+    this.$store.commit("setPageNavItems", ["Sales", "Customers"]);
+
     self.refreshTable();
   },
   methods: {
+    // setNavItems() {
+    //   this.$store.commit("setPageNavItems", [
+    //     { label: "Customer", route: "/tenants/Customer", active: true },
+    //     { label: "Quotation", route: "/tenants/QuotationList" },
+    //     { label: "Invoice", route: "/tenants/InvoiceList" },
+    //   ]);
+    // },
     setDefault(item) {},
     toast(header, message, color) {
       var self = this;

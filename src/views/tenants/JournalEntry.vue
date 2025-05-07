@@ -21,6 +21,12 @@
           <CCardBody>
             <CForm>
               <CInput
+                readonly
+                label="Journal No"
+                horizontal
+                v-model="obj.journalNo"
+              />
+              <CInput
                 type="date"
                 :value="computeTransactionDate"
                 @change="setTransactionDate"
@@ -58,10 +64,7 @@
                     </template>
                     <template #show_description="{ item }">
                       <td>
-                        <CInput
-                          v-model="item.description"
-                          horizontal
-                        />
+                        <CInput v-model="item.description" horizontal />
                       </td>
                     </template>
                     <template #show_debit="{ item }">
@@ -150,7 +153,6 @@
         </CCard>
       </CCol>
     </CRow>
-    
   </div>
 </template>
 
@@ -278,9 +280,7 @@ export default {
       return moment(this.obj.date).format("YYYY-MM-DD");
     },
   },
-  watch: {
-   
-  },
+  watch: {},
   methods: {
     formatCurrency(amount) {
       try {
@@ -352,7 +352,7 @@ export default {
 
       this.updatePositions(); // Update positions after removal
     },
-   
+
     findChartAccount(id) {
       return (
         this.computedChartAccountItems.find((item) => item.id === id) || null
@@ -397,27 +397,30 @@ export default {
     onSubmit() {
       var self = this;
       let haveError = false;
-      self.obj.items.forEach(journalitem => {
-        if(journalitem.chartAccount == null) {
+      self.obj.items.forEach((journalitem) => {
+        if (journalitem.chartAccount == null) {
           haveError = true;
           return;
-        }
-        else {
+        } else {
           journalitem.chartAccountId = journalitem.chartAccount.id;
         }
       });
 
       if (haveError) {
-        self.toast("Error", "Please select chart of account for all items", "danger");
+        self.toast(
+          "Error",
+          "Please select chart of account for all items",
+          "danger"
+        );
         return;
       }
-     
+
       if (!self.obj.id) {
         this.api
           .create(self.obj)
           .then((response) => {
             self.toast("Success", "Updated", "success");
-
+let newObj = response.result;
             // self.$router.push({ path: "/tenants/journalEntryList" });
             self.$router.push({
               path: `/tenants/journalEntry/${newObj.id}`,

@@ -151,7 +151,7 @@ export default {
         return {
           ...item,
           profileName: item.profile.fullName,
-          businessName: item.business.name,
+          // businessName: item.business.name,
           totalAmount: this.getTotalAmount(item)
         };
       });
@@ -159,6 +159,7 @@ export default {
    
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Staff", "Payroll"]);
     var self = this;
     self.refreshTable();
   },

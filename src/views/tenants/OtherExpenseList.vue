@@ -207,6 +207,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "General Expenses"]);
     var self = this;
     self.refreshTable();
   },

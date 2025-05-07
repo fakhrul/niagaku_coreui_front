@@ -143,6 +143,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Vendors"]);
     var self = this;
     self.refreshTable();
   },

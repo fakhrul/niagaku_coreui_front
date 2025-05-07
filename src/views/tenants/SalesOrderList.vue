@@ -154,6 +154,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Sales", "Customer P.O."]);
     var self = this;
     self.refreshTable();
   },

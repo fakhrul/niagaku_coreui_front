@@ -138,6 +138,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Accounting", "Chart of Accounts"]);
     var self = this;
     self.refreshTable();
   },

@@ -162,6 +162,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Vendor Receipts"]);
     var self = this;
     self.refreshTable();
   },

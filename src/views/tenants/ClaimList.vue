@@ -157,6 +157,7 @@ export default {
    
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Staff Claims"]);
     var self = this;
     self.refreshTable();
   },

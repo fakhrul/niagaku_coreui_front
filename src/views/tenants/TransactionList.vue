@@ -375,6 +375,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Accounting", "Bank Transactions"]);
     var self = this;
     self.refreshTable();
   },

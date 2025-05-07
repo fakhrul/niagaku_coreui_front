@@ -39,7 +39,7 @@
                 > -->
                 <CDropdownDivider />
                 <CDropdownHeader>Change Status To:</CDropdownHeader>
-                <template v-for="status in computedClaimStates">
+                <template v-for="status in computedPayrollStates">
                   <CDropdownItem @click="changeState(status)">{{
                     status.name
                   }}</CDropdownItem>
@@ -61,11 +61,28 @@
                     :label="'fullName'"
                     :options="employeeItems"
                     placeholder="Select Employee"
+                    v-if="obj.statusDescription === 'Draft'"
+                  />
+                  <CInput
+                    v-else
+                    style="width: 100%"
+                    :value="obj.profile.fullName"
+                    readonly
                   />
                 </CCol>
               </CRow>
-              <CInput label="Payroll No" horizontal v-model="obj.payrollNo" />
-              <CInput label="Reference" horizontal v-model="obj.reference" />
+              <CInput
+                label="Payroll No"
+                horizontal
+                v-model="obj.payrollNo"
+                :readonly="obj.statusDescription !== 'Draft'"
+              />
+              <CInput
+                label="Reference"
+                horizontal
+                v-model="obj.reference"
+                :readonly="obj.statusDescription !== 'Draft'"
+              />
 
               <CInput
                 type="date"
@@ -73,6 +90,7 @@
                 @change="setTransactionDate"
                 label="Payroll Date"
                 horizontal
+                :readonly="obj.statusDescription !== 'Draft'"
               />
 
               <CInput
@@ -81,6 +99,7 @@
                 @change="setPayPeriodStartDate"
                 label="Period Start Date"
                 horizontal
+                :readonly="obj.statusDescription !== 'Draft'"
               />
               <CInput
                 type="date"
@@ -88,6 +107,7 @@
                 @change="setPayPeriodEndDate"
                 label="Period End Date"
                 horizontal
+                :readonly="obj.statusDescription !== 'Draft'"
               />
 
               <!-- <CInput
@@ -128,20 +148,57 @@
               <template #show_type="{ item }">
                 <td>
                   <CSelect
+                    v-if="obj.statusDescription === 'Draft'"
                     horizontal
                     :value.sync="item.type"
                     :options="earningTypes"
+                  />
+                  <CInput
+                    v-else
+                    style="width: 100%"
+                    :value="item.typeDescription"
+                    readonly
                   />
                 </td>
               </template>
               <template #show_description="{ item }">
                 <td>
-                  <CInput v-model="item.description"></CInput>
+                  <CInput
+                    v-model="item.description"
+                    :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
                 </td>
               </template>
+              <template #show_account="{ item }">
+                <td>
+                  <CFormGroup>
+                    <template #input>
+                      <v-select
+                        style="width: 100%"
+                        v-model="item.chartAccount"
+                        :label="`itemDisplay`"
+                        :options="earningChartOfAccountItems"
+                        placeholder="Select COA"
+                        v-if="obj.statusDescription === 'Draft'"
+                      />
+                      <CInput
+                        v-else
+                        style="width: 100%"
+                        :value="item.chartAccount.itemDisplay"
+                        readonly
+                      />
+                    </template>
+                  </CFormGroup>
+                </td>
+              </template>
+
               <template #show_amount="{ item }">
                 <td>
-                  <CInput v-model="item.amount" min="0" step="0.01"></CInput>
+                  <CInput 
+                  v-model="item.amount" 
+                  min="0" step="0.01"
+                  :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
                 </td>
               </template>
 
@@ -153,6 +210,7 @@
                     square
                     size="sm"
                     @click="onRemoveEarning(item)"
+                    v-if="obj.statusDescription === 'Draft'"
                   >
                     Remove
                   </CButton>
@@ -160,8 +218,10 @@
               </template>
 
               <template #footer>
-                <td colspan="2">
-                  <CButton @click="addNewEarning()" color="primary"
+                <td colspan="3">
+                  <CButton 
+                  @click="addNewEarning()" color="primary"
+                  v-if="obj.statusDescription === 'Draft'"
                     >Add Earning</CButton
                   >
                 </td>
@@ -182,20 +242,55 @@
               <template #show_type="{ item }">
                 <td>
                   <CSelect
-                    horizontal
+                  v-if="obj.statusDescription === 'Draft'"
+                  horizontal
                     :value.sync="item.type"
                     :options="deductionTypes"
+                  />
+                  <CInput
+                    v-else
+                    style="width: 100%"
+                    :value="item.typeDescription"
+                    readonly
                   />
                 </td>
               </template>
               <template #show_description="{ item }">
                 <td>
-                  <CInput v-model="item.description"></CInput>
+                  <CInput v-model="item.description"
+                  :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
                 </td>
               </template>
+              <template #show_account="{ item }">
+                <td>
+                  <CFormGroup>
+                    <template #input>
+                      <v-select
+                        style="width: 100%"
+                        v-model="item.chartAccount"
+                        :label="`itemDisplay`"
+                        :options="deductionChartOfAccountItems"
+                        placeholder="Select COA"
+                        v-if="obj.statusDescription === 'Draft'"
+
+                      />
+                      <CInput
+                        v-else
+                        style="width: 100%"
+                        :value="item.chartAccount.itemDisplay"
+                        readonly
+                      />
+                    </template>
+                  </CFormGroup>
+                </td>
+              </template>
+
               <template #show_amount="{ item }">
                 <td>
-                  <CInput v-model="item.amount" min="0" step="0.01"></CInput>
+                  <CInput v-model="item.amount" min="0" step="0.01"
+                  :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
                 </td>
               </template>
 
@@ -207,6 +302,8 @@
                     square
                     size="sm"
                     @click="onRemoveDeduction(item)"
+                    v-if="obj.statusDescription === 'Draft'"
+
                   >
                     Remove
                   </CButton>
@@ -215,8 +312,10 @@
 
               <template #footer>
                 <tr>
-                  <td colspan="2">
+                  <td colspan="3">
                     <CButton @click="addNewDeduction()" color="primary"
+                  v-if="obj.statusDescription === 'Draft'"
+
                       >Add Deduction</CButton
                     >
                   </td>
@@ -227,21 +326,22 @@
                   <td></td>
                 </tr>
                 <tr>
-                  <td colspan="2"></td>
+                  <td colspan="3"></td>
                   <td colspan="1" class="text-right">
                     <strong>Net Pay:</strong>
                   </td>
                   <td>
-                    {{ helper.formatCurrency(
-                      grandTotalEarnings - grandTotalDeductions
-                    ) }}
+                    {{
+                      helper.formatCurrency(
+                        grandTotalEarnings - grandTotalDeductions
+                      )
+                    }}
                   </td>
                   <td></td>
                 </tr>
               </template>
             </CDataTable>
           </CCardBody>
-         
         </CCard>
       </CCol>
     </CRow>
@@ -250,7 +350,10 @@
         <CCard>
           <CCardHeader> Employer Contributions</CCardHeader>
           <CCardBody>
-            <CDataTable :items="obj.employerContributions" :fields="employerContributionFields">
+            <CDataTable
+              :items="obj.employerContributions"
+              :fields="employerContributionFields"
+            >
               <template #show_index="{ index }">
                 <td class="py-2">
                   {{ index + 1 }}
@@ -259,20 +362,54 @@
               <template #show_type="{ item }">
                 <td>
                   <CSelect
-                    horizontal
+                  v-if="obj.statusDescription === 'Draft'"
+                  horizontal
                     :value.sync="item.type"
                     :options="employerContributionTypes"
+                  />
+                  <CInput
+                    v-else
+                    style="width: 100%"
+                    :value="item.typeDescription"
+                    readonly
                   />
                 </td>
               </template>
               <template #show_description="{ item }">
                 <td>
-                  <CInput v-model="item.description"></CInput>
+                  <CInput v-model="item.description"
+                  :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
+                </td>
+              </template>
+              <template #show_account="{ item }">
+                <td>
+                  <CFormGroup>
+                    <template #input>
+                      <v-select
+                        style="width: 100%"
+                        v-model="item.chartAccount"
+                        :label="`itemDisplay`"
+                        :options="employerContributionChartOfAccountItems"
+                        placeholder="Select COA"
+                        v-if="obj.statusDescription === 'Draft'"
+
+                      />
+                      <CInput
+                        v-else
+                        style="width: 100%"
+                        :value="item.chartAccount.itemDisplay"
+                        readonly
+                      />
+                    </template>
+                  </CFormGroup>
                 </td>
               </template>
               <template #show_amount="{ item }">
                 <td>
-                  <CInput v-model="item.amount" min="0" step="0.01"></CInput>
+                  <CInput v-model="item.amount" min="0" step="0.01"
+                  :readonly="obj.statusDescription !== 'Draft'"
+                  ></CInput>
                 </td>
               </template>
 
@@ -284,6 +421,7 @@
                     square
                     size="sm"
                     @click="onRemoveEmployerContribution(item)"
+                    v-if="obj.statusDescription === 'Draft'"
                   >
                     Remove
                   </CButton>
@@ -291,8 +429,10 @@
               </template>
 
               <template #footer>
-                <td colspan="2">
+                <td colspan="3">
                   <CButton @click="addNewEmployerContribution()" color="primary"
+                  v-if="obj.statusDescription === 'Draft'"
+
                     >Add Employer Contribution</CButton
                   >
                 </td>
@@ -304,7 +444,6 @@
               </template>
             </CDataTable>
           </CCardBody>
-        
         </CCard>
       </CCol>
     </CRow>
@@ -319,7 +458,6 @@
               Cancel
             </CButton>
           </CCardBody>
-          
         </CCard>
       </CCol>
     </CRow>
@@ -427,11 +565,19 @@ export default {
           label: "Description",
         },
         {
+          key: "show_account",
+          label: "Account",
+          _style: "width:300px",
+        },
+
+        {
           key: "show_amount",
           label: "Amount",
         },
+
         {
           key: "show_remove",
+          label: "Action",
           _style: "width:1%",
         },
       ],
@@ -452,11 +598,18 @@ export default {
           label: "Description",
         },
         {
+          key: "show_account",
+          label: "Account",
+          _style: "width:300px",
+        },
+
+        {
           key: "show_amount",
           label: "Amount",
         },
         {
           key: "show_remove",
+          label: "Action",
           _style: "width:1%",
         },
       ],
@@ -477,11 +630,18 @@ export default {
           label: "Description",
         },
         {
+          key: "show_account",
+          label: "Account",
+          _style: "width:300px",
+        },
+
+        {
           key: "show_amount",
           label: "Amount",
         },
         {
           key: "show_remove",
+          label: "Action",
           _style: "width:1%",
         },
       ],
@@ -506,7 +666,7 @@ export default {
 
       // claimFields,
 
-      claimStates: [],
+      payrollStates: [],
       // selectedClaimState: null,
       organizationTypeList: [],
       infoList: [],
@@ -533,6 +693,21 @@ export default {
     // self.resetObj();
   },
   computed: {
+    employerContributionChartOfAccountItems() {
+      return this.chartOfAccountItems.filter(
+        (a) => a.accountTypeDescription === "Expense"
+      );
+    },
+    earningChartOfAccountItems() {
+      return this.chartOfAccountItems.filter(
+        (a) => a.accountTypeDescription === "Expense"
+      );
+    },
+    deductionChartOfAccountItems() {
+      return this.chartOfAccountItems.filter(
+        (a) => a.accountTypeDescription === "Liability"
+      );
+    },
     computePayPeriodStartDate() {
       return moment(this.obj.payPeriodStart).format("YYYY-MM-DD");
     },
@@ -542,20 +717,20 @@ export default {
     computeTransactionDate() {
       return moment(this.obj.date).format("YYYY-MM-DD");
     },
-    computedClaimStates() {
-      let statuses = this.claimStates.filter(
-        (status) => status.name != this.obj.claimStateDescription
+    computedPayrollStates() {
+      let statuses = this.payrollStates.filter(
+        (status) => status.name != this.obj.statusDescription
       );
 
       if (this.obj.id == null) return [];
 
-      if (this.obj.claimStateDescription === "Draft")
-        return statuses.filter((status) => status.name == "Submit");
-      if (this.obj.claimStateDescription === "Submit")
-        return statuses.filter(
-          (status) => status.name == "Approve" || status.name == "NotApprove"
-        );
-      if (this.obj.claimStateDescription === "Approve")
+      if (this.obj.statusDescription === "Draft")
+        return statuses.filter((status) => status.name == "Approve");
+      // if (this.obj.statusDescription === "Submit")
+      //   return statuses.filter(
+      //     (status) => status.name == "Approve" || status.name == "NotApprove"
+      //   );
+      if (this.obj.statusDescription === "Approve")
         return statuses.filter(
           (status) => status.name == "Paid" || status.name == "Cancelled"
         );
@@ -665,7 +840,7 @@ export default {
 
     proceedChangeState(account) {
       var self = this;
-      self.obj.claimState = self.pendingStatusChange.id;
+      self.obj.status = self.pendingStatusChange.id;
       let accountId = null;
       if (account != null) accountId = account.id;
 
@@ -828,7 +1003,8 @@ export default {
       self.api
         .getPayrollState()
         .then((response) => {
-          this.claimStates = response.result;
+          this.payrollStates = response.result;
+          console.log("this.payrollStates", this.payrollStates);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -892,9 +1068,39 @@ export default {
       // self.obj.claimState = self.selectedClaimState;
       // self.obj.items = self.computedClaimItems;
 
-      self.obj.earnings;
+      if (self.selectedEmployee == null) {
+        self.toast("Error", "Please select employee", "danger");
+        return;
+      }
+      // if (self.obj.earnings.length == 0) {
+      //   self.toast("Error", "Please add at least one earning", "danger");
+      //   return;
+      // }
+      
       self.obj.profile = self.selectedEmployee;
       self.obj.profileId = self.selectedEmployee.id;
+      self.obj.earnings = self.obj.earnings.map((item) => {
+        return {
+          ...item,
+          chartAccountId: item.chartAccount.id,
+        };
+      });
+
+      self.obj.deductions = self.obj.deductions.map((item) => {
+        return {
+          ...item,
+          chartAccountId: item.chartAccount.id,
+        };
+      });
+
+      self.obj.employerContributions = self.obj.employerContributions.map(
+        (item) => {
+          return {
+            ...item,
+            chartAccountId: item.chartAccount.id,
+          };
+        }
+      );
       console.log("onSubmit", self.obj);
 
       if (!self.obj.id) {
@@ -902,7 +1108,12 @@ export default {
           .create(self.obj)
           .then((response) => {
             self.toast("Success", "Update Success", "success");
-            this.resetObj();
+            var newObj = response.result;
+            self.$router.push({
+              path: `/tenants/payroll/${newObj.id}`,
+            });
+
+            // this.resetObj();
             // self.$router.push({ path: "/employee/claimList" });
           })
           .catch(({ data }) => {
@@ -973,6 +1184,11 @@ export default {
         date: today,
         payPeriodStart: startOfMonth,
         payPeriodEnd: endOfMonth,
+        earnings: [],
+        deductions: [],
+        employerContributions: [],
+        status: 0,
+        statusDescription: "Draft",
       };
     },
     submit() {

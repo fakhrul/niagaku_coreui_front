@@ -716,6 +716,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Rental & Leasing", "Reservation"]);
     this.fetchStatuses();
 
     this.loadRentalProducts();

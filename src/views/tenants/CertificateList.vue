@@ -154,6 +154,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Documentation", "License/Certificate"]);
     var self = this;
     self.refreshTable();
   },

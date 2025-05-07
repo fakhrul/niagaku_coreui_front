@@ -35,8 +35,8 @@ class AuthService {
         var url = apiUrl + 'Account/login';
 
         return api.call('post', url, data)
-            .then((response) => {
-                return response.data
+            .then(({data}) => {
+                return data;
             });
 
     }

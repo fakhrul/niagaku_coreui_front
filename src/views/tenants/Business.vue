@@ -81,11 +81,16 @@
                             v-model="obj.taxIdentificationNumber"
                             placeholder="C1234567890"
                           />
-                          <CInput
+                          <!-- <CInput
                             label="Currency"
                             v-model="obj.currency"
                             readonly
                             placeholder="RM"
+                          /> -->
+                          <CSelect
+                            label="Currency"
+                            :options="currencyOptions"
+                            :value.sync="obj.currency"
                           />
                           <CInput
                             label="Website"
@@ -203,7 +208,6 @@ Malaysia"
                             rows="5"
                             v-model="obj.quotationDefaultFooter"
                           />
-
                         </CCol>
                       </CRow>
                       <CRow>
@@ -214,7 +218,6 @@ Malaysia"
                             rows="5"
                             v-model="obj.invoiceDefaultFooter"
                           />
-
                         </CCol>
                       </CRow>
                       <CRow>
@@ -225,7 +228,6 @@ Malaysia"
                             rows="5"
                             v-model="obj.receiptDefaultFooter"
                           />
-
                         </CCol>
                       </CRow>
                     </CCardBody>
@@ -417,6 +419,15 @@ export default {
   },
   data() {
     return {
+      currencyOptions: [
+  { value: 'RM', label: 'MYR - Ringgit Malaysia' },
+  { value: 'SGD', label: 'SGD - Singapore Dollar' },
+  { value: 'USD', label: 'USD - US Dollar' },
+  { value: 'THB', label: 'THB - Thai Baht' },
+  { value: 'IDR', label: 'IDR - Indonesian Rupiah' },
+  { value: 'VND', label: 'VND - Vietnamese Dong' },
+  { value: 'PHP', label: 'PHP - Philippine Peso' },
+],
       isResetPassword: false,
       plainPassword: "",
       isEmailReadOnly: false,

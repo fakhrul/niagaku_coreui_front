@@ -150,6 +150,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Purchase Orders"]);
     var self = this;
     self.refreshTable();
   },

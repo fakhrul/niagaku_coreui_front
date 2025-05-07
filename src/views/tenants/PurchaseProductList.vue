@@ -140,6 +140,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Products/Services"]);
     var self = this;
     self.refreshTable();
   },

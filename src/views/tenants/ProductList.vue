@@ -152,6 +152,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Sales", "Products/Services"]);
     var self = this;
     self.refreshTable();
   },

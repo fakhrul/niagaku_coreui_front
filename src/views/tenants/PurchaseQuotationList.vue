@@ -139,6 +139,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Vendor Quotations"]);
     var self = this;
     self.refreshTable();
   },

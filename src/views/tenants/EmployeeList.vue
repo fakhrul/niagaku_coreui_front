@@ -154,6 +154,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Staff", "Employee"]);
     var self = this;
     self.refreshTable();
   },

@@ -196,6 +196,8 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Sales", "Quotations"]);
+
     var self = this;
     self.refreshTable();
   },

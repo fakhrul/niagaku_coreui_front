@@ -4,7 +4,7 @@
     :class="{ 'c-dark-theme': $store.state.darkMode }"
   >
     <CContainer fluid>
-      <CToaster :autohide="3000">
+      <!-- <CToaster :autohide="3000">
         <template v-for="info in infoList">
           <CToast
             :key="info.message"
@@ -15,8 +15,8 @@
             {{ info.message }}.
           </CToast>
         </template>
-      </CToaster>
-
+      </CToaster> -->
+      <ToastContainer :toasts="toasts" />
       <CRow class="justify-content-center">
         <CCol md="8" lg="6">
           <CCard class="mx-4 mb-0">
@@ -132,12 +132,16 @@
 
 <script>
 import { mapState } from "vuex"; // Import Vuex helpers
+import ToastContainer from "../widgets/ToastContainer.vue";
 
 export default {
   name: "Login",
+  components: {
+    ToastContainer,
+  },
   data: () => {
     return {
-      infoList: [],
+      toasts: [],
       loginObj: {
         email: "",
         password: "",
@@ -177,24 +181,16 @@ export default {
           auth.recordLogin(response.accessToken, response, false);
           this.$router.push({ path: "/" });
         })
-        .catch((error) => {
+        .catch(({ data }) => {
+          this.toast("Error", data || "Login failed", "danger");
           this.loading = false;
-          let errorMessage = "An unknown error occurred.";
-          if (
-            error.data &&
-            error.data.responseException &&
-            error.data.responseException.exceptionMessage
-          ) {
-            errorMessage = error.data.responseException.exceptionMessage.title;
-          }
-          this.toast("Error", errorMessage, "danger");
         });
     },
     navigateTo(path) {
       this.$router.push({ path: path });
     },
     toast(header, message, color) {
-      this.infoList.push({
+      this.toasts.push({
         header: header,
         message: message,
         color: color,

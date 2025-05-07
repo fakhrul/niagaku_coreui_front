@@ -59,6 +59,8 @@ const TransactionList = () => import('@/views/tenants/TransactionList')
 const JournalEntry = () => import('@/views/tenants/JournalEntry') 
 const JournalEntryList = () => import('@/views/tenants/JournalEntryList') 
 
+const GeneralLedger = () => import('@/views/tenants/GeneralLedger') 
+
 const CustomerList = () => import('@/views/tenants/CustomerList')
 const Customer = () => import('@/views/tenants/Customer')
 
@@ -517,6 +519,13 @@ function configRoutes() {
               name: 'JournalEntryList',
               component: JournalEntryList
             },
+
+            {
+              path: '/tenants/GeneralLedger',
+              name: 'GeneralLedger',
+              component: GeneralLedger
+            },
+            
 
             {
               path: '/tenants/Product',

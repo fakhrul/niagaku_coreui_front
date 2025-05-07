@@ -188,6 +188,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Sales", "Receipts"]);
     var self = this;
     self.refreshTable();
   },

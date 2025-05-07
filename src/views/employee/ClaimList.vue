@@ -158,6 +158,7 @@ export default {
    
   },
   mounted() {
+    this.$store.commit("setPageNavItems", []);
     var self = this;
     self.refreshTable();
   },

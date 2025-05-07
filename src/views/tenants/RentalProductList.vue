@@ -181,6 +181,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Rental & Leasing", "Products"]);
     var self = this;
     self.refreshTable();
   },

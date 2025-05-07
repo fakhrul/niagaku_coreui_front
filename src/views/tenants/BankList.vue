@@ -155,6 +155,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Accounting", "Banks"]);
     var self = this;
     self.refreshTable();
   },

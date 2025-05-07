@@ -287,6 +287,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Rental & Leasing", "Availability"]);
     this.fetchStatuses();
 
     this.loadRentalProducts();

@@ -70,21 +70,7 @@ class Helper {
             return "Unkown Error" + error;
         }
     }
-    getErrorMessage(data) {
-        var errorMessage = "";
-        // console.log(data); //'23505: duplicate key
-        if (data.responseException.exceptionMessage.title) {
-            errorMessage = data.responseException.exceptionMessage.title;
-            if (errorMessage == "One or more validation errors occurred.") {
-                const myJSON = JSON.stringify(data.responseException.exceptionMessage.errors);
-                errorMessage += "\n\n";
-                errorMessage += myJSON;
-            }
-        } else {
-            errorMessage = data.responseException.exceptionMessage;
-        }
-        return errorMessage;
-    }
+   
 
     isInt(n) {
         return Number(n) === n && n % 1 === 0;
@@ -115,19 +101,36 @@ class Helper {
     }
 
     getErrorMessage(data) {
-        var errorMessage = "";
-        if (data.responseException.exceptionMessage.title) {
-            errorMessage = data.responseException.exceptionMessage.title;
-            if (errorMessage == "One or more validation errors occurred.") {
-                const myJSON = JSON.stringify(data.responseException.exceptionMessage.errors);
-                errorMessage += "\n\n";
-                errorMessage += myJSON;
-            }
-        } else {
-            errorMessage = data.responseException.exceptionMessage;
-        }
-        return errorMessage;
-    }
+      return data;
+      
+      var errorMessage = "";
+      if (data.responseException.exceptionMessage.title) {
+          errorMessage = data.responseException.exceptionMessage.title;
+          if (errorMessage == "One or more validation errors occurred.") {
+              const myJSON = JSON.stringify(data.responseException.exceptionMessage.errors);
+              errorMessage += "\n\n";
+              errorMessage += myJSON;
+          }
+      } else {
+          errorMessage = data.responseException.exceptionMessage;
+      }
+      return errorMessage;
+  }
+
+    // getErrorMessage(data) {
+    //     var errorMessage = "";
+    //     if (data.responseException.exceptionMessage.title) {
+    //         errorMessage = data.responseException.exceptionMessage.title;
+    //         if (errorMessage == "One or more validation errors occurred.") {
+    //             const myJSON = JSON.stringify(data.responseException.exceptionMessage.errors);
+    //             errorMessage += "\n\n";
+    //             errorMessage += myJSON;
+    //         }
+    //     } else {
+    //         errorMessage = data.responseException.exceptionMessage;
+    //     }
+    //     return errorMessage;
+    // }
 
     // getCenterOfShape(pointList) {
 

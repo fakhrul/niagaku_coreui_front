@@ -227,6 +227,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Expenses", "Vendor Invoices"]);
     var self = this;
     self.refreshTable();
   },

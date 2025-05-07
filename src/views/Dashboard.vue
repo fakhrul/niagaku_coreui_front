@@ -295,6 +295,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setPageNavItems", []);
     this.fetchCurrentProfile();
     this.fetchCertificateList();
   },

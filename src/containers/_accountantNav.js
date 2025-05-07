@@ -116,13 +116,13 @@ export default [
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Banking',
-            to: '/tenants/expenseList',
+            name: 'General Ledger',
+            to: '/tenants/generalLedger',
             icon: 'cilBookmark'
           },
           {
             _name: 'CSidebarNavItem',
-            name: 'Reconcilation',
+            name: 'Banking',
             to: '/tenants/expenseList',
             icon: 'cilBookmark'
           },

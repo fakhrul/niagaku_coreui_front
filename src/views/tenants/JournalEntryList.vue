@@ -70,15 +70,14 @@
                     :duration="collapseDuration"
                   >
                     <CCardBody>
-                      <CDataTable 
-                      :items="item.items" 
-                      :fields="journalFields"
-                      border
-                      small
-                      hover
-          striped
-          bordered
-
+                      <CDataTable
+                        :items="item.items"
+                        :fields="journalFields"
+                        border
+                        small
+                        hover
+                        striped
+                        bordered
                       >
                         <template #show_index="{ index }">
                           <td class="py-2">
@@ -87,7 +86,7 @@
                         </template>
                         <template #show_chartaccount="{ item }">
                           <td class="py-2">
-{{ item.chartAccount.itemDisplay }}
+                            {{ item.chartAccount.itemDisplay }}
                           </td>
                         </template>
 
@@ -147,9 +146,6 @@
         </CCol>
       </CRow>
     </div>
-   
-
-    
   </div>
 </template>
 
@@ -188,8 +184,6 @@ export default {
           label: "Credit",
           _style: "width:100px",
         },
-
-       
       ],
 
       currentPage: 1,
@@ -206,6 +200,11 @@ export default {
           sorter: false,
           filter: false,
         },
+        { 
+          key: "journalNo",
+          label: "Journal No",
+        },
+
         { key: "dateDisplay", label: "Date" },
         { key: "description" },
         // { key: "accountDisplay", label: "Account" },
@@ -239,6 +238,7 @@ export default {
     },
   },
   mounted() {
+    this.$store.commit("setPageNavItems", ["Accounting", "Journal Entries"]);
     var self = this;
     self.refreshTable();
   },
