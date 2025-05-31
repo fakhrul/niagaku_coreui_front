@@ -1,6 +1,8 @@
 
 <template>
   <div class="wrapper">
+    <!-- <ToastContainer :toasts="infoList" /> -->
+
     <CDropdown
       v-if="isTenantAdmin()"
       placement="bottom"
@@ -12,10 +14,10 @@
       <template #toggler>
         <CHeaderNavLink class="dropdown-toggler">
           <img
-          :src="getBusinessIcon(currentBusiness)"
-          alt="Business Logo"
-          class="business-icon"
-        />
+            :src="getBusinessIcon(currentBusiness)"
+            alt="Business Logo"
+            class="business-icon"
+          />
           {{ currentBusinessShortName }}
           <CIcon name="cil-chevron-bottom" class="ml-2 dropdown-icon" />
         </CHeaderNavLink>
@@ -28,6 +30,7 @@
         :key="item.id"
         @click="changeBusiness(item)"
         class="dropdown-item"
+        :disabled="item.id == currentBusiness.id"
       >
         <img
           :src="getBusinessIcon(item)"
@@ -46,9 +49,13 @@
 <script>
 import ProfileApi from "@/lib/profileApi";
 import BusinessApi from "@/lib/businessApi";
+import ToastContainer from "@/views/widgets/ToastContainer.vue";
 
 export default {
-  name: "TheHeaderDropdownNotif",
+  name: "TheHeaderDropdownBusiness",
+  components: {
+    ToastContainer,
+  },
   data() {
     return {
       defaultIcon: "/img/avatars/6.jpg",
@@ -68,14 +75,12 @@ export default {
     currentRole() {
       return this.currentProfile.appUser.role;
     },
-    currentBusiness()
-    {
+    currentBusiness() {
       try {
         return this.currentProfile.defaultBusiness;
       } catch (error) {
         return null;
       }
-
     },
     currentBusinessShortName() {
       try {
@@ -90,7 +95,6 @@ export default {
     getBusinessIcon(item) {
       try {
         return item.logoUrl ? this.getImageUrl(item.logoUrl) : this.defaultIcon;
-        
       } catch (error) {
         return this.defaultIcon;
       }
@@ -120,15 +124,29 @@ export default {
     },
 
     changeBusiness(item) {
+      console.log("Current business:", this.currentBusiness);
+      console.log("Changing business...", item);
+      if (item.id == this.currentBusiness.id) {
+        this.toast("Info", "You are already in this business", "info");
+        return;
+      }
       var self = this;
       self.businessApi
         .updateDefaultBusiness(item)
         .then((response) => {
           this.initalize();
-          this.$router.push({ path: "/" }).then(() => {
-            // Force reload the page to clear all cached data
-            window.location.reload();
-          });
+          this.$router
+            .push({ path: "/dashboard" })
+            .then(() => {
+              window.location.reload();k
+            })
+            .catch((err) => {
+              window.location.reload(); // Still reload even on same path
+            });
+          // this.$router.push({ path: "/" }).then(() => {
+          //   // Force reload the page to clear all cached data
+          //   window.location.reload();
+          // });
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -140,6 +158,9 @@ export default {
         .getCurrentProfile()
         .then((response) => {
           self.currentProfile = response.result;
+          auth.updateDefaultBusiness(
+            self.currentProfile.defaultBusiness
+          ); // Update auth with the new default business
           // console.log(self.currentProfile);
         })
         .catch(({ data }) => {

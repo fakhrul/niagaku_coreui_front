@@ -123,7 +123,9 @@ const mutations = {
     }
     else if (state.navItemType === 'Dashboard') {
       state.pageNavItems = [
-        { label: "Dashboard", route: "/tenants/dashboard", tooltip: "Overview of key business information and KPIs" },
+        { label: "Home", route: "/dashboard", tooltip: "Overview of key business information and KPIs" },
+        { label: "Cash flow", route: "/tenants/dashboardCashFlow", tooltip: "Overview of key cash flow information" },
+        { label: "Planner", route: "/tenants/dashboardPlanner", tooltip: "Overview of business planning" },
       ]
     }
     else {

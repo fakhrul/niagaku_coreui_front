@@ -111,6 +111,17 @@ class AuthService {
         this.user = user;
     }
 
+    updateDefaultBusiness(data) {
+        this.user.userData.profile.defaultBusiness = data;
+        this.user.userData.profile.defaultBusinessId = data.id;
+
+        window.localStorage.setItem('user', JSON.stringify(this.user));
+    }
+
+    getLocalUser() {
+        return this.user.userData;
+    }
+
     isSuperAdmin() {
         return this.user.userData.role == 'super';
     }

@@ -15,33 +15,10 @@
       </CToaster>
     </div>
     <div>
-      <CAlert color="info" closeButton :show.sync="showQuickInfo">
-        <p><strong>Quick Info</strong> This page show all of your quotation</p>
-        <!-- <ul>
-          <li>You can select your default business to manage.</li>
-          <li>To manage your specific buisness, click Show and Edit.</li>
-        </ul> -->
-      </CAlert>
-    </div>
-    <div>
       <CRow>
         <CCol sm="12">
           <CCard>
-            <CCardHeader>
-              <strong> Quotation </strong> List
-              <div class="card-header-actions">
-                <CDropdown
-                  size="sm"
-                  toggler-text="Help"
-                  color="link"
-                  class="m-0 d-inline-block"
-                >
-                  <CDropdownItem @click="showQuickInfo = true"
-                    >Quick Info</CDropdownItem
-                  >
-                </CDropdown>
-              </div>
-            </CCardHeader>
+            <CCardHeader> <strong> Invoice </strong> List </CCardHeader>
             <CCardBody>
               <CDataTable
                 :items="computedItems"
@@ -53,7 +30,6 @@
                 sorter
                 pagination
                 :loading="loading"
-                responsive
               >
                 <template #show_index="{ index }">
                   <td class="py-2">
@@ -64,7 +40,7 @@
                   <td>
                     <CBadge
                       :color="
-                        getQuotationStatusBadgeColor(item.statusDescription)
+                        getInvoiceStatusBadgeColor(item.statusDescription)
                       "
                       >{{ item.statusDescription }}</CBadge
                     >
@@ -73,23 +49,7 @@
 
                 <template #show_details="{ item, index }">
                   <td class="py-2">
-                    <CDropdown toggler-text="Action" class="m-2" color="light">
-                      <CDropdownItem @click="onEdit(item)"
-                        >View/Edit</CDropdownItem
-                      >
-                      <CDropdownItem @click="onDuplicate(item)"
-                        >Duplicate</CDropdownItem
-                      >
-                      <CDropdownDivider />
-                      <CDropdownItem>Print</CDropdownItem>
-                      <CDropdownItem>Export to PDF</CDropdownItem>
-                      <CDropdownDivider />
-                      <CDropdownItem @click="showDeleteConfirmation(item)"
-                        >Delete</CDropdownItem
-                      >
-                    </CDropdown>
-
-                    <!-- <CButton
+                    <CButton
                       color="primary"
                       variant="outline"
                       square
@@ -97,7 +57,7 @@
                       @click="toggleDetails(item, index)"
                     >
                       {{ Boolean(item._toggled) ? "Hide" : "Show" }}
-                    </CButton> -->
+                    </CButton>
                   </td>
                 </template>
                 <template #details="{ item }">
@@ -144,12 +104,11 @@
         </CCol>
       </CRow>
     </div>
-    
   </div>
 </template>
 
 <script>
-import QuotationApi from "@/lib/quotationApi";
+import InvoiceApi from "@/lib/invoiceApi";
 import moment from "moment";
 
 const items = [];
@@ -161,11 +120,10 @@ const fields = [
     sorter: false,
     filter: false,
   },
-  { key: "quotationNumber", label: "Quotation No" },
-  { key: "customerName", label: "Customer" },
-  { key: "picName", label: "PIC" },
+  { key: "invoiceNumber", lable: "Invoice No" },
+  { key: "customerName" },
   { key: "displayIssuedDate", label: "Issued" },
-  { key: "grandTotal", label: "Amount" },
+  { key: "grandTotal" },
 
   { key: "show_status", label: "Status" },
   // { key: "statusDescription" },
@@ -179,10 +137,9 @@ const fields = [
 ];
 
 export default {
-  name: "QuotationList",
+  name: "InvoiceList",
   data() {
     return {
-      showQuickInfo: false,
       loading: true,
       items: items.map((item, id) => {
         return { ...item, id };
@@ -191,13 +148,13 @@ export default {
       fields,
       details: [],
       collapseDuration: 0,
-      api: new QuotationApi(),
+      api: new InvoiceApi(),
       warningModal: false,
       itemToDelete: {},
     };
   },
   mounted() {
-    this.$store.commit("setPageNavItems", ["Sales", "Quotations"]);
+    this.$store.commit("setPageNavItems", ["Sales", "Invoices"]);
 
     var self = this;
     self.refreshTable();
@@ -208,9 +165,7 @@ export default {
         return {
           ...item,
           displayIssuedDate: this.getDisplayDate(item.issuedDate),
-
           customerName: this.getCustomerName(item),
-          picName: this.getPicName(item),
           grandTotal: this.getGrandTotal(item),
         };
       });
@@ -221,27 +176,22 @@ export default {
     getDisplayDate(dt) {
       return moment(dt).format("DD/MM/YYYY");
     },
-    getPicName(item) {
-      if (item.contactName) {
-        return item.contactName;
-      }
-      return "N/A";
-    },
     getCustomerName(item) {
       if (item.customer) {
         return item.customer.name;
       }
       return "N/A";
     },
-    getGrandTotal(quotation) {
+    getGrandTotal(invoice) {
+      console.log("grandTotal", invoice);
       var total = 0;
-      for (var i = 0; i < quotation.items.length; i++) {
-        var item = quotation.items[i];
+      for (var i = 0; i < invoice.items.length; i++) {
+        var item = invoice.items[i];
         total += item.price * item.quantity;
       }
       return total.toFixed(2);
     },
-    getQuotationStatusBadgeColor(status) {
+    getInvoiceStatusBadgeColor(status) {
       return status === "Draft"
         ? "secondary"
         : status === "Accepted"
@@ -285,16 +235,10 @@ export default {
           self.toast("Error", helper.getErrorMessage(data), "danger");
         });
     },
-    onDuplicate(item) {
-      var self = this;
-      self.$router.push({
-        path: `/tenants/Quotation/${item.id}/duplicate`,
-      });
-    },
     onEdit(item) {
       var self = this;
       self.$router.push({
-        path: `/tenants/Quotation/${item.id}`,
+        path: `/tenants/Invoice/${item.id}`,
       });
     },
     onDeleteConfirmation(status, evt, accept) {
@@ -317,7 +261,7 @@ export default {
       self.warningModal = true;
     },
     addNew() {
-      this.$router.push({ path: "/tenants/Quotation" });
+      this.$router.push({ path: "/tenants/Invoice" });
     },
     toast(header, message, color) {
       var self = this;

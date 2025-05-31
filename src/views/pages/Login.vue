@@ -36,7 +36,7 @@
                 </h1>
                 <p class="text-muted">Sign in to your account</p>
               </div>
-              <CForm class="text-center">
+              <CForm class="text-center"  @submit.prevent="login">
                 <CInput
                   placeholder="Email"
                   autocomplete="username email"
@@ -52,12 +52,12 @@
                     <CIcon name="cil-user" />
                   </template>
                 </CInput>
-                <CSmall
+                <small 
                   v-if="!isValidEmail && loginObj.email.length > 0"
-                  class="text-danger"
+                  class="mt-0 text-danger"
                 >
                   Please enter a valid email address.
-                </CSmall>
+                </small>
 
                 <CInput
                   placeholder="Password"
@@ -75,12 +75,12 @@
                     <CIcon name="cil-lock-locked" />
                   </template>
                 </CInput>
-                <CSmall
+                <small
                   v-if="!isValidPassword && loginObj.password.length > 0"
                   class="text-danger"
                 >
                   Password must be at least 8 characters long.
-                </CSmall>
+                </small>
 
                 <!-- <CButton
                   :color="loading ? 'secondary' : 'success'"
@@ -95,10 +95,10 @@
                   <CSpinner v-if="loading" size="sm" /> Login
                 </CButton> -->
                 <CButton
+                type="submit"
                   :color="loading ? 'secondary' : 'success'"
                   :disabled="loading"
                   block
-                  @click.prevent="login"
                   style="background-color: #756cfb; border-color: #756cfb"
                   data-test-id="loginButton"
                 >
@@ -133,6 +133,9 @@
 <script>
 import { mapState } from "vuex"; // Import Vuex helpers
 import ToastContainer from "../widgets/ToastContainer.vue";
+import ChatbotAiApi from '../../lib/chatbotAiApi'; // adjust path as needed
+
+const chatbotApi = new ChatbotAiApi();
 
 export default {
   name: "Login",
@@ -160,6 +163,7 @@ export default {
   },
   methods: {
     login() {
+      console.log("Login attempt with:", this.loginObj); // Debugging line
       if (!this.isValidEmail || !this.isValidPassword) {
         this.toast(
           "Error",
@@ -179,6 +183,32 @@ export default {
         .then((response) => {
           this.loading = false;
           auth.recordLogin(response.accessToken, response, false);
+
+
+          console.log("Login response:", response); // Debugging line
+          console.log("User data:", response.userData); // Debugging line
+          // Extract businessId and profileId from user data
+          const user = response.userData; // or response.user if wrapped
+          const businessId = user.profile.defaultBusinessId;
+          const profileId = user.profileId;
+
+          // // Store user in localStorage so ChatbotWidget can use it
+          // window.localStorage.setItem("user", JSON.stringify(user));
+
+          // Call chatbot /refresh
+          chatbotApi
+            .refresh(businessId, profileId)
+            .then(() => {
+              console.log(
+                "[Chatbot] Content refreshed for:",
+                businessId,
+                profileId
+              );
+            })
+            .catch((err) => {
+              console.warn("[Chatbot] Refresh failed:", err);
+            });
+
           this.$router.push({ path: "/" });
         })
         .catch(({ data }) => {

@@ -2,32 +2,27 @@
   <div ref="pdfContent" class="pdf-content">
     <CCard>
       <CCardHeader class="no-print">
-        <div class="d-flex justify-content-end no-print">
-          <CButton color="info" size="sm" class="ml-1" @click="printContent">
+        <div class="float-right no-print">
+          <a href="#" class="btn btn-sm btn-info ml-1" @click="printContent">
             <CIcon name="cil-print" class="mr-1" /> Print
-          </CButton>
-          <CButton color="success" size="sm" class="ml-1" @click="showPdfInstallMessage">
-            <CIcon name="cil-file" class="mr-1" /> Export PDF
-          </CButton>
-          <CButton color="primary" size="sm" class="ml-1" @click="exportToWord">
-            <CIcon name="cil-description" class="mr-1" /> Export Word
-          </CButton>
+          </a>
         </div>
       </CCardHeader>
       <CCardBody>
         <CRow class="justify-content-between align-items-center">
-          <CCol sm="6">
+          <CCol>
             <img
               :src="getImageUrl()"
               alt="Logo Syarikat"
               class="img-fluid logo-image"
             />
           </CCol>
-          <CCol sm="6" class="text-right">
+          <CCol class="text-right">
             <h1>INVOICE</h1>
             <h5>{{ invoice.business.name }}</h5>
             <p>{{ "(" + invoice.business.regNo + ")" }}</p>
             <p v-html="formatAddress(invoice.business.address)"></p>
+            <!--item.description is rendered from handlekeydown event and rerun format-->
             <p>Tel: {{ invoice.business.phone }}</p>
           </CCol>
         </CRow>
@@ -74,13 +69,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in computedInvoiceItems" :key="item.id || item.position">
+              <tr v-for="item in computedInvoiceItems" :key="item.name">
                 <td class="index-column">{{ item.position }}</td>
                 <td class="item-column">
                   <p>
                     <strong>{{ item.product.name }}</strong>
                   </p>
-                  <p v-html="formatDescription(item.description || '')"></p>
+                  <p v-html="formatDescription(item.description)"></p>
                 </td>
                 <td class="text-center quantity-column">{{ item.quantity }}</td>
                 <td class="text-right price-column">
@@ -90,6 +85,15 @@
                   {{ formatCurrency(item.totalAmountPerItem) }}
                 </td>
               </tr>
+
+              <!-- <tr>
+              <td><strong>Total Amount Due</strong></td>
+              <td>
+                <strong>{{ getTotalAmountDue() }}</strong>
+              </td>
+            </tr> -->
+
+              <!-- Grand Total Row -->
               <tr>
                 <td colspan="4" class="text-right">
                   <strong>Total</strong>
@@ -98,38 +102,18 @@
                   <strong>{{ formatCurrency(grandTotal) }}</strong>
                 </td>
               </tr>
+              <!-- <tr>
+              <td>
+                <strong>Total Amount </strong>
+                {{ stock.sale.loan.bank.name }}
+              </td>
+              <td>
+                <strong>{{ getNetAmountDue() }}</strong>
+              </td>
+            </tr>  -->
             </tbody>
           </table>
         </div>
-        
-        <!-- Mobile View for Items -->
-        <div class="d-md-none mobile-items">
-          <div v-for="item in computedInvoiceItems" :key="item.id || item.position" class="mobile-item">
-            <div class="mobile-item-header">
-              <strong>Item #{{ item.position }}</strong>
-              <span>{{ formatCurrency(item.totalAmountPerItem) }}</span>
-            </div>
-            <div class="mobile-item-body">
-              <p><strong>{{ item.product.name }}</strong></p>
-              <p v-html="formatDescription(item.description || '')"></p>
-              <div class="mobile-item-details">
-                <div>
-                  <small>Quantity</small>
-                  <p>{{ item.quantity }}</p>
-                </div>
-                <div>
-                  <small>Price</small>
-                  <p>{{ formatCurrency(item.price) }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mobile-total">
-            <strong>Total:</strong>
-            <span>{{ formatCurrency(grandTotal) }}</span>
-          </div>
-        </div>
-        
         <!-- Terms and Conditions Section -->
         <div v-if="invoice.note" class="terms-and-conditions mt-4">
           <p><strong>Terms and Conditions</strong></p>
@@ -149,25 +133,11 @@
         </div>
       </CCardBody>
     </CCard>
-    
-    <!-- Installation Instructions Modal -->
-    <CModal 
-      :show.sync="showInstallModal" 
-      title="Package Installation Required" 
-      size="md"
-      color="info"
-    >
-      <p>To enable PDF export functionality, you need to install the following packages:</p>
-      <code>npm install --save html2pdf.js file-saver</code>
-      <p class="mt-3">After installation, please restart your development server.</p>
-      <template #footer>
-        <CButton color="secondary" @click="showInstallModal = false">Close</CButton>
-      </template>
-    </CModal>
   </div>
 </template>
 
 <script>
+// import html2pdf from "html2pdf.js";
 import moment from "moment";
 
 export default {
@@ -176,50 +146,31 @@ export default {
     invoice: {
       type: Object,
       required: true,
-    }
-  },
-  data() {
-    return {
-      isPrinting: false,
-      showInstallModal: false
-    };
+    },
   },
   computed: {
     computedInvoiceItems() {
-      if (!this.invoice.items || !Array.isArray(this.invoice.items)) {
-        return [];
-      }
-      
       return this.invoice.items.map((item) => {
         return {
           ...item,
-          productName: item.product ? item.product.name : '',
+          productName: item.product.name,
           totalAmountPerItem: this.getTotalItemPrice(item),
         };
       });
     },
     grandTotal() {
       // Calculate the grand total by summing up the total amount per item
-      const total = this.computedInvoiceItems
+      return this.computedInvoiceItems
         .reduce((acc, item) => {
           return acc + item.totalAmountPerItem;
-        }, 0);
-      
-      return parseFloat(total).toFixed(2);
+        }, 0)
+        .toFixed(2);
     },
-  },
-  mounted() {
-    // Add event listener for afterprint
-    window.addEventListener('afterprint', this.handleAfterPrint);
-  },
-  beforeDestroy() {
-    // Remove event listener when component is destroyed
-    window.removeEventListener('afterprint', this.handleAfterPrint);
   },
   methods: {
     formatCurrency(amount) {
       try {
-        return parseFloat(amount).toLocaleString(undefined, {
+        return amount.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
@@ -228,12 +179,9 @@ export default {
       }
     },
     formatNote(note) {
-      if (!note) return '';
       return note.replace(/\n/g, "<br />");
     },
     formatDescription(description) {
-      if (!description) return '';
-      
       // split item.description \n
       return description
         .split("\n") //split into an array
@@ -250,7 +198,7 @@ export default {
 
     getTotalItemPrice(item) {
       try {
-        return parseFloat(item.quantity) * parseFloat(item.price);
+        return item.quantity * item.price;
       } catch (error) {
         return 0;
       }
@@ -260,41 +208,114 @@ export default {
       return moment(this.invoice.issuedDate).format("DD/MM/YYYY");
     },
     getInvoiceExpiryDate() {
-      return moment(this.invoice.expiryDate || this.invoice.dueDate).format("DD/MM/YYYY");
+      return moment(this.invoice.expiryDate).format("DD/MM/YYYY");
+    },
+    getNetAmountDue() {
+      var totalAmount = this.getTotalAmountDue() - this.getTotalLess();
+      return totalAmount.toFixed(2);
+    },
+    getTotalLess() {
+      var totalAmount = 0;
+      try {
+        totalAmount =
+          this.stock.sale.depositAmount + this.stock.sale.tradeInAmount;
+      } catch (error) {}
+      return totalAmount.toFixed(2);
+    },
+    getTotalAmountDue() {
+      var totalAmount = 0;
+      try {
+        totalAmount = this.stock.sale.saleAmount;
+        for (
+          var i = 0;
+          i < this.stock.adminitrativeCost.adminitrativeCostItems.length;
+          i++
+        ) {
+          totalAmount +=
+            this.stock.adminitrativeCost.adminitrativeCostItems[i].amount;
+        }
+      } catch (error) {}
+      return totalAmount.toFixed(2);
+    },
+    getSellingPrice() {
+      try {
+        return this.stock.sale.saleAmount.toFixed(2);
+      } catch (error) {
+        return null;
+      }
+    },
+    getPlateNo() {
+      try {
+        return this.stock.registration.vehicleRegistrationNumber;
+      } catch (error) {
+        return "N/A";
+      }
+    },
+    getBrandModelNo() {
+      try {
+        return (
+          this.stock.vehicle.brand.name + " - " + this.stock.vehicle.model.name
+        );
+      } catch (error) {
+        return "N/A";
+      }
+    },
+    getVehicleEngineNo() {
+      try {
+        return this.stock.vehicle.engineNo;
+      } catch (error) {
+        return "N/A";
+      }
+    },
+    getVehicleChasisNo() {
+      try {
+        return this.stock.vehicle.chasisNo;
+      } catch (error) {
+        return "N/A";
+      }
     },
     getCustomerAddress() {
       try {
-        return this.invoice.customer.address || "N/A";
+        return this.invoice.customer.address;
       } catch (error) {
         return "N/A";
       }
     },
     getCustomerName() {
       try {
-        return this.invoice.customer.name || "N/A";
+        return this.invoice.customer.name;
+      } catch (error) {
+        return "N/A";
+      }
+    },
+    getCustomerIcNumber() {
+      try {
+        return this.stock.sale.customer.icNumber;
       } catch (error) {
         return "N/A";
       }
     },
     removeTrailingSlash(str) {
-      if (!str) return '';
       if (str.endsWith("/")) {
         return str.slice(0, -1);
       }
       return str;
     },
+    getImageChopUrl() {
+      var url =
+        this.removeTrailingSlash(apiUrl) + this.invoice.business.companyChopUrl;
+      return url;
+    },
     getImageUrl() {
       if (!this.invoice || !this.invoice.business || !this.invoice.business.logoUrl) {
-        return ""; // or return a default placeholder image URL
-      }
+    return ""; // or return a default placeholder image URL
+  }
 
-      // Get the API URL from window.apiUrl or use a default
-      const apiBaseUrl = window.apiUrl || '';
-      var url = this.removeTrailingSlash(apiBaseUrl) + this.invoice.business.logoUrl;
+      var url =
+        this.removeTrailingSlash(apiUrl) + this.invoice.business.logoUrl;
       return url;
     },
     formatAddress(address) {
-      if (!address) return '';
       return address.replace(/\n/g, "<br />");
     },
     forceA4Size() {
@@ -302,114 +323,39 @@ export default {
       if (pdfContent) {
         // Ensure the size is recalculated and displayed correctly
         pdfContent.style.width = "210mm";
-        pdfContent.style.minHeight = "297mm";
-      }
-    },
-    handleAfterPrint() {
-      if (this.isPrinting) {
-        this.isPrinting = false;
-        // Force Vue to re-render the component
-        this.$forceUpdate();
+        pdfContent.style.height = "297mm";
       }
     },
     printContent() {
-      this.isPrinting = true;
       this.forceA4Size(); // Ensure the content is set to A4 size
-      
-      // Set a timeout to allow the DOM to update
       setTimeout(() => {
         const originalTitle = document.title; // Save the current title
-        document.title = 
-          (this.invoice.business ? this.invoice.business.shortName : 'Invoice') + 
-          "_" + this.invoice.invoiceNumber; // Set the desired filename
-        
+        document.title =
+          this.invoice.business.shortName + "_" + this.invoice.invoiceNumber; // Set the desired filename
+
+        const printContents = this.$refs.pdfContent.innerHTML;
+        const originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
         window.print();
-        
-        // Restore the title
-        document.title = originalTitle;
-      }, 100);
+        document.body.innerHTML = originalContents;
+        document.title = originalTitle; // Restore the original title
+
+        // Reattach Vue.js event listeners (important!)
+        this.$nextTick(() => {
+          this.$forceUpdate();
+          //window.location.reload(); // Refresh the page to reinitialize Vue bindings
+
+          // console.log(originalDate)
+          // console.log(originalSelectedDevice)
+          // this.queryDate = originalDate;
+          // this.selectedDeviceID = originalSelectedDevice.devicecID;
+        });
+      }, 100); // Delay slightly to allow reflow
     },
-    showPdfInstallMessage() {
-      this.showInstallModal = true;
-    },
-    exportToWord() {
-      // Create a clone of the invoice content
-      const element = this.$refs.pdfContent.cloneNode(true);
-      
-      // Remove no-print elements
-      const noPrintElements = element.querySelectorAll('.no-print');
-      noPrintElements.forEach(el => el.remove());
-      
-      // Get the HTML content
-      const html = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" 
-              xmlns:w="urn:schemas-microsoft-com:office:word" 
-              xmlns="http://www.w3.org/TR/REC-html40">
-        <head>
-          <meta charset="utf-8">
-          <title>Invoice</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              font-size: 12pt;
-            }
-            .text-right {
-              text-align: right;
-            }
-            .text-center {
-              text-align: center;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            table, th, td {
-              border: 1px solid #ddd;
-            }
-            th, td {
-              padding: 8px;
-            }
-            .thick-hr {
-              border: 1px solid #000;
-              margin: 10px 0;
-            }
-            .report-footer {
-              text-align: center;
-              margin-top: 20px;
-              padding-top: 10px;
-              border-top: 1px solid #ccc;
-            }
-            .logo-image {
-              max-width: 200px;
-            }
-          </style>
-        </head>
-        <body>
-          ${element.innerHTML}
-        </body>
-        </html>
-      `;
-      
-      // Create a Blob with the HTML content
-      const blob = new Blob([html], { type: 'application/msword' });
-      
-      // Create filename
-      const filename = 
-        (this.invoice.business ? this.invoice.business.shortName : 'Invoice') + 
-        "_" + this.invoice.invoiceNumber + ".doc";
-      
-      // Create a download link and trigger it
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
   },
 };
 </script>
-
 <style scoped>
 .report-footer {
   text-align: center;
@@ -433,17 +379,17 @@ export default {
 .logo-image {
   max-width: 200px;
 }
-
 .pdf-content > .CRow:first-child {
   margin-bottom: 0; /* Reduce space between header and content */
 }
-
 .pdf-content {
   width: 210mm;
-  min-height: 297mm;
+  height: 297mm;
+  max-height: 297mm;
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
   background-color: white;
 }
 
@@ -460,7 +406,7 @@ export default {
 }
 
 .table tr {
-  page-break-inside: avoid; /* Prevent page breaks inside table rows */
+  page-break-inside: auto; /* Prevent page breaks inside table rows */
   page-break-after: auto; /* Allow page breaks after rows */
 }
 
@@ -493,75 +439,15 @@ export default {
   white-space: normal; /* Ensure text wraps within cells */
 }
 
-/* Mobile view styling */
-.mobile-items {
-  margin-top: 20px;
-}
-
-.mobile-item {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-
-.mobile-item-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
-}
-
-.mobile-item-body {
-  padding: 10px;
-}
-
-.mobile-item-details {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.mobile-item-details > div {
-  flex: 1;
-}
-
-.mobile-item-details small {
-  color: #6c757d;
-  display: block;
-}
-
-.mobile-total {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 10px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1.1em;
-}
-
 @media screen and (max-width: 768px) {
   .pdf-content {
     width: 100%;
     height: auto;
-    min-height: auto;
-    padding: 10px;
   }
-  
-  .table-wrapper {
-    display: none;
-  }
-  
-  .logo-image {
-    max-width: 150px;
-  }
-}
 
-@media screen and (min-width: 769px) {
-  .mobile-items {
-    display: none;
+  .table-wrapper {
+    display: block;
+    white-space: nowrap;
   }
 }
 
@@ -569,41 +455,38 @@ export default {
   .text-right {
     text-align: right;
   }
-  
   .pdf-content {
     width: 100%;
     height: auto;
-    min-height: auto;
-    margin: 0;
-    padding: 0;
+    margin: 0 auto;
+    page-break-inside: avoid;
   }
 
   .table-wrapper {
     page-break-before: auto;
+    /*page-break-inside: avoid;*/
     margin-top: 10px;
-  }
-  
-  .mobile-items {
-    display: none;
   }
 
   .invoice-details {
-    margin-right: 20px;
-    margin-left: 20px;
-    margin-bottom: 20px;
+    margin-right: 20px; /* Add some bottom margin to the header section */
+    margin-left: 20px; /* Add some bottom margin to the header section */
+    margin-bottom: 20px; /* Add some bottom margin to the header section */
+  }
+
+  .table tr {
+    /*page-break-inside: avoid; -- Remove this line */
+    page-break-after: auto;
   }
 
   .table {
     width: 100%;
+    /*page-break-inside: auto;  -- Remove this line */
     border-collapse: collapse;
   }
 
   .no-print {
     display: none !important;
-  }
-  
-  .table-wrapper {
-    display: block !important;
   }
 }
 
@@ -618,5 +501,11 @@ export default {
 
 .terms-and-conditions {
   margin-top: 20px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
 </style>

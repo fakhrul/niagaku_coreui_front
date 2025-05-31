@@ -6,6 +6,8 @@ const TheContainer = () => import('@/containers/TheContainer')
 
 // Views
 const Dashboard = () => import('@/views/Dashboard')
+const DashboardCashFlow = () => import('@/views/tenants/DashboardCashFlow')
+const DashboardPlanner = () => import('@/views/tenants/DashboardPlanner')
 
 // Views - Pages
 const Page404 = () => import('@/views/pages/Page404')
@@ -187,7 +189,27 @@ function configRoutes() {
         {
           path: 'dashboard',
           name: 'Dashboard',
-          component: Dashboard,
+          component: {
+            render(c) { return c('router-view') }
+          },
+          children: [
+            {
+              path: '/dashboard',
+              name: 'Dashboard',
+              component: Dashboard
+            },
+            {
+              path: '/tenants/dashboardCashFlow',
+              name: 'DashboardCashFlow',
+              component: DashboardCashFlow
+            },
+            {
+              path: '/tenants/dashboardPlanner',
+              name: 'DashboardPlanner',
+              component: DashboardPlanner
+            },
+
+          ]
 
         },
         //

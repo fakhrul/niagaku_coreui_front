@@ -24,9 +24,11 @@ class Api {
         method,
         url,
         data,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: data instanceof FormData ? {} : { 'Content-Type': 'application/json' }
+
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
       });
       return response;
     } catch (error) {

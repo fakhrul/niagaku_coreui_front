@@ -1,343 +1,600 @@
 <template>
   <div>
-    <CToaster :autohide="3000">
+    <!-- Toast Notifications -->
+    <CToaster :autohide="3000" placement="top-end">
       <template v-for="info in infoList">
         <CToast
           :key="info.message"
           :show="true"
           :header="info.header"
           :color="info.color"
+          class="shadow-sm"
         >
-          {{ info.message }}.
+          {{ info.message }}
         </CToast>
       </template>
     </CToaster>
-    <div>
-      <CRow>
-        <CCol sm="12">
-          <CCard>
-            <CCardHeader>
-              <strong>Invoice</strong>
-              <small>{{ obj.invoiceNumber }}</small>
-              <a href="" target="_blank" :class="getBadgeClass()">
-                {{ obj.statusDescription }}
-              </a>
-              <div class="card-header-actions">
-                <CDropdown
-                  placement="bottom-end"
-                  toggler-text="Action"
-                  color="light"
-                  class="m-2 d-inline-block tour-cdropdown"
-                  size="sm"
-                >
-                  <CDropdownItem @click="addNew()">Add New</CDropdownItem>
-                  <CDropdownItem @click="onConvertToReceipt(obj)"
-                    >Convert To Receipt</CDropdownItem
+
+    <!-- Page Header -->
+    <CCard class="mb-4 border-0 shadow-sm">
+      <CCardBody class="p-4">
+        <CRow class="align-items-center">
+          <CCol md="6">
+            <h1 class="mb-1 font-weight-bold">
+              {{ obj.id ? "Edit Invoice" : "Create Invoice" }}
+            </h1>
+            <p class="text-medium-emphasis mb-0">
+              {{
+                obj.id
+                  ? `Editing invoice ${obj.invoiceNumber}`
+                  : "Create a new invoice for your customer"
+              }}
+            </p>
+          </CCol>
+          <CCol md="6" class="d-flex justify-content-end">
+            <CBadge :class="getBadgeClass()" class="mr-3 p-2">
+              {{ obj.statusDescription || "Draft" }}
+            </CBadge>
+            <CDropdown
+              placement="bottom-end"
+              toggler-text="Actions"
+              color="primary"
+              class="mr-2"
+              size="sm"
+            >
+              <CDropdownItem @click="addNew()">New Invoice</CDropdownItem>
+              <CDropdownItem @click="onConvertToReceipt(obj)"
+                >Convert To Receipt</CDropdownItem
+              >
+              <CDropdownDivider />
+              <CDropdownHeader>Change Status To:</CDropdownHeader>
+              <template v-for="status in computedInvoiceStatuses">
+                <CDropdownItem @click="changeState(status)">{{
+                  status.name
+                }}</CDropdownItem>
+              </template>
+            </CDropdown>
+            <CDropdown size="sm" toggler-text="Help" color="light">
+              <CDropdownItem @click="startTour">Onboarding Tour</CDropdownItem>
+              <CDropdownItem disabled>Quick Info</CDropdownItem>
+              <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
+              <CDropdownItem disabled>Video Tutorial</CDropdownItem>
+              <CDropdownItem disabled>Live Chat</CDropdownItem>
+              <CDropdownItem disabled>Send Feedback</CDropdownItem>
+            </CDropdown>
+          </CCol>
+        </CRow>
+      </CCardBody>
+    </CCard>
+
+    <!-- Main Form -->
+    <CRow>
+      <CCol lg="8">
+        <CCard class="mb-4 border-0 shadow-sm">
+          <CCardHeader class="bg-transparent border-0 p-4">
+            <h5 class="mb-0">Invoice Details</h5>
+          </CCardHeader>
+          <CCardBody class="p-4">
+            <!-- Customer & Invoice Info -->
+            <CRow>
+              <CCol md="6">
+                <CFormGroup>
+                  <CLabel class="font-weight-bold">Customer</CLabel>
+                  
+                  <v-select
+                    class="mb-3"
+                    v-model="selectedCustomer"
+                    :label="'name'"
+                    :options="customerItemsWithAddNew"
+                    placeholder="Select customer"
+                    @input="handleCustomerSelect"
                   >
-                  <CDropdownDivider />
-                  <CDropdownHeader>Change Status To:</CDropdownHeader>
-                  <template v-for="status in computedInvoiceStatuses">
-                    <CDropdownItem @click="changeState(status)">{{
-                      status.name
-                    }}</CDropdownItem>
-                  </template>
-                </CDropdown>
-                <CDropdown
-                  size="sm"
-                  toggler-text="Help"
-                  color="link"
-                  class="m-0 d-inline-block"
-                >
-                  <CDropdownItem @click="startTour"
-                    >Onboarding Tour</CDropdownItem
+                    <span slot="no-options" @click="addNewCustomer">
+                      No More Options. Click to add New.
+                    </span>
+                  </v-select>
+
+                  <div
+                    v-if="selectedCustomer && selectedCustomer.id !== 'add_new'"
+                    class="customer-details p-3 bg-light rounded mb-3"
                   >
-                  <CDropdownItem disabled>Quick Info</CDropdownItem>
-                  <CDropdownItem disabled>Help Center & FAQ</CDropdownItem>
-                  <CDropdownItem disabled>Video Tutorial</CDropdownItem>
-                  <CDropdownItem disabled>Live Chat</CDropdownItem>
-                  <CDropdownItem disabled>Send Feedback</CDropdownItem>
-                </CDropdown>
-              </div>
-            </CCardHeader>
-            <CCardBody>
-              <CRow>
-                <CCol sm="12" md="12" lg="6"
-                  ><CFormGroup wrapperClasses="input-group pt-2">
-                    <template #label>Customer </template>
-                    <template #input>
-                      <v-select
-                        style="width: 100%"
-                        v-model="selectedCustomer"
-                        :label="'name'"
-                        :options="customerItemsWithAddNew"
-                        placeholder="Select customer"
-                        @input="handleCustomerSelect"
+                    <div class="d-flex align-items-center mb-2">
+                      <div
+                        class="c-avatar c-avatar-sm bg-primary-gradient text-white mr-2"
                       >
-                        <span slot="no-options" @click="addNewCustomer">
-                          No More Options. Click to add New.</span
-                        >
-                      </v-select>
-                    </template>
-                  </CFormGroup>
-                </CCol>
-                <CCol sm="12" md="12" lg="6"
-                  ><CInput
-                    label="Invoice No"
-                    placeholder=""
-                    v-model="obj.invoiceNumber"
-                /></CCol>
-              </CRow>
-              <CRow>
-                <CCol sm="12" md="12" lg="6"
-                  ><CInput
-                    placeholder=""
+                        {{
+                          selectedCustomer.name
+                            ? selectedCustomer.name.charAt(0)
+                            : "?"
+                        }}
+                      </div>
+                      <div class="font-weight-bold">
+                        {{ selectedCustomer.name }}
+                      </div>
+                    </div>
+                    <div
+                      class="small text-muted mb-1"
+                      v-if="selectedCustomer.address"
+                    >
+                      <CIcon name="cil-location-pin" />
+                      {{ selectedCustomer.address }}
+                    </div>
+                    <div
+                      class="small text-muted mb-1"
+                      v-if="selectedCustomer.contactEmail"
+                    >
+                      <CIcon name="cil-envelope-closed" />
+                      {{ selectedCustomer.contactEmail }}
+                    </div>
+                    <div
+                      class="small text-muted"
+                      v-if="selectedCustomer.contactPhone"
+                    >
+                      <CIcon name="cil-phone" />
+                      {{ selectedCustomer.contactPhone }}
+                    </div>
+                  </div>
+                </CFormGroup>
+
+                <CFormGroup>
+                  <CLabel class="font-weight-bold">Contact Person</CLabel>
+                  <CInput
+                    placeholder="Contact person name"
                     v-model="obj.contactName"
-                    label="Attn"
-                  >
-                    <!-- <template #prepend-content><CIcon name="cil-envelope-closed"/></template>  -->
-                  </CInput></CCol
-                >
-                <CCol sm="12" md="12" lg="6"> </CCol>
-              </CRow>
-              <CRow>
-                <CCol sm="12" md="8" lg="4">
-                  <CInput
-                    label="Date"
-                    type="date"
-                    :value="computeIssuedDate"
-                    @change="setIssuedDate"
                   />
+                </CFormGroup>
+              </CCol>
 
-                  <!-- <input
-                  type="date"
-                  :value="computeIssuedDate"
-                  @change="setIssuedDate"
-                  class="mr-2"
-                /> -->
-                </CCol>
-                <CCol sm="12" md="8" lg="4">
+              <CCol md="6">
+                <CFormGroup>
+                  <CLabel class="font-weight-bold">Invoice Number</CLabel>
                   <CInput
-                    label="Expiry"
-                    type="date"
-                    :value="computeExpiryDate"
-                    @change="setExpiryDate"
-                /></CCol>
-                <CCol sm="12" md="8" lg="4">
-                  <CInput label="Reference" v-model="obj.reference"
-                /></CCol>
-              </CRow>
-
-              <CRow>
-                <CCol>
-                  <CTextarea
-                    label="Invoice Title"
-                    v-model="obj.title"
-                    placeholder=""
-                    rows="2"
+                    placeholder="Auto-generated if left empty"
+                    v-model="obj.invoiceNumber"
                   />
-                </CCol>
-              </CRow>
+                </CFormGroup>
 
-              <CRow>
-                <CCol>
-                  <!-- Wrap CDataTable with draggable -->
+                <CRow>
+                  <CCol sm="6">
+                    <CFormGroup>
+                      <CLabel class="font-weight-bold">Issue Date</CLabel>
+                      <CInput
+                        type="date"
+                        :value="computeIssuedDate"
+                        @change="setIssuedDate"
+                      />
+                    </CFormGroup>
+                  </CCol>
+                  <CCol sm="6">
+                    <CFormGroup>
+                      <CLabel class="font-weight-bold">Due Date</CLabel>
+                      <CInput
+                        type="date"
+                        :value="computeExpiryDate"
+                        @change="setExpiryDate"
+                      />
+                    </CFormGroup>
+                  </CCol>
+                </CRow>
 
-                  <CDataTable
-                    :items="computedInvoiceItems"
-                    :fields="invoiceFields"
-                  >
-                    <template #show_index="{ index }">
-                      <td class="py-2">
-                        {{ index + 1 }}
-                      </td>
-                    </template>
-                    <template #show_item="{ item }">
+                <CFormGroup>
+                  <CLabel class="font-weight-bold">Reference</CLabel>
+                  <CInput
+                    placeholder="PO number or reference"
+                    v-model="obj.reference"
+                  />
+                </CFormGroup>
+              </CCol>
+            </CRow>
+
+            <CFormGroup>
+              <CLabel class="font-weight-bold">Invoice Title</CLabel>
+              <CTextarea
+                v-model="obj.title"
+                placeholder="Enter a descriptive title for this invoice"
+                rows="2"
+              />
+            </CFormGroup>
+
+            <!-- Invoice Items -->
+            <div class="mt-4">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h5 class="mb-0">Invoice Items</h5>
+                <CButton color="primary" size="sm" @click="addNewItem()">
+                  <CIcon name="cil-plus" /> Add Item
+                </CButton>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-hover border">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px">#</th>
+                      <th>Item</th>
+                      <th>Description</th>
+                      <th style="width: 100px">Quantity</th>
+                      <th style="width: 100px">Unit</th>
+                      <th style="width: 150px">Price</th>
+                      <th style="width: 150px">Total</th>
+                      <th style="width: 100px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, index) in computedInvoiceItems"
+                      :key="item.id"
+                    >
+                      <td>{{ index + 1 }}</td>
                       <td>
-                        <CFormGroup>
-                          <template #input>
-                            <v-select
-                              style="width: 100%"
-                              v-model="item.product"
-                              :label="'name'"
-                              :options="computeProductItemsWithAddNew"
-                              placeholder="Select product"
-                              @input="handleProductSelect($event, item)"
-                            />
-                          </template>
-                        </CFormGroup>
-                      </td>
-                    </template>
-                    <template #show_description="{ item }">
-                      <td>
-                        <CTextarea
-                          placeholder=""
-                          v-model="item.description"
-                          rows="3"
+                        <v-select
+                          v-model="item.product"
+                          :label="'name'"
+                          :options="computeProductItemsWithAddNew"
+                          placeholder="Select product"
+                          @input="handleProductSelect($event, item)"
                         />
                       </td>
-                    </template>
-                    <template #show_quantity="{ item }">
                       <td>
-                        <CInput v-model="item.quantity" min="1"></CInput>
+                        <CTextarea
+                          placeholder="Item description"
+                          v-model="item.description"
+                          rows="2"
+                        />
                       </td>
-                    </template>
-                    <template #show_unit="{ item }">
                       <td>
-                        <CInput v-model="item.unit"></CInput>
+                        <CInput v-model="item.quantity" type="number" min="1" />
                       </td>
-                    </template>
-                    <template #show_price="{ item }">
                       <td>
-                        <CInput
-                          v-model="item.price"
-                          min="0"
-                          step="0.01"
-                        ></CInput>
+                        <CInput v-model="item.unit" />
                       </td>
-                    </template>
-                    <template #show_total="{ item }">
                       <td>
-                        {{ getTotalItemPrice(item) }}
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Rp</span>
+                          </div>
+                          <CInput
+                            v-model="item.price"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
                       </td>
-                    </template>
-                    <template #show_move="{ item, index }">
-                      <td class="py-2">
-                        <CButton
-                          color="primary"
-                          size="sm"
-                          @click="moveItem(index, 'up')"
-                          :disabled="index === 0"
-                        >
-                          ↑
-                        </CButton>
-                        <CButton
-                          color="primary"
-                          size="sm"
-                          @click="moveItem(index, 'down')"
-                          :disabled="index === invoiceItems.length - 1"
-                        >
-                          ↓
-                        </CButton>
+                      <td class="font-weight-bold">
+                        {{ formatCurrency(getTotalItemPrice(item)) }}
                       </td>
-                    </template>
-                    <template #show_remove="{ item }">
-                      <td class="py-2">
-                        <CDropdown
-                          color="secondary"
-                          split
-                          toggler-text="Remove"
-                          class="m-2"
-                          @click="onRemoveClaimItem(item)"
-                        >
-                          <CDropdownItem @click="createReceiptByItem(item)"
-                            >Create Receipt</CDropdownItem
+                      <td>
+                        <CButtonGroup>
+                          <CButton
+                            color="light"
+                            size="sm"
+                            @click="moveItem(index, 'up')"
+                            :disabled="index === 0"
+                            title="Move Up"
                           >
-                        </CDropdown>
-
-                        <!-- <CButton
-                          color="primary"
-                          variant="outline"
-                          square
-                          size="sm"
-                          @click="onRemoveClaimItem(item)"
-                        >
-                          Remove
-                        </CButton> -->
+                            <CIcon name="cil-arrow-top" />
+                          </CButton>
+                          <CButton
+                            color="light"
+                            size="sm"
+                            @click="moveItem(index, 'down')"
+                            :disabled="index === invoiceItems.length - 1"
+                            title="Move Down"
+                          >
+                            <CIcon name="cil-arrow-bottom" />
+                          </CButton>
+                          <CButton
+                            color="light"
+                            size="sm"
+                            @click="onRemoveClaimItem(item)"
+                            title="Remove"
+                          >
+                            <CIcon name="cil-trash" />
+                          </CButton>
+                        </CButtonGroup>
                       </td>
-                    </template>
-
-                    <template #footer>
-                      <td colspan="2">
-                        <CButton @click="addNewItem()" color="primary"
-                          >Add Item</CButton
-                        >
+                    </tr>
+                    <tr v-if="computedInvoiceItems.length === 0">
+                      <td colspan="8" class="text-center py-4">
+                        <div class="text-muted">
+                          <CIcon name="cil-basket" size="xl" />
+                          <p class="mt-2">No items added yet</p>
+                          <CButton
+                            color="primary"
+                            size="sm"
+                            @click="addNewItem()"
+                            >Add Item</CButton
+                          >
+                        </div>
                       </td>
-                      <td colspan="5" class="text-right">
-                        <strong>Grand Total:</strong>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="6" class="text-right font-weight-bold">
+                        Subtotal:
                       </td>
-                      <td>{{ grandTotal.toFixed(2) }}</td>
-                    </template>
-                  </CDataTable>
-                </CCol>
-              </CRow>
-              <CRow>
-                <CCol> </CCol>
-              </CRow>
+                      <td class="font-weight-bold">
+                        {{ formatCurrency(grandTotal) }}
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td colspan="6" class="text-right font-weight-bold">
+                        Tax (0%):
+                      </td>
+                      <td class="font-weight-bold">{{ formatCurrency(0) }}</td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td colspan="6" class="text-right font-weight-bold">
+                        Grand Total:
+                      </td>
+                      <td class="font-weight-bold">
+                        {{ formatCurrency(grandTotal) }}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
 
-              <CRow>
-                <CCol>
-                  <CTextarea
-                    label="Term & Conditions"
-                    v-model="obj.note"
-                    placeholder=""
-                    rows="10"
-                  />
-                </CCol>
-              </CRow>
-            </CCardBody>
-            <CCardFooter>
-              <CButton type="submit" size="sm" color="primary" @click="submit"
-                ><CIcon name="cil-check-circle" /> Submit</CButton
-              >
-              <CButton class="ml-1" color="secondary" @click="cancel">
-                Cancel
-              </CButton>
-            </CCardFooter>
-          </CCard>
-        </CCol>
-      </CRow>
-      <CRow>
-        <CCol>
-          <CCard>
-            <CCardHeader>Preview</CCardHeader>
-            <CCardBody>
+              <!-- Mobile View for Items -->
+              <div class="d-md-none">
+                <div
+                  v-for="(item, index) in computedInvoiceItems"
+                  :key="item.id"
+                  class="mb-3 border rounded p-3"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-2"
+                  >
+                    <h6 class="mb-0">Item #{{ index + 1 }}</h6>
+                    <CButtonGroup>
+                      <CButton
+                        color="light"
+                        size="sm"
+                        @click="moveItem(index, 'up')"
+                        :disabled="index === 0"
+                      >
+                        <CIcon name="cil-arrow-top" />
+                      </CButton>
+                      <CButton
+                        color="light"
+                        size="sm"
+                        @click="moveItem(index, 'down')"
+                        :disabled="index === invoiceItems.length - 1"
+                      >
+                        <CIcon name="cil-arrow-bottom" />
+                      </CButton>
+                      <CButton
+                        color="light"
+                        size="sm"
+                        @click="onRemoveClaimItem(item)"
+                      >
+                        <CIcon name="cil-trash" />
+                      </CButton>
+                    </CButtonGroup>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Product</label>
+                    <v-select
+                      v-model="item.product"
+                      :label="'name'"
+                      :options="computeProductItemsWithAddNew"
+                      placeholder="Select product"
+                      @input="handleProductSelect($event, item)"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Description</label>
+                    <CTextarea
+                      placeholder="Item description"
+                      v-model="item.description"
+                      rows="2"
+                    />
+                  </div>
+
+                  <CRow>
+                    <CCol xs="6">
+                      <div class="form-group">
+                        <label>Quantity</label>
+                        <CInput v-model="item.quantity" type="number" min="1" />
+                      </div>
+                    </CCol>
+                    <CCol xs="6">
+                      <div class="form-group">
+                        <label>Unit</label>
+                        <CInput v-model="item.unit" />
+                      </div>
+                    </CCol>
+                  </CRow>
+
+                  <div class="form-group">
+                    <label>Price</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Rp</span>
+                      </div>
+                      <CInput
+                        v-model="item.price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    class="d-flex justify-content-between mt-2 pt-2 border-top"
+                  >
+                    <div class="text-muted">Total:</div>
+                    <div class="font-weight-bold">
+                      {{ formatCurrency(getTotalItemPrice(item)) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-if="computedInvoiceItems.length === 0"
+                  class="text-center py-4 border rounded"
+                >
+                  <div class="text-muted">
+                    <CIcon name="cil-basket" size="xl" />
+                    <p class="mt-2">No items added yet</p>
+                    <CButton color="primary" size="sm" @click="addNewItem()"
+                      >Add Item</CButton
+                    >
+                  </div>
+                </div>
+
+                <div class="mt-3 p-3 border rounded bg-light">
+                  <div class="d-flex justify-content-between mb-2">
+                    <div>Subtotal:</div>
+                    <div class="font-weight-bold">
+                      {{ formatCurrency(grandTotal) }}
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <div>Tax (0%):</div>
+                    <div class="font-weight-bold">{{ formatCurrency(0) }}</div>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <div class="font-weight-bold">Grand Total:</div>
+                    <div class="font-weight-bold">
+                      {{ formatCurrency(grandTotal) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="mt-4">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">Terms & Conditions</CLabel>
+                <CTextarea
+                  v-model="obj.note"
+                  placeholder="Enter your terms and conditions"
+                  rows="5"
+                />
+              </CFormGroup>
+            </div>
+          </CCardBody>
+          <CCardFooter
+            class="bg-transparent d-flex justify-content-between p-4"
+          >
+            <CButton color="light" @click="cancel"> Cancel </CButton>
+            <CButton color="primary" @click="submit">
+              <CIcon name="cil-check-circle" />
+              {{ obj.id ? "Update Invoice" : "Create Invoice" }}
+            </CButton>
+          </CCardFooter>
+        </CCard>
+      </CCol>
+
+      <!-- Sidebar -->
+      <CCol lg="4">
+        <!-- Invoice Summary -->
+        <CCard class="mb-4 border-0 shadow-sm">
+          <CCardHeader class="bg-transparent border-0 p-4">
+            <h5 class="mb-0">Invoice Summary</h5>
+          </CCardHeader>
+          <CCardBody class="p-4">
+            <div class="d-flex justify-content-between mb-3">
+              <div class="text-muted">Subtotal:</div>
+              <div class="font-weight-bold">
+                {{ formatCurrency(grandTotal) }}
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <div class="text-muted">Tax (0%):</div>
+              <div class="font-weight-bold">{{ formatCurrency(0) }}</div>
+            </div>
+            <!-- Replace CSeparator with a simple horizontal rule -->
+            <hr class="my-3" />
+            <div class="d-flex justify-content-between mb-3">
+              <div class="font-weight-bold">Grand Total:</div>
+              <div class="font-weight-bold h4">
+                {{ formatCurrency(grandTotal) }}
+              </div>
+            </div>
+
+            <CButton color="success" block class="mt-3">
+              <CIcon name="cil-envelope-letter" /> Send to Customer
+            </CButton>
+            <CButton color="light" block class="mt-2">
+              <CIcon name="cil-print" /> Print Invoice
+            </CButton>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
+    <CRow>
+      <CCol
+        ><!-- Invoice Preview -->
+        <CCard class="mb-4 border-0 shadow-sm">
+          <CCardHeader class="bg-transparent border-0 p-4">
+            <h5 class="mb-0">Preview</h5>
+          </CCardHeader>
+          <CCardBody class="p-0">
+            <div class="invoice-preview">
               <WidgetsReportInvoice
                 :invoice="computedPreviewItem"
               ></WidgetsReportInvoice>
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+            </div>
+          </CCardBody> </CCard
+      ></CCol>
+    </CRow>
 
-      <!-- <CRow>
-        <CCol>
-          <WidgetsReportInvoice :invoice="obj"></WidgetsReportInvoice>
-        </CCol>
-      </CRow> -->
-    </div>
-
-    <div>
-      <CModal
-        title="Add New Customer"
-        size="xl"
-        :show.sync="addCustomerFormPopup"
-        @update:show="onCustomerPopupConfirmation"
-      >
-        <CRow form>
-          <CCol md="6">
+    <!-- Add Customer Modal -->
+    <CModal
+      title="Add New Customer"
+      size="lg"
+      :show.sync="addCustomerFormPopup"
+      @update:show="onCustomerPopupConfirmation"
+    >
+      <CRow>
+        <CCol md="6">
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Company Name</CLabel>
             <CInput
-              label="Name"
               v-model="itemAddNewCustomer.name"
               placeholder="Customer Sdn Bhd"
               required
-              was-validated
             />
+          </CFormGroup>
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Contact Name</CLabel>
             <CInput
-              label="Contact Name"
               v-model="itemAddNewCustomer.contactName"
+              placeholder="Contact person name"
             />
+          </CFormGroup>
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Contact Email</CLabel>
             <CInput
-              label="Contact Email"
               v-model="itemAddNewCustomer.contactEmail"
+              placeholder="contact@example.com"
+              type="email"
             />
+          </CFormGroup>
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Contact Phone</CLabel>
             <CInput
-              label="Contact Phone"
               v-model="itemAddNewCustomer.contactPhone"
+              placeholder="+60 12 345 6789"
             />
-          </CCol>
-          <CCol md="6">
+          </CFormGroup>
+        </CCol>
+        <CCol md="6">
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Address</CLabel>
             <CTextarea
-              label="Address"
               placeholder="No. 123, Jalan Example
 Taman Example, 
 12345 Kuala Lumpur,
@@ -345,90 +602,155 @@ Malaysia"
               rows="5"
               v-model="itemAddNewCustomer.address"
               required
-              was-validated
             />
-            <CInput label="City" v-model="itemAddNewCustomer.city" />
-            <CInput label="Country" v-model="itemAddNewCustomer.country" />
-            <CInput label="State" v-model="itemAddNewCustomer.state" />
-            <CInput label="Postcode" v-model="itemAddNewCustomer.postcode" />
-            <CInput label="Phone" v-model="itemAddNewCustomer.phone" />
-            <CInput label="Website" v-model="itemAddNewCustomer.website" />
-          </CCol>
-        </CRow>
-      </CModal>
-
-      <CModal
-        title="Add New Product"
-        size="xl"
-        :show.sync="addPoductFormPopup"
-        @update:show="onProductPopupConfirmation"
-      >
-        <CRow form>
-          <CCol md="12">
-            <CInput label="Name" horizontal v-model="itemAddNewProduct.name" />
-            <CRow form class="form-group">
-              <CCol tag="label" sm="3" class="col-form-label">
-                Description
-              </CCol>
-              <CCol sm="9">
-                <CTextarea
-                  placeholder=""
-                  rows="5"
-                  v-model="itemAddNewProduct.description"
+          </CFormGroup>
+          <CRow>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">City</CLabel>
+                <CInput v-model="itemAddNewCustomer.city" placeholder="City" />
+              </CFormGroup>
+            </CCol>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">Postcode</CLabel>
+                <CInput
+                  v-model="itemAddNewCustomer.postcode"
+                  placeholder="Postcode"
                 />
-              </CCol>
-            </CRow>
-          </CCol>
-        </CRow>
-      </CModal>
-
-
-      <CModal
-        title="Select Chart of Account"
-        size="lg"
-        :show.sync="chooseAccountPopup"
-        @update:show="onAccountPopupConfirmation"
-      >
-        <CRow form>
-          <CCol md="12">
-            <CFormGroup>
-              <template #input>
-                <v-select
-                  style="width: 100%"
-                  v-model="selectedChartAccount"
-                  :label="`itemDisplay`"
-                  :options="filteredChartAccounts"
-                  placeholder="Select COA"
+              </CFormGroup>
+            </CCol>
+          </CRow>
+          <CRow>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">State</CLabel>
+                <CInput
+                  v-model="itemAddNewCustomer.state"
+                  placeholder="State"
                 />
-              </template>
-            </CFormGroup>
+              </CFormGroup>
+            </CCol>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">Country</CLabel>
+                <CInput
+                  v-model="itemAddNewCustomer.country"
+                  placeholder="Country"
+                />
+              </CFormGroup>
+            </CCol>
+          </CRow>
+        </CCol>
+      </CRow>
+      <template #footer>
+        <CButton color="light" @click="addCustomerFormPopup = false">
+          Cancel
+        </CButton>
+        <CButton color="primary" @click="confirmAddCustomer">
+          Add Customer
+        </CButton>
+      </template>
+    </CModal>
 
-            <!-- <CSelect
-              label="Pilih Akaun Perakaunan"
-              v-model="selectedChartAccountId"
-              :options="filteredChartAccounts"
-              option-label="label"
-              option-value="id"
+    <!-- Add Product Modal -->
+    <CModal
+      title="Add New Product"
+      size="lg"
+      :show.sync="addPoductFormPopup"
+      @update:show="onProductPopupConfirmation"
+    >
+      <CRow>
+        <CCol md="12">
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Product Name</CLabel>
+            <CInput
+              v-model="itemAddNewProduct.name"
+              placeholder="Product name"
               required
-              was-validated
-            /> -->
-          </CCol>
-        </CRow>
+            />
+          </CFormGroup>
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Description</CLabel>
+            <CTextarea
+              placeholder="Product description"
+              rows="5"
+              v-model="itemAddNewProduct.description"
+            />
+          </CFormGroup>
+          <CRow>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">Default Price</CLabel>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Rp</span>
+                  </div>
+                  <CInput
+                    v-model="itemAddNewProduct.defaultPrice"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                  />
+                </div>
+              </CFormGroup>
+            </CCol>
+            <CCol sm="6">
+              <CFormGroup>
+                <CLabel class="font-weight-bold">Default Unit</CLabel>
+                <CInput
+                  v-model="itemAddNewProduct.defaultUnit"
+                  placeholder="e.g. pcs, kg, hours"
+                />
+              </CFormGroup>
+            </CCol>
+          </CRow>
+        </CCol>
+      </CRow>
+      <template #footer>
+        <CButton color="light" @click="addPoductFormPopup = false">
+          Cancel
+        </CButton>
+        <CButton color="primary" @click="confirmAddProduct">
+          Add Product
+        </CButton>
+      </template>
+    </CModal>
 
-        <template #footer>
-          <CButton color="secondary" @click="chooseAccountPopup = false"
-            >Cancel</CButton
-          >
-          <CButton
-            color="primary"
-            :disabled="!selectedChartAccount"
-            @click="confirmAccountSelection"
-          >
-            Confirm
-          </CButton>
-        </template>
-      </CModal>
-    </div>
+    <!-- Chart of Account Modal -->
+    <CModal
+      title="Select Chart of Account"
+      size="lg"
+      :show.sync="chooseAccountPopup"
+      @update:show="onAccountPopupConfirmation"
+    >
+      <CRow>
+        <CCol md="12">
+          <CFormGroup>
+            <CLabel class="font-weight-bold">Select Account</CLabel>
+            <v-select
+              v-model="selectedChartAccount"
+              :label="`itemDisplay`"
+              :options="filteredChartAccounts"
+              placeholder="Select Chart of Account"
+            />
+          </CFormGroup>
+        </CCol>
+      </CRow>
+      <template #footer>
+        <CButton color="light" @click="chooseAccountPopup = false">
+          Cancel
+        </CButton>
+        <CButton
+          color="primary"
+          :disabled="!selectedChartAccount"
+          @click="confirmAccountSelection"
+        >
+          Confirm
+        </CButton>
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -443,49 +765,6 @@ import WidgetsReportInvoice from "../widgets/WidgetsReportInvoice";
 import QuotationApi from "@/lib/quotationApi";
 import BusinessApi from "@/lib/businessApi";
 import ChartOfAccountApi from "../../lib/chartOfAccountApi";
-
-const invoiceItems = [];
-// const invoiceFields = [
-//   {
-//     key: "show_index",
-//     label: "#",
-//     _style: "width:1%",
-//     sorter: false,
-//     filter: false,
-//   },
-//   { key: "position", label: "Position" },
-//   // { key: "productName", label: "Item" },
-//   {
-//     key: "show_item",
-//     label: "Item",
-//   },
-//   {
-//     key: "show_description",
-//     label: "Description",
-//   },
-//   {
-//     key: "show_quantity",
-//     label: "Quantity",
-//     _style: "width:100px",
-//   },
-//   {
-//     key: "show_price",
-//     label: "Price",
-//     _style: "width:100px",
-//   },
-//   {
-//     key: "show_total",
-//     label: "Total",
-//   },
-//   {
-//     key: "show_move",
-//     _style: "width:1%",
-//   },
-//   {
-//     key: "show_remove",
-//     _style: "width:1%",
-//   },
-// ];
 
 export default {
   name: "Invoice",
@@ -522,14 +801,12 @@ export default {
         items: [],
         note: "",
       },
-      // invoicePreviewPopup: false,
       invoiceStatuses: [],
       issuedDate: Date(),
       expiryDate: Date(),
-      // Invoice Itm
-      invoiceItems: invoiceItems.map((item, id) => {
-        return { ...item, id };
-      }),
+
+      // Invoice Items
+      invoiceItems: [],
 
       invoiceFields: [
         {
@@ -539,8 +816,6 @@ export default {
           sorter: false,
           filter: false,
         },
-        // { key: "position", label: "Position" },
-        // { key: "productName", label: "Item" },
         {
           key: "show_item",
           label: "Item",
@@ -625,23 +900,17 @@ export default {
       else return [];
     },
     computeProductItemsWithAddNew() {
-      return [
-        ...this.productItems,
-        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
-      ];
+      return [...this.productItems, { id: "add_new", name: "-- Add New --" }];
     },
 
     customerItemsWithAddNew() {
-      return [
-        ...this.customerItems,
-        { id: "add_new", name: "-- Add New --" }, // Fixed "Add New" option
-      ];
+      return [...this.customerItems, { id: "add_new", name: "-- Add New --" }];
     },
     computedPreviewItem() {
       return {
         ...this.obj,
         items: this.computedInvoiceItems,
-        expiryDate: this.expiryDate, // Add this line to include the expiry date
+        expiryDate: this.expiryDate,
       };
     },
     computeExpiryDate() {
@@ -670,6 +939,15 @@ export default {
     },
   },
   methods: {
+    formatCurrency(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount);
+    },
+
     fetchChartOfAccount() {
       var self = this;
       self.chartOfAccountApi
@@ -680,6 +958,7 @@ export default {
         })
         .catch(({ data }) => {});
     },
+
     onProductPopupConfirmation(status, evt, accept) {
       if (accept) {
         this.productApi
@@ -689,17 +968,33 @@ export default {
             var addedProduct = response.result;
             this.refreshProduct();
             this.itemPendingNewProduct.product = addedProduct;
-
-            // self.$router.push({ path: "/tenants/customerList" });
           })
           .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
+            this.toast("Error", helper.getErrorMessage(data), "danger");
           });
       } else {
         this.itemPendingNewProduct.product = null;
       }
       this.itemAddNewProduct = {};
     },
+
+    confirmAddProduct() {
+      this.productApi
+        .create(this.itemAddNewProduct)
+        .then((response) => {
+          var addedProduct = response.result;
+          this.refreshProduct();
+          if (this.itemPendingNewProduct) {
+            this.itemPendingNewProduct.product = addedProduct;
+          }
+          this.toast("Success", "Product added successfully", "success");
+          this.addPoductFormPopup = false;
+        })
+        .catch(({ data }) => {
+          this.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
     handleProductSelect(selected, item) {
       if (selected.id === "add_new") {
         this.itemPendingNewProduct = item;
@@ -723,24 +1018,37 @@ export default {
             var addedCustomer = response.result;
             this.refreshCustomer();
             this.selectedCustomer = addedCustomer;
-
-            // self.$router.push({ path: "/tenants/customerList" });
           })
           .catch(({ data }) => {
-            self.toast("Error", helper.getErrorMessage(data), "danger");
+            this.toast("Error", helper.getErrorMessage(data), "danger");
           });
       }
       this.itemAddNewCustomer = {};
     },
+
+    confirmAddCustomer() {
+      this.customerApi
+        .create(this.itemAddNewCustomer)
+        .then((response) => {
+          var addedCustomer = response.result;
+          this.refreshCustomer();
+          this.selectedCustomer = addedCustomer;
+          this.toast("Success", "Customer added successfully", "success");
+          this.addCustomerFormPopup = false;
+        })
+        .catch(({ data }) => {
+          this.toast("Error", helper.getErrorMessage(data), "danger");
+        });
+    },
+
     handleCustomerSelect(selected) {
       if (selected.id === "add_new") {
-        // Trigger action to add a new customer
         this.addNewCustomer();
-        this.selectedCustomer = null; // Reset selection
+        this.selectedCustomer = null;
       }
     },
     addNewCustomer() {
-      this.selectedCustomer = null; // Reset selection
+      this.selectedCustomer = null;
       this.itemAddNewCustomer = {};
       this.addCustomerFormPopup = true;
     },
@@ -750,7 +1058,6 @@ export default {
     changeState(item) {
       this.pendingStatusChange = item;
       if (item.name === "Paid" || item.name === "Cancelled") {
-        // Filter accounts by type
         const type = item.name === "Paid" ? "Asset" : "Income";
         this.filteredChartAccounts = this.chartOfAccountItems.filter(
           (a) => a.accountTypeDescription === type
@@ -760,7 +1067,6 @@ export default {
       } else {
         this.proceedChangeState(null); // Auto for Approve, etc.
       }
-
     },
     onAccountPopupConfirmation(visible) {
       this.chooseAccountPopup = visible;
@@ -775,17 +1081,14 @@ export default {
       var self = this;
       self.obj.status = self.pendingStatusChange.id;
       let accountId = null;
-      if(account != null)
-      accountId = account.id;
-      // self.obj.selectedAccountId = account.id;
-
-      // self.obj.status = item.id;
+      if (account != null) accountId = account.id;
 
       if (self.obj.id) {
         this.api
           .updateState(self.obj, accountId)
           .then((response) => {
             self.resetObj();
+            self.toast("Success", "Invoice status updated", "success");
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -802,31 +1105,25 @@ export default {
         .getInvoiceStatus()
         .then((response) => {
           this.invoiceStatuses = response.result;
-          console.log(this.invoiceStatuses);
         })
         .catch(({ data }) => {
           self.toast("Error", helper.getErrorMessage(data), "danger");
         });
     },
 
-    // preview() {
-    //   this.previewObj = this.obj;
-    //   this.previewObj.items = this.computedInvoiceItems;
-    //   this.invoicePreviewPopup = true;
-    // },
     getBadgeClass() {
       if (this.obj.statusDescription == "Draft") {
-        return "badge badge-secondary ml-1";
+        return "badge badge-secondary";
       } else if (this.obj.statusDescription == "Accepted") {
-        return "badge badge-primary ml-1";
+        return "badge badge-primary";
       } else if (this.obj.statusDescription == "Sent") {
-        return "badge badge-success ml-1";
+        return "badge badge-success";
       } else if (this.obj.statusDescription == "Rejected") {
-        return "badge badge-warning ml-1";
+        return "badge badge-warning";
       } else if (this.obj.statusDescription == "Cancelled") {
-        return "badge badge-danger ml-1";
+        return "badge badge-danger";
       } else {
-        return "badge badge-secondary ml-1";
+        return "badge badge-secondary";
       }
     },
     setExpiryDate(e) {
@@ -858,23 +1155,10 @@ export default {
       }
     },
 
-    // moveItem(index, direction) {
-    //   const newIndex = direction === "up" ? index - 1 : index + 1;
-    //   if (newIndex >= 0 && newIndex < this.computedInvoiceItems.length) {
-    //     const temp = this.computedInvoiceItems[index];
-    //     this.$set(this.computedInvoiceItems, index, this.invoiceItems[newIndex]);
-    //     this.$set(this.computedInvoiceItems, newIndex, temp);
-    //   }
-    // },
-    // onProductChange(item, product) {
-    //   alert("asdasd");
-    //   console.log(item);
-    //   console.log(product);
-    // },
     onRemoveClaimItem(item) {
       var self = this;
       if (self.invoiceItems != null) {
-        for (var i = 0; i < self.invoiceItems.length; i++) {
+        for (let i = 0; i < self.invoiceItems.length; i++) {
           if (self.invoiceItems[i].id === item.id) {
             self.invoiceItems.splice(i, 1);
           }
@@ -898,7 +1182,8 @@ export default {
       const newPosition = this.invoiceItems.length + 1;
       this.invoiceItems.push({
         id: this.generateGUID(),
-        product: this.productItems[0],
+        product:
+          this.productItems.length > 0 ? this.productItems[0] : { name: "" },
         price: 0,
         quantity: 1,
         unit: "L.S.",
@@ -930,13 +1215,6 @@ export default {
         .getListByCurrentBusiness()
         .then((response) => {
           self.customerItems = response.result;
-
-          // for (let i = 0; i < response.result.length; i++) {
-          //   self.customerItems.push({
-          //     value: response.result[i].id,
-          //     label: response.result[i].name,
-          //   });
-          // }
         })
         .catch(({ data }) => {});
     },
@@ -947,7 +1225,6 @@ export default {
         .then((response) => {
           self.obj = self.getEmptyObj();
           var item = response.result;
-          console.log("item", item);
           let currentDate = new Date();
           this.issuedDate = new Date(
             currentDate.toISOString().split("T")[0] + "T00:00:00"
@@ -959,13 +1236,6 @@ export default {
 
           self.selectedCustomer = item.quotation.customer;
 
-          // if (quotation.items.length > 0) {
-          //   if (quotation.items[0].position == 0) {
-          //     for (var i = 0; i < quotation.items.length; i++) {
-          //       quotation.items[i].position = i + 1;
-          //     }
-          //   }
-          // }
           this.obj.items.push({
             id: this.generateGUID(),
             product: item.product,
@@ -976,7 +1246,6 @@ export default {
           });
 
           this.invoiceItems = this.obj.items;
-          console.log(this.invoiceItems);
 
           this.api
             .getNextNumber()
@@ -985,11 +1254,6 @@ export default {
             })
             .catch(({ data }) => {});
 
-          // for (var i = 0; i < self.obj.items.length; i++) {
-          //   delete self.obj.items[i].id;
-          // }
-
-          // Optionally modify any other fields if required
           this.toast(
             "Info",
             "You are convert quotation item to invoice.",
@@ -1020,7 +1284,7 @@ export default {
 
           if (quotation.items.length > 0) {
             if (quotation.items[0].position == 0) {
-              for (var i = 0; i < quotation.items.length; i++) {
+              for (let i = 0; i < quotation.items.length; i++) {
                 quotation.items[i].position = i + 1;
               }
             }
@@ -1031,13 +1295,11 @@ export default {
           this.api
             .getNextNumber()
             .then((response) => {
-              console.log(response.result);
               self.obj.invoiceNumber = response.result;
-              console.log(self.obj);
             })
             .catch(({ data }) => {});
 
-          for (var i = 0; i < self.obj.items.length; i++) {
+          for (let i = 0; i < self.obj.items.length; i++) {
             delete self.obj.items[i].id;
           }
 
@@ -1055,14 +1317,13 @@ export default {
           .get(self.$route.params.id)
           .then((response) => {
             self.obj = response.result;
-            console.log(self.obj);
             this.issuedDate = self.obj.issuedDate;
             this.expiryDate = self.obj.dueDate;
             self.selectedCustomer = self.obj.customer;
 
             if (self.obj.items.length > 0) {
               if (self.obj.items[0].position == 0) {
-                for (var i = 0; i < self.obj.items.length; i++) {
+                for (let i = 0; i < self.obj.items.length; i++) {
                   self.obj.items[i].position = i + 1;
                 }
               }
@@ -1089,17 +1350,13 @@ export default {
           .getNextNumber()
           .then((response) => {
             self.obj.invoiceNumber = response.result;
-            console.log(self.obj.invoiceNumber);
           })
           .catch(({ data }) => {});
 
         this.businessApi
           .getCurrentActiveBusiness()
           .then((response) => {
-            console.log(response.result);
-            console.log(response.result.invoiceDefaultFooter);
             self.obj.note = response.result.invoiceDefaultFooter;
-            // console.log(self.obj);
           })
           .catch(({ data }) => {});
       }
@@ -1140,7 +1397,6 @@ export default {
 
       if (self.grandTotal == 0) {
         self.toast("Error", "Amount is zero.", "danger");
-
         return;
       }
 
@@ -1148,14 +1404,11 @@ export default {
         this.api
           .create(self.obj)
           .then((response) => {
-            self.toast("Success", "Updated", "success");
+            self.toast("Success", "Invoice created successfully", "success");
             var newObj = response.result;
             self.$router.push({
               path: `/tenants/Invoice/${newObj.id}`,
             });
-
-            self.resetObj();
-            // self.$router.push({ path: "/tenants/invoiceList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
@@ -1164,17 +1417,13 @@ export default {
         this.api
           .update(self.obj)
           .then((response) => {
-            self.toast("Success", "Updated", "success");
+            self.toast("Success", "Invoice updated successfully", "success");
             self.resetObj();
-            //  self.$router.push({ path: "/tenants/invoiceList" });
           })
           .catch(({ data }) => {
             self.toast("Error", helper.getErrorMessage(data), "danger");
           });
       }
-    },
-    onReset() {
-      this.obj = {};
     },
     toast(header, message, color) {
       var self = this;
@@ -1184,29 +1433,10 @@ export default {
         color: color,
       });
     },
-
-    checkIfValid(fieldName) {
-      const field = this.$v.obj[fieldName];
-      if (!field.$dirty) {
-        return null;
-      }
-      return !(field.$invalid || field.$model === "");
-    },
-    validate() {
-      this.$v.$touch();
-    },
-    reset() {
-      this.resetObj();
-      this.submitted = false;
-      this.$v.$reset();
-    },
     getEmptyObj() {
       return {
         invoiceNumber: "",
         items: [],
-        // code: "",
-        // name: "",
-        // decsription: "",
       };
     },
     submit() {
@@ -1218,8 +1448,36 @@ export default {
 </script>
 
 <style scoped>
-.table {
-  width: 100%;
-  margin-top: 20px;
+.customer-details {
+  transition: all 0.3s ease;
+}
+
+.invoice-preview {
+  transform: scale(0.8);
+  transform-origin: top center;
+  overflow: hidden;
+  border: 1px solid #ebedef;
+  border-radius: 0.25rem;
+}
+
+/* Custom styling for mobile view */
+@media (max-width: 767.98px) {
+  .table-responsive {
+    display: none;
+  }
+
+  .invoice-preview {
+    transform: scale(0.7);
+  }
+}
+
+@media (min-width: 768px) {
+  .d-md-none {
+    display: none;
+  }
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(135deg, #321fdb 0%, #1f67db 100%);
 }
 </style>

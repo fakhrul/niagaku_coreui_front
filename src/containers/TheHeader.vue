@@ -37,19 +37,18 @@
           <CIcon v-else name="cil-moon" />
         </button>
       </CHeaderNavItem>
-      <!-- -->
-      <!--   <TheHeaderDropdownNotif/> -->
-      <!--<TheHeaderDropdownTasks/>
-      <TheHeaderDropdownMssgs/> -->
+        <TheHeaderDropdownNotif/>
+      <TheHeaderDropdownTasks/>
+      <TheHeaderDropdownMssgs/>
       <TheHeaderDropdownAccnt />
-      <!-- <CHeaderNavItem class="px-3">
+      <CHeaderNavItem class="px-3">
         <button
           class="c-header-nav-btn"
           @click="$store.commit('toggle', 'asideShow')"
         >
           <CIcon size="lg" name="cil-applications-settings" class="mr-2"/>
         </button>
-      </CHeaderNavItem> -->
+      </CHeaderNavItem>
     </CHeaderNav>
 
     <!-- <CSubheader class="px-3">

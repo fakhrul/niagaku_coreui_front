@@ -35,6 +35,19 @@ import {
 
 
 import {
+  cilArrowTop,
+  cilArrowBottom,
+  cilDescription,
+
+  cilAlarm,
+  cilSwapHorizontal,
+  cilFilter,
+  cilChart,
+  cilPlus,
+  cilNoteAdd,
+  cilArrowThickToTop,
+  cilArrowThickFromBottom,
+  cilSync,
   cilPen,
   cilLockUnlocked,
   cilRestaurant,
@@ -146,6 +159,18 @@ import { logo } from './logo'
 
 
 export const iconsSet = Object.assign({}, { logo }, {
+  cilArrowTop,
+  cilArrowBottom,
+  cilDescription,
+  cilAlarm,
+  cilSwapHorizontal,
+  cilFilter,
+  cilChart,
+  cilPlus,
+  cilNoteAdd,
+  cilArrowThickToTop,
+  cilArrowThickFromBottom,
+  cilSync,
   cilPen,
   cilLockUnlocked,
   cilRestaurant,
